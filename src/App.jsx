@@ -5,6 +5,7 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import NavBar from './components/navbar'
 import MenuDrawer from './components/menuDrawer'
+import WelcomeBanner from './components/welcomeBanner'
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +22,9 @@ function App() {
       </header>
 
       {/* Menu Drawer */}
-      <MenuDrawer isOpen={isMenuOpen} closeMenu={() => setIsMenuOpen(false)} /> 
+      <MenuDrawer isOpen={isMenuOpen} closeMenu={() => setIsMenuOpen(false)} />
+
+      <WelcomeBanner />
 
       {/* Your Page Content Goes Here */}
       <main className="p-8">
