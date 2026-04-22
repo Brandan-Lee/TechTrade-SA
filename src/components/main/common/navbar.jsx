@@ -9,6 +9,7 @@ export default function NavBar({ toggleMenu }) {
         "Sell your Gear",
         "Build Doctor",
         "Login/Register",
+        "Contact Us",
         "More"
     ]
 
