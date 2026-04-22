@@ -1,5 +1,5 @@
 import React from "react";
-import ListingCard from "../../ListingCard";
+import ListingCard from "../../ListingCard.jsx";
 
 export default function FeaturedListings() {
     const listings = [

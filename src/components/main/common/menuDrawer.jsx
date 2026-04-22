@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function MenuDrawer({ isOpen, closeMenu }) {
-    const [activeIndex, setActiveIndex] = useState(null);
+    const location = useLocation();
     
     const menuItems = [
-        "About Us",
-        "Main Marketplace",
-        "Sell Your Gear",
-        "Build Doctor",
-        "My Offers",
-        "divider",
-        "Settings",
-        "Contact Us",
-        "Log in/Register"
+        { name: "Home", path: "/" },
+        { name: "About Us", path: "/about" },
+        { name: "Main Marketplace", path: "/market" },
+        { name: "Sell Your Gear", path: "/sell" },
+        { name: "Build Doctor", path: "/build-doctor" },
+        { name: "My Offers", path: "/offers" },
+        { name: "divider", path: null },
+        { name: "Settings", path: "/settings" },
+        { name: "Contact Us", path: "/contact" },
+        { name: "Log in/Register", path: "/login" }
     ];
 
     return (
@@ -45,24 +47,20 @@ export default function MenuDrawer({ isOpen, closeMenu }) {
                                 return <div key={index} className='w-56 h-px my-2 border-t border-violet-800' />;
                             }
 
-                            const isActive = activeIndex === index;
+                            const isActive = location.pathname === item.path;
 
                             return (
-                                <button
-                                    key={index}
-                                    onClick={() => setActiveIndex(index)}
+                                <Link key={index}
+                                    to={item.path}
+                                    onClick={closeMenu}
                                     className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden 
                                         ${isActive
                                             ? 'bg-white/30 shadow-inner translate-x-[-8px] scale-105'
                                             : 'hover:bg-white/10'
                                         }`}
-                                    >
-                                        {/* Left accent bar that appears when clicked */}
-                                        {isActive && (
-                                            <div className="absolute left-0 w-1.5 h-full bg-violet-800" />
-                                        )}
-                                        <span className={isActive ? 'pl-2' : ''}>{item}</span>
-                                    </button>
+                                >
+                                    <span className={isActive ? 'pl-2' : ''}>{item.name}</span>
+                                </Link>
                             )
                         })}
                     </nav>

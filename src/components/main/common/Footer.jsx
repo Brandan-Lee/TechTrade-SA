@@ -1,5 +1,6 @@
 import React from "react";
 import { ShieldCheck, Lock, Globe, Zap, ShieldAlert } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
     const steps = [
@@ -17,10 +18,15 @@ export default function Footer() {
     ];
 
     const navigationLinks = [
-        "Privacy Policy",
-        "About Us",
-        "Contact Support",
-        "Terms of Service",
+        { name: "About Us", path: "/about" },
+        { name: "Privacy Policy", path: "/privacy" },
+        { name: "Contact Support", path: "/contact" },
+        { name: "Terms of Service", path: "/terms" },
+        { name: "Marketplace", path: "/market" },
+        { name: "Sell your Gear", path: "/sell" },
+        { name: "Build Doctor", path: "/build-doctor" },
+        { name: "Login/Register", path: "/login" },
+        { name: "Contact Us", path: "/contact" },
     ];
 
     return (
@@ -88,11 +94,12 @@ export default function Footer() {
                 {/* Navigation Links */}
                 <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center border-t-2 border-b-2 border-pink-500/20 py-8 mb-10`}>
                     {navigationLinks.map((link) => (
-                        <a key={link}
-                            href="#"
-                            className="text-sm font-bold uppercase tracking-tight hover:text-pink-400 transition-colors py-2">
-                                {link}
-                        </a>
+                        <Link key={link.name}
+                            to={link.path}
+                            className="text-sm font-bold uppercase tracking-tight hover:text-pink-400 transition-colors py-2"
+                        >
+                            {link.name}
+                        </Link>
                     ))}       
                 </div>
 
