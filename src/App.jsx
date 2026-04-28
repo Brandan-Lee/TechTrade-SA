@@ -7,6 +7,7 @@ import Home from './pages/main/Home';
 import About from './pages/main/About';
 import ScrollToTop from './components/main/common/ScrollToTop';
 import Market from './pages/main/Market';
+import SellGear from './pages/main/SellGear';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,6 +23,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path='about' element={<About />} />
           <Route path='marketplace' element={<Market />} />
+          <Route path='sell' element={<SellGear />} />
         </Route>
       </Routes>
     </BrowserRouter>

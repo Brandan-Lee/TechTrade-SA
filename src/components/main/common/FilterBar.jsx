@@ -171,7 +171,7 @@ export default function FilterBar() {
                                 >
                                     {dropdown.id === 'price' && <Banknote className="w-4 h-4" />}
                                     {dropdown.label}
-                                    <ChevronDown className="w-3 h-3" />
+                                     <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === dropdown.id ? "rotate-180" : ""}`} />
                                 </button>
                             )
                         })}
