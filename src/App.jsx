@@ -8,6 +8,7 @@ import About from './pages/main/About';
 import ScrollToTop from './components/main/common/ScrollToTop';
 import Market from './pages/main/Market';
 import SellGear from './pages/main/SellGear';
+import BuildDoctor from './pages/main/BuildDoctor';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,6 +25,7 @@ function App() {
           <Route path='about' element={<About />} />
           <Route path='marketplace' element={<Market />} />
           <Route path='sell' element={<SellGear />} />
+          <Route path='build-doctor' element={<BuildDoctor />} />
         </Route>
       </Routes>
     </BrowserRouter>
