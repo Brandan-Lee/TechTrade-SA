@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import ListingCard from "../../ListingCard.jsx";
 
 export default function FeaturedListings() {
@@ -54,11 +55,19 @@ export default function FeaturedListings() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                {listings.map((item, index) => (
-                    <ListingCard key={index} {...item} />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {listings.map((item, index) => (
+                    <ListingCard key={index}
+                                {...item}
+                                isFeatured={true} 
+                    />
                 ))}
-            </div>
+            </motion.div>
         </div>
     </section>
   )

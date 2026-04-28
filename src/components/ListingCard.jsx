@@ -1,7 +1,7 @@
 import React from "react";
 import { MapPin, User, Zap, Award } from "lucide-react";
 
-export default function ListingCard({ title, price, seller, location, status, condition, image, badgeColor}) {
+export default function ListingCard({ title, price, seller, location, status, condition, image, isFeatured = false}) {
     const statusStyles = {
         "Available Now": "bg-green-100 outline-emerald-500 text-emerald-500",
         "Offer Received": "bg-amber-100 outline-amber-500 text-amber-500",
@@ -15,10 +15,12 @@ export default function ListingCard({ title, price, seller, location, status, co
                 <img src={image} alt={title} className="w-full h-full object-cover" />
 
                 {/* Featured Badge */}
-                <div className={`absolute top-3 left-3 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg shadow-md flex items-center gap-1.5 z-10`}>
-                    <Award className="w-3.5 h-3.5 text-white" />
-                    <span className="text-white text-xs font-black tracking-tight">Featured</span>
-                </div>
+                {isFeatured && (
+                    <div className={`absolute top-3 left-3 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg shadow-md flex items-center gap-1.5 z-10`}>
+                        <Award className="w-3.5 h-3.5 text-white" />
+                        <span className="text-white text-xs font-black tracking-tight">Featured</span>
+                    </div>
+                )}
 
                 {/* Condition Badge */}
                 <div className={`absolute top-3 right-3 px-3 py-2 bg-white/95 rounded-lg shadow-md text-gray-800 text-xs font-bold`}>

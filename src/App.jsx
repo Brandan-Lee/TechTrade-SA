@@ -6,6 +6,7 @@ import MainLayout from './components/MainLayout';
 import Home from './pages/main/Home';
 import About from './pages/main/About';
 import ScrollToTop from './components/main/common/ScrollToTop';
+import Market from './pages/main/Market';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +21,7 @@ function App() {
         <Route path='/' element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path='about' element={<About />} />
+          <Route path='marketplace' element={<Market />} />
         </Route>
       </Routes>
     </BrowserRouter>
