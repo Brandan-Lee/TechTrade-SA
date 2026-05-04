@@ -28,8 +28,8 @@ export default function SearchBar({ className }) {
                 <button
                     onClick={() => setSearchTerm("")}
                     className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-bold'>
-                        CLEAR
-                    </button>
+                    CLEAR
+                </button>
             )}
         </div>
     );

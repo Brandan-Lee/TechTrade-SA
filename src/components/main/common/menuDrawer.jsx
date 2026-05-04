@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-export default function MenuDrawer({ isOpen, closeMenu }) {
+export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
     const location = useLocation();
     
     const menuItems = [
@@ -15,7 +15,7 @@ export default function MenuDrawer({ isOpen, closeMenu }) {
         { name: "divider", path: null },
         { name: "Settings", path: "/settings" },
         { name: "Contact Us", path: "/contact" },
-        { name: "Log in/Register", path: "/login" }
+        { name: "Log in/Register", path: "/login", isModal: true  }
     ];
 
     return (
@@ -43,11 +43,31 @@ export default function MenuDrawer({ isOpen, closeMenu }) {
                     {/* Navigation Links */}
                     <nav className='flex flex-col items-end gap-[-3px]'>
                         {menuItems.map((item, index) => {
-                            if (item === "divider") {
+                            if (item.name === "divider") {
                                 return <div key={index} className='w-56 h-px my-2 border-t border-violet-800' />;
                             }
 
                             const isActive = location.pathname === item.path;
+
+                            if (item.isModal) {
+                                return (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            closeMenu();
+                                            onSwitchToLogin();
+                                        }}
+                                        className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden 
+                                        ${isActive
+                                            ? 'bg-white/30 shadow-inner translate-x-[-8px] scale-105'
+                                            : 'hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <span className={isActive ? 'pl-2' : ''}>{item.name}</span>
+                                    </button>
+
+                                )
+                            }
 
                             return (
                                 <Link key={index}

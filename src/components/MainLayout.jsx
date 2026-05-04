@@ -25,7 +25,7 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen }) {
                 isOpen={isMenuOpen}
                 closeMenu={closeMenu}
                 // Pass openLogin here so mobile users can log in too!
-                onLoginClick={openLogin} 
+                onSwitchToLogin={openLogin} 
             />
             
             {/* Constant Top Components */}

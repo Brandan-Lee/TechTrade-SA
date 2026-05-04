@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, X, ArrowLeft } from 'lucide-react';
 import AuthHeader from './AuthHeader';
 
-export const LoginModal = ({ isOpen, onClose }) => {
+export const LoginModal = ({ isOpen, onClose, onSwitchToForgot, onSwitchToRegister }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
 
@@ -33,27 +33,29 @@ export const LoginModal = ({ isOpen, onClose }) => {
 
         {/* Mobile Form: */}
         <div className="flex-grow p-8 space-y-8 overflow-y-auto">
+          <div className="w-full px-6 md:px-10 py-8">
+            <h1 className="text-purple-600 text-5xl font-black uppercase tracking-tighter">
+              User Login
+            </h1>
+          </div>
+
           <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="w-full px-6 md:px-10 py-8">
-                  <h1 className="text-purple-600 text-5xl font-black uppercase tracking-tighter">
-                      User Login
-                  </h1>
-              </div>
+            <div className="space-y-2">
               <label className="text-violet-600 text-[10px] font-black uppercase tracking-[0.2em] ml-1">Email Address</label>
               <input 
                 type="email" 
                 placeholder="you@company.com" 
-                className="w-full h-14 bg-slate-100 rounded-xl px-4 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-600 transition-all text-400" 
+                className="w-full h-14 bg-slate-100 rounded-xl px-4 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-600 transition-all text-gray-400" 
               />
             </div>
+
             <div className="space-y-2">
               <label className="text-violet-600 text-[10px] font-black uppercase tracking-[0.2em] ml-1">Password</label>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
                   placeholder="••••••••" 
-                  className="w-full h-14 bg-slate-100 rounded-xl px-4 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-600 transition-all text-400" 
+                  className="w-full h-14 bg-slate-100 rounded-xl px-4 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-600 transition-all text-gray-400" 
                 />
                 <button 
                   onClick={() => setShowPassword(!showPassword)} 
@@ -62,7 +64,13 @@ export const LoginModal = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
-            <button className="text-violet-800 text-xs font-bold uppercase tracking-widest w-full text-right py-2">Forgot Password?</button>
+
+            <button 
+              onClick={onSwitchToForgot}
+              className="text-violet-800 text-xs font-bold uppercase tracking-widest w-full text-right py-2"
+            >
+              Forgot Password?
+            </button>
           </div>
 
           <button className="w-full h-16 bg-gradient-to-r from-violet-800 to-purple-600 rounded-2xl outline outline-2 outline-pink-600 text-white font-black text-lg shadow-xl shadow-purple-500/20">
@@ -139,10 +147,21 @@ export const LoginModal = ({ isOpen, onClose }) => {
             </div>
 
             <div className="space-y-6">
+              <div className="space-y-2">
+                <button 
+                  onClick={onSwitchToForgot}
+                  className="text-violet-800 text-xs font-bold uppercase tracking-widest w-full text-right py-2"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-6">
               <button className="w-full h-14 bg-gradient-to-r from-violet-800 to-purple-600 rounded-xl outline outline-2 outline-pink-600 text-white font-black tracking-widest hover:brightness-110 transition-all">LOG IN</button>
 
               <div className="flex flex-col items-center gap-4 pt-4 border-t border-slate-100">
-                <span className='text-slate-400 text-xs font-bold uppercase'>Don't have an account?</span>
+                <span className='text-slate-400 text-xs font-bold uppercase'>New To TechTrade?</span>
                 <button className="text-violet-800 text-[10px] font-black uppercase tracking-[0.2em]">Register Account</button>
               </div>
             </div>
