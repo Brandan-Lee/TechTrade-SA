@@ -9,9 +9,11 @@ import ScrollToTop from './components/main/common/ScrollToTop';
 import Market from './pages/main/Market';
 import SellGear from './pages/main/SellGear';
 import BuildDoctor from './pages/main/BuildDoctor';
+import Login from './components/main/authentication/Login'; 
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
@@ -19,8 +21,20 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
+      
       <Routes>
-        <Route path='/' element={<MainLayout />}>
+        {/* Pass the login trigger to MainLayout so the Navbar can use it */}
+        <Route 
+          path='/' 
+          element={
+            <MainLayout 
+              openLogin={() => setIsLoginOpen(true)} 
+              isMenuOpen={isMenuOpen} 
+              setIsMenuOpen={setIsMenuOpen} 
+            />
+          }
+        >
           <Route index element={<Home />} />
           <Route path='about' element={<About />} />
           <Route path='marketplace' element={<Market />} />
@@ -28,8 +42,14 @@ function App() {
           <Route path='build-doctor' element={<BuildDoctor />} />
         </Route>
       </Routes>
+
+      {/* The Login Modal sits outside the Routes so it can overlay any page */}
+      <Login 
+        isOpen={isLoginOpen} 
+        onClose={() => setIsLoginOpen(false)} 
+      />
     </BrowserRouter>
   )
 }
 
-export default App
+export default App;

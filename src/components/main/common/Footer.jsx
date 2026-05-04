@@ -1,6 +1,7 @@
 import React from "react";
 import { ShieldCheck, Lock, Globe, Zap, ShieldAlert } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from '../../../assets/logo.png';
 
 export default function Footer() {
     const steps = [
@@ -108,7 +109,7 @@ export default function Footer() {
                     <div className="flex items-center gap-4">
                         <div className="relative">
                             <div className="absolute inset-0 bg-pink-500 blur-2xl opacity-40 rounded-full" />
-                            <img src="/logo.png" alt="TechTrade SA Logo" className="w-10 h-10 lg:w-16 lg:h-16 object-contain" />
+                            <img src={logo} alt="TechTrade SA Logo" className="w-10 h-10 lg:w-16 lg:h-16 object-contain" />
                         </div>
                         <h3 className="text-3xl font-black italic tracking-tighter uppercase">TechTrade SA</h3>
                     </div>

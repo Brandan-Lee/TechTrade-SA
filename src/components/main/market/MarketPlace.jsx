@@ -22,11 +22,11 @@ export default function MarketPlace() {
     const fetchAndFilter = async () => {
         setLoading(true);
 
-        // 1. Grab the state from the URL
+        //Grab the state from the URL
         const state = location.state;
         const activeFilters = state?.appliedFilters;
 
-        // 2. THE FIX: Explicitly check if state is missing or filters are cleared
+        //Explicitly check if state is missing or filters are cleared
         const hasNoFilters = !activeFilters || 
             Object.values(activeFilters).every(v => v === null || v === "");
 

@@ -10,28 +10,28 @@ export default function TrustedSellers() {
     ];
 
     return (
-            <section className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 py-12 px-4">
-                <div className="max-w-[1440px] mx-auto">
-                    {/* Header Section */}
-                    <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                        <div>
-                            <div className="flex items-center gap-3">
-                                <h2 className="text-white text-3xl font-black">Trusted Sellers</h2>
-                            </div>
-                            <p className="text-purple-100/70 text-sm mt-1">Elite Verified Merchants</p>
-                            <button className="text-white text-xs font-bold border-b border-pink-500 pb-1">VIEW ALL SELLERS</button>
+        <section className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 py-12 px-4">
+            <div className="max-w-[1440px] mx-auto">
+                {/* Header Section */}
+                <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-white text-3xl font-black">Trusted Sellers</h2>
                         </div>
-                    </div>
-
-                    {/* Scrollable Container */}
-                    <div className="flex overflow-x-auto gap-6 pb-8 no-scrollbar snap-x touch-pan-x">
-                        {sellers.map((seller, index) => (
-                            <div key={index} className='snap-start'>
-                                <TrustedSellerCard {...seller} />
-                            </div>
-                        ))}
+                            
+                        <p className="text-purple-100/70 text-sm mt-1">Elite Verified Merchants</p>
                     </div>
                 </div>
-            </section>
+
+                {/* Scrollable Container */}
+                <div className="flex overflow-x-auto gap-6 pb-8 no-scrollbar snap-x touch-pan-x">
+                    {sellers.map((seller, index) => (
+                        <div key={index} className='snap-start'>
+                            <TrustedSellerCard {...seller} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
     );
 }
