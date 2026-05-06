@@ -12,6 +12,7 @@ import BuildDoctor from './pages/main/BuildDoctor';
 import LoginModal from './components/main/authentication/LoginModal';
 import RegisterModal from './components/main/authentication/RegisterModal';
 import ForgotModal from './components/main/authentication/ForgotModal';
+import OTPModal from './components/main/authentication/OTPModal';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +20,8 @@ function App() {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isOTPOpen, setIsOTPOpen] = useState(false);
+  const [isResetOpen, setIsResetOpen] = useState(false);
+
 
   useEffect(() => {
     document.body.style.overflow = (isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen) ? 'hidden' : 'unset';
@@ -32,6 +35,7 @@ function App() {
   const switchToLogin = () => {
     setIsRegisterOpen(false);
     setIsForgotOpen(false);
+    setIsOTPOpen(false);
     setIsLoginOpen(true);
   }
 
@@ -40,9 +44,14 @@ function App() {
     setIsForgotOpen(true);
   }
 
-  const SwitchToOTP = () => {
+  const switchToOTP = () => {
     setIsForgotOpen(false);
     setIsOTPOpen(true);
+  }
+
+  const switchToReset = () => {
+    setIsOTPOpen(false);
+    setIsResetOpen(true);
   }
 
   return (
@@ -81,7 +90,15 @@ function App() {
         isOpen={isForgotOpen}
         onClose={() => setIsForgotOpen(false)}
         onSwitchToLogin={switchToLogin}
-        onSwitchToOTP={SwitchToOTP}
+        onSwitchToOTP={switchToOTP}
+      />
+
+      <OTPModal
+        isOpen={isOTPOpen}
+        onClose={() => setIsOTPOpen(false)}
+        onSwitchToForgot={switchToForgot}
+        onSwitchToReset={switchToReset}
+        onSwitchToLogin={switchToLogin}
       />
 
       <RegisterModal

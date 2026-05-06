@@ -13,7 +13,6 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
         { name: "Build Doctor", path: "/build-doctor" },
         { name: "My Offers", path: "/offers" },
         { name: "divider", path: null },
-        { name: "Settings", path: "/settings" },
         { name: "Contact Us", path: "/contact" },
         { name: "Log in/Register", path: "/login", isModal: true  }
     ];
