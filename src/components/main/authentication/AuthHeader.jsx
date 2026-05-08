@@ -29,7 +29,7 @@ export default function AuthHeader() {
 					<img
 						src={logo}
 						alt="Logo"
-						className="relative z-10 w-16 h-16 lg:w-20 lg:h-20 object-contain"
+						className="relative z-10 w-24 h-24 lg:w-32 lg:h-32 object-cover"
 					/>
 				</div>
 

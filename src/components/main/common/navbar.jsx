@@ -29,12 +29,12 @@ export default function NavBar({ toggleMenu, onLoginClick }) {
 
 				<Link
 					to="/"
-					className="flex items-center gap-2 lg:gap-4 group cursor-pointer"
+					className="flex items-center gap-1 lg:gap-4 group cursor-pointer"
 				>
 					<img
 						src={logo}
 						alt="Logo"
-						className="w-10 h-10 lg:w-16 lg:h-16 object-contain"
+						className="w-10 h-10 lg:w-16 lg:h-16 object-cover"
 					/>
 					<h1 className="text-white text-xl lg:text-4xl font-black tracking-tighter whitespace-nowrap">
 						TechTrade SA

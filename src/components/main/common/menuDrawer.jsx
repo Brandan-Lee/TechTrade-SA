@@ -66,10 +66,10 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 											closeMenu();
 											onSwitchToLogin();
 										}}
-										className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden 
-                                        ${isActive
-											? "bg-white/30 shadow-inner translate-x-[-8px] scale-105"
-											: "hover:bg-white/10"
+										className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden ${
+											isActive
+												? "bg-white/30 shadow-inner translate-x-[-8px] scale-105"
+												: "hover:bg-white/10"
 										}`}
 									>
 										<span className={isActive ? "pl-2" : ""}>{item.name}</span>
@@ -83,10 +83,10 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 									to={item.path}
 									onClick={closeMenu}
 									className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden ${
-                                        isActive
-                                            ? "bg-white/30 shadow-inner translate-x-[-8px] scale-105"
+										isActive
+											? "bg-white/30 shadow-inner translate-x-[-8px] scale-105"
 											: "hover:bg-white/10"
-                                    }`}
+									}`}
 								>
 									<span className={isActive ? "pl-2" : ""}>{item.name}</span>
 								</Link>

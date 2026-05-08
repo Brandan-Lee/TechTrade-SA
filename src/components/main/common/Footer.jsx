@@ -136,7 +136,7 @@ export default function Footer() {
 							<img
 								src={logo}
 								alt="TechTrade SA Logo"
-								className="w-10 h-10 lg:w-16 lg:h-16 object-contain"
+								className="w-10 h-10 lg:w-16 lg:h-16 object-cover"
 							/>
 						</div>
 						<h3 className="text-3xl font-black italic tracking-tighter uppercase">

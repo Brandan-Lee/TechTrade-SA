@@ -1,14 +1,19 @@
-import { useState, useEffect } from "react";
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+
+// Layout & Navigation
 import MainLayout from "./components/MainLayout";
+import ScrollToTop from "./components/main/common/ScrollToTop";
+
+// Pages
 import Home from "./pages/main/Home";
 import About from "./pages/main/About";
-import ScrollToTop from "./components/main/common/ScrollToTop";
 import Market from "./pages/main/Market";
 import SellGear from "./pages/main/SellGear";
 import BuildDoctor from "./pages/main/BuildDoctor";
+
+// Auth Modals
 import LoginModal from "./components/main/authentication/LoginModal";
 import RegisterModal from "./components/main/authentication/RegisterModal";
 import ForgotModal from "./components/main/authentication/ForgotModal";
@@ -16,123 +21,116 @@ import OTPModal from "./components/main/authentication/OTPModal";
 import ResetModal from "./components/main/authentication/ResetModal";
 
 function App() {
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const [isLoginOpen, setIsLoginOpen] = useState(false);
-	const [isForgotOpen, setIsForgotOpen] = useState(false);
-	const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-	const [isOTPOpen, setIsOTPOpen] = useState(false);
-	const [isResetOpen, setIsResetOpen] = useState(false);
+    // --- UI State ---
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isForgotOpen, setIsForgotOpen] = useState(false);
+    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+    const [isOTPOpen, setIsOTPOpen] = useState(false);
+    const [isResetOpen, setIsResetOpen] = useState(false);
 
-	useEffect(() => {
-		document.body.style.overflow =
-			isMenuOpen ||
-			isLoginOpen ||
-			isRegisterOpen ||
-			isForgotOpen ||
-			isOTPOpen ||
-			isResetOpen
-				? "hidden"
-				: "unset";
-	}, [
-		isMenuOpen,
-		isLoginOpen,
-		isRegisterOpen,
-		isForgotOpen,
-		isOTPOpen,
-		isResetOpen,
-	]);
+    const isAnyModalOpen = useMemo(() => {
+        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen;
+    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen]);
 
-	const switchToRegister = () => {
-		setIsLoginOpen(false);
-		setIsRegisterOpen(true);
-	};
+    useEffect(() => {
+        document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
+    }, [isAnyModalOpen]);
 
-	const switchToLogin = () => {
-		setIsRegisterOpen(false);
-		setIsForgotOpen(false);
-		setIsOTPOpen(false);
-		setIsResetOpen(false);
-		setIsLoginOpen(true);
-	};
+    // --- Switch Logic (Navigation between Auth States) ---
+    const closeAllModals = () => {
+        setIsLoginOpen(false);
+        setIsRegisterOpen(false);
+        setIsForgotOpen(false);
+        setIsOTPOpen(false);
+        setIsResetOpen(false);
+    };
 
-	const switchToForgot = () => {
-		setIsLoginOpen(false);
-    setIsOTPOpen(false);
-		setIsForgotOpen(true);
-	};
+    const switchToRegister = () => {
+        closeAllModals();
+        setIsRegisterOpen(true);
+    };
 
-	const switchToOTP = () => {
-		setIsForgotOpen(false);
-    setIsResetOpen(false);
-		setIsOTPOpen(true);
-	};
+    const switchToLogin = () => {
+        closeAllModals();
+        setIsLoginOpen(true);
+    };
 
-	const switchToReset = () => {
-		setIsOTPOpen(false);
-		setIsResetOpen(true);
-	};
+    const switchToForgot = () => {
+        closeAllModals();
+        setIsForgotOpen(true);
+    };
 
-	return (
-		<BrowserRouter>
-			<ScrollToTop />
+    const switchToOTP = () => {
+        closeAllModals();
+        setIsOTPOpen(true);
+    };
 
-			<Routes>
-				{/* Pass the login trigger to MainLayout so the Navbar can use it */}
-				<Route
-					path="/"
-					element={
-						<MainLayout
-							openLogin={() => setIsLoginOpen(true)}
-							isMenuOpen={isMenuOpen}
-							setIsMenuOpen={setIsMenuOpen}
-						/>
-					}
-				>
-					<Route index element={<Home />} />
-					<Route path="about" element={<About />} />
-					<Route path="marketplace" element={<Market />} />
-					<Route path="sell" element={<SellGear />} />
-					<Route path="build-doctor" element={<BuildDoctor />} />
-				</Route>
-			</Routes>
+    const switchToReset = () => {
+        closeAllModals();
+        setIsResetOpen(true);
+    };
 
-			{/* Modals sit outside the Routes so it can overlay any page */}
-			<LoginModal
-				isOpen={isLoginOpen}
-				onClose={() => setIsLoginOpen(false)}
-				onSwitchToRegister={switchToRegister}
-				onSwitchToForgot={switchToForgot}
-			/>
+    return (
+        <BrowserRouter>
+            <ScrollToTop />
 
-			<ForgotModal
-				isOpen={isForgotOpen}
-				onClose={() => setIsForgotOpen(false)}
-				onSwitchToLogin={switchToLogin}
-				onSwitchToOTP={switchToOTP}
-			/>
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <MainLayout
+                            openLogin={() => setIsLoginOpen(true)}
+                            isMenuOpen={isMenuOpen}
+                            setIsMenuOpen={setIsMenuOpen}
+                        />
+                    }
+                >
+                    <Route index element={<Home />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="marketplace" element={<Market />} />
+                    <Route path="sell" element={<SellGear />} />
+                    <Route path="build-doctor" element={<BuildDoctor />} />
+                </Route>
+            </Routes>
 
-			<OTPModal
-				isOpen={isOTPOpen}
-				onClose={() => setIsOTPOpen(false)}
-				onSwitchToForgot={switchToForgot}
-				onSwitchToReset={switchToReset}
-				onSwitchToLogin={switchToLogin}
-			/>
+            {/* Modals sit outside the Routes so it can overlay any page */}
+            <LoginModal
+                isOpen={isLoginOpen}
+                onClose={() => setIsLoginOpen(false)}
+                onSwitchToRegister={switchToRegister}
+                onSwitchToForgot={switchToForgot}
+            />
 
-			<ResetModal
-				isOpen={isResetOpen}
-				onClose={() => setIsResetOpen(false)}
-				onSwitchToLogin={switchToLogin}
-			/>
+            <RegisterModal
+                isOpen={isRegisterOpen}
+                onClose={() => setIsRegisterOpen(false)}
+                onSwitchToOTP={switchToOTP}
+                onSwitchToLogin={switchToLogin}
+            />
 
-			<RegisterModal
-				isOpen={isRegisterOpen}
-				onClose={() => setIsRegisterOpen(false)}
-				onSwitchToOTP={switchToOTP}
-				onSwitchToLogin={switchToLogin}
-			/>
-		</BrowserRouter>
-	);
+            <ForgotModal
+                isOpen={isForgotOpen}
+                onClose={() => setIsForgotOpen(false)}
+                onSwitchToLogin={switchToLogin}
+                onSwitchToOTP={switchToOTP}
+            />
+
+            <OTPModal
+                isOpen={isOTPOpen}
+                onClose={() => setIsOTPOpen(false)}
+                onSwitchToForgot={switchToForgot}
+                onSwitchToReset={switchToReset}
+                onSwitchToLogin={switchToLogin}
+            />
+
+            <ResetModal
+                isOpen={isResetOpen}
+                onClose={() => setIsResetOpen(false)}
+                onSwitchToLogin={switchToLogin}
+            />
+        </BrowserRouter>
+    );
 }
 
 export default App;
