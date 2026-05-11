@@ -2,8 +2,9 @@ import React from "react";
 import { Cpu, ShieldCheck, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import PurpleGradientButton from "../../ui/PurpleGradientButton";
 
-export default function Pillars() {
+export default function Pillars({ onOpenLogin }) {
 	const pillars = [
 		{
 			title: "Hardware Intelligence",
@@ -89,12 +90,12 @@ export default function Pillars() {
 					variants={cardVariants}
 					className="flex flex-col items-center justify-center gap-6 mt-8 w-full"
 				>
-					<Link
-						to="/login"
-						className="w-full sm:w-auto text-center px-10 py-4 bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-md outline outline-2 outline-pink-600 hover:scale-105 transition-all text-white font-bold text-lg tracking-tight shadow-lg shadow-pink-500/10"
-					>
-						Register Now
-					</Link>
+					<div className="w-full max-w-sm">
+						<PurpleGradientButton
+							label="GET STARTED NOW"
+							onClick={onOpenLogin}
+						/>
+					</div>
 
 					<p className="text-gray-400 text-[10px] sm:text-xs font-normal tracking-wide text-center">
 						Securing the South African Tech Landscape since 2026.

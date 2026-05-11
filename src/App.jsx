@@ -87,7 +87,7 @@ function App() {
                     }
                 >
                     <Route index element={<Home />} />
-                    <Route path="about" element={<About />} />
+                    <Route path="about" element={<About openLogin={switchToLogin} />} />
                     <Route path="marketplace" element={<Market />} />
                     <Route path="sell" element={<SellGear />} />
                     <Route path="build-doctor" element={<BuildDoctor />} />

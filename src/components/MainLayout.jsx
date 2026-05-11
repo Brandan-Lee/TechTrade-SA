@@ -27,13 +27,11 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen }) {
 			<MenuDrawer
 				isOpen={isMenuOpen}
 				closeMenu={closeMenu}
-				// Pass openLogin here so mobile users can log in too!
 				onSwitchToLogin={openLogin}
 			/>
 
 			{/* Constant Top Components */}
 			<header className="w-full h-auto bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 border-b-4 border-pink-600 flex justify-center px-4">
-				{/* Navbar now handles both the Menu toggle and the Login trigger */}
 				<NavBar
 					toggleMenu={() => setIsMenuOpen(true)}
 					onLoginClick={openLogin}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ComponentCard from "../../components/main/build-doctor/ComponentCard";
 import { Cpu, Monitor, Zap } from "lucide-react";
+import PurpleGradientButton from "../../components/ui/PurpleGradientButton";
 
 export default function BuildDoctor() {
 	const [build, setBuild] = useState({
@@ -46,9 +47,11 @@ export default function BuildDoctor() {
 					onChange={(e) => setBuild({ ...build, psu: e.target.value })}
 				/>
 
-				<button className="w-full h-14 mt-4 bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-xl outline outline-2 outline-pink-600 text-white text-lg font-bold uppercase tracking-widest hover:scale-[1.05] active:scale-95 transition-all shadow-2xl">
-					Save my build
-				</button>
+				<div className="w-full max-w-sm mx-auto">
+					<PurpleGradientButton
+						label="SAVE MY BUILD"
+					/>
+				</div>
 			</div>
 		</motion.div>
 	);

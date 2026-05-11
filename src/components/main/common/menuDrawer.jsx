@@ -8,10 +8,9 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 	const menuItems = [
 		{ name: "Home", path: "/" },
 		{ name: "About Us", path: "/about" },
-		{ name: "Main Marketplace", path: "/market" },
+		{ name: "Main Marketplace", path: "/marketplace" },
 		{ name: "Sell Your Gear", path: "/sell" },
 		{ name: "Build Doctor", path: "/build-doctor" },
-		{ name: "My Offers", path: "/offers" },
 		{ name: "divider", path: null },
 		{ name: "Contact Us", path: "/contact" },
 		{ name: "Log in/Register", path: "/login", isModal: true },

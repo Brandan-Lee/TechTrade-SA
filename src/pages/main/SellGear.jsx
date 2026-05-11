@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import IntelSection from "../../components/main/sell/IntelSection";
 import GallerySection from "../../components/main/sell/GallerySection";
 import ContextSection from "../../components/main/sell/ContextSection";
+import PurpleGradientButton from "../../components/ui/PurpleGradientButton";
 
 export default function SellGear() {
 	const [formData, setFormData] = useState({
@@ -50,9 +51,11 @@ export default function SellGear() {
 						</div>
 
 						<div className="flex flex-col items-center gap-4 pt-10">
-							<button className="btn btn-wide bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 text-white border-2 border-pink-600 hover:scale-105 transition-all font-bold text-lg">
-								Publish to TechTrade
-							</button>
+							<div className="w-full max-w-sm">
+								<PurpleGradientButton
+									label="PUBLISH TO TECHTRADE"
+								/>
+							</div>
 							<p className="text-gray-400 text-xs text-center max-w-xs leading-relaxed">
 								By publishing, you agree to TechTrade SA's verification
 								protocols and escrow terms.

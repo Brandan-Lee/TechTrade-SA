@@ -52,6 +52,8 @@ export const ResetModal = ({
                             label="New Password"
                             type="password"
                             isPassword={true}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             showPassword={newShowPassword}
                             togglePassword={() => newSetShowPassword(!newShowPassword)}
                         />
@@ -61,12 +63,14 @@ export const ResetModal = ({
 
                     {/* Confirm Password */}
                     <AuthInput
-                            label="Confirm Password"
-                            type="password"
-                            isPassword={true}
-                            showPassword={confirmShowPassword}
-                            togglePassword={() => confirmSetShowPassword(!confirmPassword)}
-                        />
+                        label="Confirm Password"
+                        type="password"
+                        isPassword={true}
+                        showPassword={confirmShowPassword}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        togglePassword={() => confirmSetShowPassword(!confirmPassword)}
+                    />
 
                     {/* Actions */}
                     <div className="space-y-4 pt-2">

@@ -1,6 +1,6 @@
 import React from "react";
 
-const PasswordMeter = ({ password }) => {
+const PasswordStrengthMeter = ({ password }) => {
 	// 1. Logic to calculate strength (0 to 4)
 	const calculateStrength = (val) => {
 		if (!val) return 0;
@@ -78,4 +78,4 @@ const PasswordMeter = ({ password }) => {
 	);
 };
 
-export default PasswordMeter;
+export default PasswordStrengthMeter;

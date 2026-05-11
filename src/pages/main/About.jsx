@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Hero from "../../components/main/about/Hero";
 import Stats from "../../components/main/about/Stats";
 import Content from "../../components/main/about/Content";
 import Pillars from "../../components/main/about/Pillars";
 
-export default function About() {
+export default function About({ openLogin }) {
+	const [isLoginOpen, setIsLoginOpen] = useState(false);
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 10 }}
@@ -16,7 +18,7 @@ export default function About() {
 			<Hero />
 			<Stats />
 			<Content />
-			<Pillars />
+			<Pillars onOpenLogin={openLogin} />
 		</motion.div>
 	);
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { User, ChevronDown } from "lucide-react";
 import AuthModalWrapper from "./AuthModalWrapper";
 import AuthInput from "../../ui/AuthInput";
@@ -16,15 +16,30 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
 		mobile: "",
 		province: "",
 		regType: "buyer",
+		profilePhoto: null
 	});
+
 	const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [confirmShowPassword, setConfirmShowPassword] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+	const [confirmShowPassword, setConfirmShowPassword] = useState(false);
+	const fileInputRef = useRef(null);
+	const [profileImage, setProfileImage] = useState(null);
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
+
+	const handleFileChange = (e) => {
+		const file = e.target.files[0];
+
+		if (file) {
+			const previewUrl = URL.createObjectURL(file);
+			setProfileImage(previewUrl);
+
+			setFormData(prev => ({ ...prev, profilePhoto: file }));
+		}
+	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -45,13 +60,33 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
 					Create Account
 				</h1>
 
+				<input 
+					type="file"
+					ref={fileInputRef}
+					className="hidden"
+					accept="image/*"
+					onChange={handleFileChange}
+				/>
+
 				<form onSubmit={handleSubmit} className="space-y-6 pb-10">
 					{/* Profile Image Upload */}
 					<div className="w-full p-6 bg-white rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center gap-4">
 						<div className="w-20 h-20 rounded-full bg-slate-100 outline outline-[3px] outline-pink-600 flex items-center justify-center overflow-hidden">
-							<User className="text-violet-600 w-8 h-8" />
+							{profileImage ? (
+								<img 
+									src={profileImage}
+									alt="Profile Preview"
+									className="w-full h-full object-cover"
+								/>
+							) : (
+								<User className="text-violet-600 w-8 h-8" />
+							)}
 						</div>
-						<GradientButton label="Add Profile Photo" type="" />
+						<GradientButton 
+							label={profileImage ? "Change Photo" : "Add Profile Photo"} 
+							type="button"
+							onClick={() => fileInputRef.current.click()} 
+						/>
 					</div>
 
 					{/* Name */}
@@ -91,22 +126,27 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
 					{/* Password Group */}
 					<div className="space-y-4">
 						<AuthInput
-              label="New Password"
-              type="password"
-              isPassword={true}
-              showPassword={showPassword}
-              togglePassword={() => setShowPassword(!showPassword)}
-            />
+							label="New Password"
+							type="password"
+							name="password"
+							isPassword={true}
+							showPassword={showPassword}
+							value={formData.password}
+							onChange={handleInputChange}
+							togglePassword={() => setShowPassword(!showPassword)}
+						/>
 
 						<PasswordStrengthMeter password={formData.password} />
 
 						<AuthInput
-              label="Confirm Password"
-              type="password"
-              isPassword={true}
-              showPassword={confirmShowPassword}
-              togglePassword={() => setConfirmShowPassword(!confirmShowPassword)}
-            />
+							label="Confirm Password"
+							type="password"
+							isPassword={true}
+							showPassword={confirmShowPassword}
+							value={formData.confirmPassword}
+							onChange={handleInputChange}
+							togglePassword={() => setConfirmShowPassword(!confirmShowPassword)}
+						/>
 					</div>
 
 					{/* Phone Number */}
