@@ -12,6 +12,7 @@ import About from "./pages/main/About";
 import Market from "./pages/main/Market";
 import SellGear from "./pages/main/SellGear";
 import BuildDoctor from "./pages/main/BuildDoctor";
+import Profile from "./pages/main/Profile";
 
 // Auth Modals
 import LoginModal from "./components/main/authentication/LoginModal";
@@ -91,6 +92,7 @@ function App() {
                     <Route path="marketplace" element={<Market />} />
                     <Route path="sell" element={<SellGear />} />
                     <Route path="build-doctor" element={<BuildDoctor />} />
+                    <Route path="profile" element={<Profile />} />
                 </Route>
             </Routes>
 
