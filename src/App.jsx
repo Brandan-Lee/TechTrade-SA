@@ -20,6 +20,7 @@ import RegisterModal from "./components/main/authentication/RegisterModal";
 import ForgotModal from "./components/main/authentication/ForgotModal";
 import OTPModal from "./components/main/authentication/OTPModal";
 import ResetModal from "./components/main/authentication/ResetModal";
+import MyOffers from "./pages/main/MyOffers";
 
 function App() {
     // --- UI State ---
@@ -93,6 +94,7 @@ function App() {
                     <Route path="sell" element={<SellGear />} />
                     <Route path="build-doctor" element={<BuildDoctor />} />
                     <Route path="profile" element={<Profile />} />
+                    <Route path="offers" element={<MyOffers />} />
                 </Route>
             </Routes>
 
