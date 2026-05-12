@@ -2,6 +2,7 @@ import { Clock, ShieldCheck, Star } from "lucide-react";
 import React from "react";
 import PurpleGradientButton from "../../ui/PurpleGradientButton";
 import AlternateButton from "../../ui/AlternateButton"; // Ensure file name matches!
+import { useNavigate } from "react-router-dom";
 
 export default function IncomingOfferCard({
 	product,
@@ -11,11 +12,18 @@ export default function IncomingOfferCard({
 	message,
 	timeAgo,
 }) {
+    const navigate = useNavigate();
+
+    const handleManage = (e) => {
+        e.stopPropagation();
+        navigate(`/manage-offer`);
+    }
+
 	return (
 		<div className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-xl p-5 border border-pink-600/30 shadow-xl">
-			{/* 1. Main Wrapper - This must contain all three sections */}
+			{/* Main Wrapper */}
 			<div className="flex flex-col lg:flex-row gap-6 items-start">
-				{/* 2. Product Info Section */}
+				{/* Product Info Section */}
 				<div className="flex gap-4 w-full lg:w-1/4 shrink-0">
 					<img
 						src={product.image || "https://placehold.co/80"}
@@ -35,7 +43,7 @@ export default function IncomingOfferCard({
 					</div>
 				</div>
 
-				{/* 3. Buyer Profile and Message Section */}
+				{/* Buyer Profile and Message Section */}
 				<div className="flex-1 w-full bg-white/5 rounded-lg p-3 lg:bg-transparent lg:p-0">
 					<div className="flex items-center gap-3 mb-3">
 						<div className="relative shrink-0">
@@ -44,7 +52,6 @@ export default function IncomingOfferCard({
 								alt={buyer.name}
 								className="w-12 h-12 rounded-full border-2 border-pink-500"
 							/>
-							{/* Fixed the p-0.5 typo here */}
 							<div className="absolute -bottom-1 -right-1 bg-pink-500 rounded-full p-0.5 border border-white">
 								<ShieldCheck size={10} className="text-white" />
 							</div>
@@ -73,10 +80,9 @@ export default function IncomingOfferCard({
 					</div>
 				</div>
 
-				{/* 4. Combined Offer Info & Actions Section */}
+				{/* Combined Offer Info & Actions Section */}
 				<div className="w-full lg:w-48 flex flex-col gap-3 shrink-0">
 					<div className="flex justify-between lg:justify-end items-center gap-3">
-						{/* Decorative line only visible on desktop */}
 						<div className="h-10 w-1 bg-gradient-to-b from-pink-600 to-pink-400 rounded-full hidden lg:block" />
 
 						<div className="text-right">
@@ -92,7 +98,10 @@ export default function IncomingOfferCard({
 
 					{/* Action Buttons are now inside the right-hand column */}
 					<div className="flex flex-col gap-2 w-full mt-2">
-						<PurpleGradientButton label="MANAGE" />
+						<PurpleGradientButton 
+                            onClick={handleManage}
+                            label="MANAGE" 
+                        />
 
 						<button
 							className={`group relative w-full h-[40px] lg:h-[48px] rounded-md overflow-hidden border-2 border-pink-600 bg-transparent transition-all duration-300 active:scale-95`}

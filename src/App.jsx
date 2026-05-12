@@ -21,6 +21,8 @@ import ForgotModal from "./components/main/authentication/ForgotModal";
 import OTPModal from "./components/main/authentication/OTPModal";
 import ResetModal from "./components/main/authentication/ResetModal";
 import MyOffers from "./pages/main/MyOffers";
+import ViewListing from "./pages/main/ViewListing";
+import ManageOffer from "./pages/main/ManageOffer";
 
 function App() {
     // --- UI State ---
@@ -95,6 +97,8 @@ function App() {
                     <Route path="build-doctor" element={<BuildDoctor />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="offers" element={<MyOffers />} />
+                    <Route path="view-listing" element={<ViewListing />} />
+                    <Route path="manage-offer" element={<ManageOffer />} />
                 </Route>
             </Routes>
 

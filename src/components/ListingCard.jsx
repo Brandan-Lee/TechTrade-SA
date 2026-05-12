@@ -1,5 +1,8 @@
 import React from "react";
 import { MapPin, User, Zap, Award } from "lucide-react";
+import PurpleGradientButton from "./ui/PurpleGradientButton";
+import { useNavigate } from "react-router-dom";
+import AlternateButton from "./ui/AlternateButton";
 
 export default function ListingCard({
 	title,
@@ -17,8 +20,21 @@ export default function ListingCard({
 		"Payment Pending": "bg-purple-200 outline-purple-700 text-purple-700",
 	};
 
+	const navigate = useNavigate();
+
+	const handleViewListing = (e) => {
+		e.stopPropagation();
+		navigate(`/view-listing`);
+	}
+
+	const handleViewShop = (e) => {
+		e.stopPropagation();
+		navigate(`/profile`);
+	}
+
 	return (
 		<div
+			onClick={handleViewListing}
 			className={`w-full bg-white rounded-2xl shadow-lg outline outline-2 outline-offset-[-2px] outline-pink-600 overflow-hidden flex flex-col transition-all hover:shadow-2xl`}
 		>
 			{/* Image Header Area */}
@@ -81,16 +97,14 @@ export default function ListingCard({
 
 				{/* Action Buttons */}
 				<div className="grid grid-cols-2 gap-3 mt-auto pt-4">
-					<button
-						className={`py-3 bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 text-white font-bold rounded-md outline outline-2 outline-pink-600 hover:brightness-110 active:scale-95 transition-all`}
-					>
-						VIEW
-					</button>
-					<button
-						className={`py-3 bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 text-white font-bold rounded-md outline outline-2 outline-pink-600 hover:brightness-110 active:scale-95 transition-all`}
-					>
-						OFFER
-					</button>
+					<PurpleGradientButton
+						label="VIEW"
+						onClick={handleViewListing}
+					/>
+					<AlternateButton
+						label="VIEW SHOP"
+						onClick={handleViewShop}
+					/>
 				</div>
 			</div>
 		</div>
