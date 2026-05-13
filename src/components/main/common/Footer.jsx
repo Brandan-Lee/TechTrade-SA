@@ -1,9 +1,9 @@
 import React from "react";
-import { ShieldCheck, Lock, Globe, Zap, ShieldAlert } from "lucide-react";
+import { ShieldCheck, Lock, Globe, ShieldAlert, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
-export default function Footer() {
+export default function Footer({ onLoginClick, onTOSClick }) {
 	const steps = [
 		{ id: 1, label: "Available" },
 		{ id: 2, label: "Offered" },
@@ -20,13 +20,13 @@ export default function Footer() {
 
 	const navigationLinks = [
 		{ name: "About Us", path: "/about" },
-		{ name: "Privacy Policy", path: "/privacy" },
+		{ name: "Privacy Policy", isModal: true },
 		{ name: "Contact Support", path: "/contact" },
-		{ name: "Terms of Service", path: "/terms" },
+		{ name: "Terms of Service", isModal: true },
 		{ name: "Marketplace", path: "/market" },
 		{ name: "Sell your Gear", path: "/sell" },
 		{ name: "Build Doctor", path: "/build-doctor" },
-		{ name: "Login/Register", path: "/login" },
+		{ name: "Login/Register", isModal: true },
 		{ name: "Contact Us", path: "/contact" },
 	];
 
@@ -47,7 +47,7 @@ export default function Footer() {
 							<React.Fragment key={step.id}>
 								<div className="flex flex-col items-center gap-2">
 									<div
-										className={`w-14 h-14 rounded-xl font-black text-xl flex items-center justify-center bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 shadow-[0_0_20px_rgba(219,39,119,0.3)] border border-pink-300/30`}
+										className="w-14 h-14 rounded-xl font-black text-xl flex items-center justify-center bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 shadow-[0_0_20px_rgba(219,39,119,0.3)] border border-pink-300/30"
 									>
 										{step.id}
 									</div>
@@ -57,7 +57,7 @@ export default function Footer() {
 								</div>
 								{index < steps.length - 1 && (
 									<div
-										className={`hidden md:block w-16 h-[2px] mx-4 mb-8 bg-gradient-to-r from-pink-500/50 to-transparent`}
+										className="hidden md:block w-16 h-[2px] mx-4 mb-8 bg-gradient-to-r from-pink-500/50 to-transparent"
 									/>
 								)}
 							</React.Fragment>
@@ -67,9 +67,7 @@ export default function Footer() {
 			</section>
 
 			{/* Nuke Suite Monitoring Bar */}
-			<div
-				className={`w-full py-5 px-4 shadow-inner bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600`}
-			>
+			<div className="w-full py-5 px-4 shadow-inner bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600">
 				<div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-center gap-4">
 					<ShieldAlert className="text-white w-7 h-7 animate-pulse" />
 					<div className="text-center md:text-left">
@@ -101,7 +99,7 @@ export default function Footer() {
 								className="flex flex-col items-center gap-4 group cursor-help"
 							>
 								<div
-									className={`w-16 h-16 rounded-2xl shadow-2xl flex items-center justify-center bg-gradient-to-br from-pink-600 via-pink-500 to-pink-600 transform transition-transform group-hover:scale-110 border border-pink-400/20`}
+									className="w-16 h-16 rounded-2xl shadow-2xl flex items-center justify-center bg-gradient-to-br from-pink-600 via-pink-500 to-pink-600 transform transition-transform group-hover:scale-110 border border-pink-400/20"
 								>
 									<div className="text-white">{item.icon}</div>
 								</div>
@@ -114,22 +112,43 @@ export default function Footer() {
 				</div>
 
 				{/* Navigation Links */}
-				<div
-					className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center border-t-2 border-b-2 border-pink-500/20 py-8 mb-10`}
-				>
-					{navigationLinks.map((link) => (
-						<Link
-							key={link.name}
-							to={link.path}
-							className="text-sm font-bold uppercase tracking-tight hover:text-pink-400 transition-colors py-2"
-						>
-							{link.name}
-						</Link>
-					))}
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center border-t-2 border-b-2 border-pink-500/20 py-8 mb-10">
+					{navigationLinks.map((link) => {
+						// Common CSS for both links and buttons
+						const linkStyles = "text-sm font-bold uppercase tracking-tight hover:text-pink-400 transition-colors py-2 text-center block w-full";
+
+						if (link.isModal) {
+							return (
+								<button
+									key={link.name}
+									onClick={() => {
+										if (link.name === "Login/Register") {
+											onLoginClick();
+										} else {
+											onTOSClick(); // Handles Privacy Policy and Terms of Service
+										}
+									}}
+									className={linkStyles}
+								>
+									{link.name}
+								</button>
+							);
+						}
+
+						return (
+							<Link
+								key={link.name}
+								to={link.path}
+								className={linkStyles}
+							>
+								{link.name}
+							</Link>
+						);
+					})}
 				</div>
 
 				{/* Branding and Copyright */}
-				<div className="flex flex-col items-center gap-6 border-t-4 border-pink-600">
+				<div className="flex flex-col items-center gap-6 border-t-4 border-pink-600 pt-8">
 					<div className="flex items-center gap-4">
 						<div className="relative">
 							<div className="absolute inset-0 bg-pink-500 blur-2xl opacity-40 rounded-full" />

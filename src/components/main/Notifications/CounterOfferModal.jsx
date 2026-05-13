@@ -21,6 +21,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName }) => {
             onClose={onClose}
             title="Counter Offer"
             icon={<Handshake className="w-5 h-5 text-white" />}
+            centerContent={true}
         >
             {/* 
                 1. CENTERING: 'flex justify-center' centers the inner block.

@@ -101,6 +101,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
             icon={<BellRing className="w-5 h-5 text-white" />}
             headerAction={notificationActions}
             footerText={`${unreadNotifications.length} unread notifications`}
+            centerContent={false}
         >
             <div className="flex flex-col gap-6">
                 {/* UNREAD SECTION */}

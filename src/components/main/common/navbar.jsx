@@ -30,7 +30,7 @@ export default function NavBar({ toggleMenu, onLoginClick, onNotificationClick }
         { name: "Marketplace", path: "/marketplace" },
         { name: "Sell your Gear", path: "/sell" },
         { name: "Build Doctor", path: "/build-doctor" },
-        { name: "Login/Register", path: "/login", isModal: true },
+        { name: "Login/Register", isModal: true },
         { name: "Contact Us", path: "/contact" },
     ];
 

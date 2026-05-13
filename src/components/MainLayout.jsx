@@ -8,7 +8,7 @@ import FilterBar from "./main/common/FilterBar";
 import Footer from "./main/common/Footer";
 
 // Destructure the new props from App.jsx
-export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openNotifications }) {
+export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openNotifications, openTOS }) {
 	const location = useLocation();
 
 	const closeMenu = () => setIsMenuOpen(false);
@@ -49,7 +49,10 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openN
 			</main>
 
 			{/* Constant Footer Component */}
-			<Footer />
+			<Footer
+				onLoginClick={openLogin}
+				onTOSClick={openTOS}
+			/>
 		</div>
 	);
 }

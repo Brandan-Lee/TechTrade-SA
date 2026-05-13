@@ -25,6 +25,7 @@ import ViewListing from "./pages/main/ViewListing";
 import ManageOffer from "./pages/main/ManageOffer";
 import NotificationModal from "./components/main/Notifications/NotificationModal";
 import CounterOfferModal from "./components/main/Notifications/CounterOfferModal";
+import TOSModal from "./components/main/tos/TOSModal";
 
 function App() {
     // --- UI State ---
@@ -36,10 +37,11 @@ function App() {
     const [isResetOpen, setIsResetOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
+    const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
     const isAnyModalOpen = useMemo(() => {
-        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen || isNotificationOpen || isCounterModalOpen;
-    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen || isNotificationOpen || isCounterModalOpen]);
+        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen || isNotificationOpen || isCounterModalOpen || isTOSModalOpen;
+    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen, isNotificationOpen, isCounterModalOpen, isTOSModalOpen]); 
 
     useEffect(() => {
         document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
@@ -54,6 +56,7 @@ function App() {
         setIsResetOpen(false);
         setIsNotificationOpen(false);
         setIsCounterModalOpen(false);
+        setIsTOSModalOpen(false);
     };
 
     const switchToRegister = () => {
@@ -94,6 +97,7 @@ function App() {
                             isMenuOpen={isMenuOpen}
                             setIsMenuOpen={setIsMenuOpen}
                             openNotifications={() => setIsNotificationOpen(true)}
+                            openTOS={() => setIsTOSModalOpen(true)}
                         />
                     }
                 >
@@ -122,6 +126,7 @@ function App() {
                 onClose={() => setIsRegisterOpen(false)}
                 onSwitchToOTP={switchToOTP}
                 onSwitchToLogin={switchToLogin}
+                onSwitchToTOS={() => setIsTOSModalOpen(true)}
             />
 
             <ForgotModal
@@ -153,6 +158,11 @@ function App() {
             <CounterOfferModal
                 isOpen={isCounterModalOpen}
                 onClose={() => setIsCounterModalOpen(false)}
+            />
+
+            <TOSModal
+                isOpen={isTOSModalOpen}
+                onClose={() => setIsTOSModalOpen(false)}
             />
             
         </BrowserRouter>
