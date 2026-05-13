@@ -26,6 +26,7 @@ import ManageOffer from "./pages/main/ManageOffer";
 import NotificationModal from "./components/main/Notifications/NotificationModal";
 import CounterOfferModal from "./components/main/Notifications/CounterOfferModal";
 import TOSModal from "./components/main/tos/TOSModal";
+import PrivacyModal from "./components/main/privacy/PrivacyModal";
 
 function App() {
     // --- UI State ---
@@ -38,10 +39,11 @@ function App() {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
     const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
+    const [isDataModalOpen, setIsDataModalOpen] = useState(false);
 
     const isAnyModalOpen = useMemo(() => {
-        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen || isNotificationOpen || isCounterModalOpen || isTOSModalOpen;
-    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen, isNotificationOpen, isCounterModalOpen, isTOSModalOpen]); 
+        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen || isNotificationOpen || isCounterModalOpen || isTOSModalOpen || isDataModalOpen;
+    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen, isNotificationOpen, isCounterModalOpen, isTOSModalOpen, isDataModalOpen]); 
 
     useEffect(() => {
         document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
@@ -57,6 +59,7 @@ function App() {
         setIsNotificationOpen(false);
         setIsCounterModalOpen(false);
         setIsTOSModalOpen(false);
+        setIsDataModalOpen(false);
     };
 
     const switchToRegister = () => {
@@ -98,6 +101,7 @@ function App() {
                             setIsMenuOpen={setIsMenuOpen}
                             openNotifications={() => setIsNotificationOpen(true)}
                             openTOS={() => setIsTOSModalOpen(true)}
+                            openData={() => setIsDataModalOpen(true)}
                         />
                     }
                 >
@@ -142,6 +146,7 @@ function App() {
                 onSwitchToForgot={switchToForgot}
                 onSwitchToReset={switchToReset}
                 onSwitchToLogin={switchToLogin}
+                onSwitchToData={() => setIsDataModalOpen(true)}
             />
 
             <ResetModal
@@ -163,6 +168,11 @@ function App() {
             <TOSModal
                 isOpen={isTOSModalOpen}
                 onClose={() => setIsTOSModalOpen(false)}
+            />
+
+            <PrivacyModal
+                isOpen={isDataModalOpen}
+                onClose={() => setIsDataModalOpen(false)}
             />
             
         </BrowserRouter>

@@ -10,6 +10,7 @@ export const OTPModal = ({
     onSwitchToReset,
     onSwitchToLogin,
     onSwitchToForgot,
+    onSwitchToData
 }) => {
     const [otp, setOtp] = useState(["", "", "", ""]);
     const [timer, setTimer] = useState(60);
@@ -120,7 +121,12 @@ export const OTPModal = ({
                 {/* FAQ Link */}
                 <p className="text-center text-[10px] text-gray-400 font-bold uppercase tracking-tight">
                     Wondering how we use this code for verification?
-                    <button className="text-violet-800 ml-1 underline">Know here</button>
+                    <button
+                        onClick={onSwitchToData} 
+                        className="text-violet-800 ml-1 underline"
+                    >
+                        Know here
+                    </button>
                 </p>
             </div>
         </AuthModalWrapper>

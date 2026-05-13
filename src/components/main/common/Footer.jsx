@@ -3,7 +3,7 @@ import { ShieldCheck, Lock, Globe, ShieldAlert, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
-export default function Footer({ onLoginClick, onTOSClick }) {
+export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 	const steps = [
 		{ id: 1, label: "Available" },
 		{ id: 2, label: "Offered" },
@@ -125,7 +125,8 @@ export default function Footer({ onLoginClick, onTOSClick }) {
 										if (link.name === "Login/Register") {
 											onLoginClick();
 										} else {
-											onTOSClick(); // Handles Privacy Policy and Terms of Service
+											onTOSClick();
+											onDataClick();
 										}
 									}}
 									className={linkStyles}

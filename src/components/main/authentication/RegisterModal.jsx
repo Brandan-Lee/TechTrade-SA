@@ -163,7 +163,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
                                 />
                             </div>
                             
-                            {/* Text and Button integrated together */}
                             <span className="text-sm font-medium text-slate-600 leading-relaxed">
                                 I agree to the{" "}
                                 <button
