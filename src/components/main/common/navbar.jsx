@@ -13,7 +13,7 @@ import SearchBar from "./searchbar";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
-export default function NavBar({ toggleMenu, onLoginClick }) {
+export default function NavBar({ toggleMenu, onLoginClick, onNotificationClick }) {
     const location = useLocation();
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
     const dropDownRef = useRef(null);
@@ -66,7 +66,6 @@ export default function NavBar({ toggleMenu, onLoginClick }) {
                     onMouseLeave={() => setIsUserDropdownOpen(false)}
                     className="absolute right-0 top-[120%] w-64 z-[100] animate-in fade-in slide-in-from-top-2 duration-200"
                 >
-                    {/* Synced with FilterBar Pink: from-pink-600 via-pink-500 to-pink-600 */}
                     <div className="bg-gradient-to-b from-pink-600 via-pink-500 to-pink-600 rounded-2xl shadow-2xl border border-white/20 p-2 overflow-hidden">
                         <div className="px-4 py-3 border-b border-white/10 mb-1">
                             <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">
@@ -126,7 +125,10 @@ export default function NavBar({ toggleMenu, onLoginClick }) {
                         <ShoppingCart className="w-4 h-4 text-white" />
                     </button>
                     <div className="relative">
-                        <button className="w-9 h-9 bg-white/10 rounded-lg flex justify-center items-center">
+                        <button
+                            onClick={onNotificationClick} 
+                            className="w-9 h-9 bg-white/10 rounded-lg flex justify-center items-center"
+                        >
                             <Bell className="w-5 h-5 text-white" />
                         </button>
                         <div className="w-2 h-2 absolute right-2 top-1.5 bg-amber-500 rounded-full border border-purple-600" />
@@ -162,7 +164,10 @@ export default function NavBar({ toggleMenu, onLoginClick }) {
                             <ShoppingCart className="w-4 h-4 text-white" />
                         </button>
                         <div className="relative">
-                            <button className="w-9 h-9 bg-white/10 rounded-lg flex justify-center items-center outline outline-1 outline-white/20 hover:bg-pink-400/20">
+                            <button 
+                                onClick={onNotificationClick}
+                                className="w-9 h-9 bg-white/10 rounded-lg flex justify-center items-center outline outline-1 outline-white/20 hover:bg-pink-400/20"
+                            >
                                 <Bell className="w-5 h-5 text-white" />
                             </button>
                             <div className="w-2 h-2 absolute right-2 top-1.5 bg-amber-500 rounded-full border border-purple-600" />

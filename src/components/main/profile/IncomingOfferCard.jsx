@@ -102,21 +102,6 @@ export default function IncomingOfferCard({
                             onClick={handleManage}
                             label="MANAGE" 
                         />
-
-						<button
-							className={`group relative w-full h-[40px] lg:h-[48px] rounded-md overflow-hidden border-2 border-pink-600 bg-transparent transition-all duration-300 active:scale-95`}
-						>
-							{/* Hover Gradient Fill */}
-							<div
-								className="absolute inset-0 bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 
-                            opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-							/>
-
-							{/* Label */}
-							<span className="relative z-10 text-white font-bold text-sm lg:text-base tracking-tight uppercase">
-								COUNTER OFFER
-							</span>
-						</button>
 					</div>
 				</div>
 			</div>

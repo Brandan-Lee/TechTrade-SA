@@ -7,13 +7,18 @@ import {
 	ShieldCheck,
 	Star,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PurpleGradientButton from "../../components/ui/PurpleGradientButton";
 import AlternateButton from "../../components/ui/AlternateButton";
 
-const ManageOffer = () => {
+const ManageOffer = ({ openCounterModal }) => {
 	const navigate = useNavigate();
+
+	const handleViewListing = (e) => {
+		e.stopPropagation();
+		navigate(`/view-listing`);
+	}
 
 	const offerData = {
 		itemTitle: "RTX 3080 Gaming OC",
@@ -165,7 +170,14 @@ const ManageOffer = () => {
 						<div className="flex flex-col gap-4">
 							<PurpleGradientButton label="DECLINE" />
 							<PurpleGradientButton label="ACCEPT" />
-							<AlternateButton label="COUNTER-OFFER" />
+							<AlternateButton
+								label="COUNTER-OFFER"
+								onClick={openCounterModal} 
+							/>
+							<AlternateButton 
+								onClick={handleViewListing}
+								label="VIEW LISTING"
+							/>
 
 							{/* System Warning */}
 							<div className="p-4 bg-gradient-to-r from-pink-600 to-pink-400 rounded-xl border border-violet-800 flex gap-3">

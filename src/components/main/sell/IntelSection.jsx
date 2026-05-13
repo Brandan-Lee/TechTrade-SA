@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Cpu, ShieldCheck, ChevronDown, Check, Search } from "lucide-react";
+import AuthInput from "../../ui/AuthInput";
 
 export default function IntelSection({ formData, setFormData }) {
 	const [isOpen, setIsOpen] = useState(false);
+	const [amount, setAmount] = useState("");
 
 	const categoryGroups = [
 		{
@@ -100,6 +102,20 @@ export default function IntelSection({ formData, setFormData }) {
 						<Search className="w-7 h-7 fill-white" />
 					</button>
 				</div>
+			</div>
+
+			<div className="relative group w-full">
+				<span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold z-10 pointer-events-none">
+					R
+				</span>
+				<AuthInput
+					label="Enter your asking price"
+					type="number"
+					value={amount}
+					onChange={(e) => setAmount(e.target.value)}
+					// Added padding-left (pl-10) so text doesn't overlap the 'R'
+					className="pl-10 w-full"
+				/>
 			</div>
 
 			{/* 3. VERIFIED SPECS BOX (Optimized & Static) */}

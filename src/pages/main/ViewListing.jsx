@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function ViewListing() {
     const [offerValue, setOfferValue] = useState("");
+    const [description, setDescription] = useState("");
     const [activeImg, setActiveImg] = useState(0);
     const navigate = useNavigate();
 
@@ -214,6 +215,16 @@ export default function ViewListing() {
                                     className="pl-10" // Make room for the 'R'
                                 />
                             </div>
+
+                            <textarea
+                                className="w-full h-48 bg-white text-gray-900 p-6 focus:outline-none focus:ring-4 ring-pink-500/30 text-base font-medium leading-relaxed rounded-[2rem] shadow-inner placeholder:text-gray-500"
+                                placeholder="Buyers Note"
+                                value={description}
+                                onChange={(e) =>
+                                    setDescription(e.target.value)
+                                }
+					        />
+
                             <PurpleGradientButton
                                 label="SUBMIT OFFER"
                             />

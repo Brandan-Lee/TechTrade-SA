@@ -7,6 +7,19 @@ export default function ComponentCard({
 	value,
 	onChange,
 }) {
+	const specs = [
+		{ label: "Brand", value: "NVIDIA" },
+		{ label: "Model", value: "GeForce RTX 3080 Ti Founders Edition" },
+		{ label: "Memory", value: "12GB GDDR6X" },
+		{ label: "Core Clock", value: "1665 MHz" },
+		{ label: "Boost Clock", value: "1770 MHz" },
+		{ label: "Interface", value: "PCIe 4.0 x16" },
+		{ label: "Power Connectors", value: "2x 8-pin" },
+		{ label: "TDP", value: "350W" },
+		{ label: "Outputs", value: "3x DisplayPort 1.4a, 1x HDMI 2.1" },
+		{ label: "Warranty", value: "No Warranty (Private Sale)" },
+	];
+
 	return (
 		<div className="w-full p-px bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-2xl shadow-xl outline outline-1 outline-pink-600 overflow-hidden">
 			{/* Card Header */}
@@ -34,6 +47,28 @@ export default function ComponentCard({
 						placeholder={placeholder}
 						className="w-full h-12 px-4 bg-gray-100 rounded-xl border border-gray-300 text-gray-800 placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 ring-pink-500 transition-all"
 					/>
+				</div>
+			</div>
+
+			{/* Technical Specifications */}
+			<div className="bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-xl p-6 shadow-xl text-white">
+				<h2 className="text-xl font-black mb-6 uppercase tracking-tight">
+					Technical Specifications
+				</h2>
+				<div className="grid grid-cols-1 gap-1">
+					{specs.map((spec, idx) => (
+						<div
+							key={idx}
+							className="flex justify-between items-center py-3 border-b border-pink-600/30 last:border-0 hover:bg-white/5 transition-colors px-2 rounded"
+						>
+							<span className="text-white/60 text-sm font-semibold">
+								{spec.label}
+							</span>
+							<span className="text-white text-sm font-bold text-right ml-4">
+								{spec.value}
+							</span>
+						</div>
+					))}
 				</div>
 			</div>
 		</div>

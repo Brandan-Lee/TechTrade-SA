@@ -8,7 +8,7 @@ import FilterBar from "./main/common/FilterBar";
 import Footer from "./main/common/Footer";
 
 // Destructure the new props from App.jsx
-export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen }) {
+export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openNotifications }) {
 	const location = useLocation();
 
 	const closeMenu = () => setIsMenuOpen(false);
@@ -35,6 +35,7 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen }) {
 				<NavBar
 					toggleMenu={() => setIsMenuOpen(true)}
 					onLoginClick={openLogin}
+					onNotificationClick={openNotifications}
 				/>
 			</header>
 

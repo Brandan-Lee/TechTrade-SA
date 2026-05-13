@@ -23,6 +23,8 @@ import ResetModal from "./components/main/authentication/ResetModal";
 import MyOffers from "./pages/main/MyOffers";
 import ViewListing from "./pages/main/ViewListing";
 import ManageOffer from "./pages/main/ManageOffer";
+import NotificationModal from "./components/main/Notifications/NotificationModal";
+import CounterOfferModal from "./components/main/Notifications/CounterOfferModal";
 
 function App() {
     // --- UI State ---
@@ -32,10 +34,12 @@ function App() {
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isOTPOpen, setIsOTPOpen] = useState(false);
     const [isResetOpen, setIsResetOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
 
     const isAnyModalOpen = useMemo(() => {
-        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen;
-    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen]);
+        return isMenuOpen || isLoginOpen || isRegisterOpen || isForgotOpen || isOTPOpen || isResetOpen || isNotificationOpen || isCounterModalOpen;
+    }, [isMenuOpen, isLoginOpen, isRegisterOpen, isForgotOpen, isOTPOpen, isResetOpen || isNotificationOpen || isCounterModalOpen]);
 
     useEffect(() => {
         document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
@@ -48,6 +52,8 @@ function App() {
         setIsForgotOpen(false);
         setIsOTPOpen(false);
         setIsResetOpen(false);
+        setIsNotificationOpen(false);
+        setIsCounterModalOpen(false);
     };
 
     const switchToRegister = () => {
@@ -87,6 +93,7 @@ function App() {
                             openLogin={() => setIsLoginOpen(true)}
                             isMenuOpen={isMenuOpen}
                             setIsMenuOpen={setIsMenuOpen}
+                            openNotifications={() => setIsNotificationOpen(true)}
                         />
                     }
                 >
@@ -98,7 +105,7 @@ function App() {
                     <Route path="profile" element={<Profile />} />
                     <Route path="offers" element={<MyOffers />} />
                     <Route path="view-listing" element={<ViewListing />} />
-                    <Route path="manage-offer" element={<ManageOffer />} />
+                    <Route path="manage-offer" element={<ManageOffer openCounterModal={() => setIsCounterModalOpen(true)} />} />
                 </Route>
             </Routes>
 
@@ -137,6 +144,17 @@ function App() {
                 onClose={() => setIsResetOpen(false)}
                 onSwitchToLogin={switchToLogin}
             />
+
+            <NotificationModal
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+            />
+
+            <CounterOfferModal
+                isOpen={isCounterModalOpen}
+                onClose={() => setIsCounterModalOpen(false)}
+            />
+            
         </BrowserRouter>
     );
 }
