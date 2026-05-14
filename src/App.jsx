@@ -28,6 +28,7 @@ import NotificationModal from "./components/main/Notifications/NotificationModal
 import CounterOfferModal from "./components/main/Notifications/CounterOfferModal";
 import TOSModal from "./components/main/tos/TOSModal";
 import PrivacyModal from "./components/main/privacy/PrivacyModal";
+import ListingReportPage from "./pages/main/ListingReport";
 
 function App() {
     // --- UI State ---
@@ -116,6 +117,7 @@ function App() {
                     <Route path="view-listing" element={<ViewListing />} />
                     <Route path="manage-offer" element={<ManageOffer openCounterModal={() => setIsCounterModalOpen(true)} />} />
                     <Route path="contact-us" element={<ContactUs />} />
+                    <Route path="listing-report" element={<ListingReportPage />} />
                 </Route>
             </Routes>
 
