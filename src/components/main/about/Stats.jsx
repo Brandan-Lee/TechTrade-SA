@@ -36,7 +36,7 @@ export default function Stats() {
 								</span>
 							</div>
 
-							<div className="text-white/80 text-sm font-semibold uppercase tracking-wider">
+							<div className="text-white/80 text-sm md:text-base font-semibold uppercase tracking-wider">
 								{stat.label}
 							</div>
 						</div>

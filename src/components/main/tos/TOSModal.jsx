@@ -31,7 +31,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 			<div className="flex flex-col gap-16 py-8 max-w-2xl mx-auto px-4">
 				{/* Intro/Hero Text */}
 				<div className="relative overflow-hidden bg-gradient-to-r from-violet-50 to-white border-l-4 border-violet-600 p-6 rounded-r-2xl shadow-sm">
-					<p className="text-violet-900 text-sm leading-relaxed relative z-10">
+					<p className="text-violet-900 text-sm md:text-base leading-relaxed relative z-10">
 						These protocols are legally binding and constitute the operational
 						framework of
 						<span className="font-bold text-violet-700 ml-1">TechTrade SA</span>
@@ -49,10 +49,10 @@ const TOSModal = ({ isOpen, onClose }) => {
 					icon={<ShieldCheck className="text-violet-600" size={24} />}
 				>
 					<div className="space-y-6">
-						<p className="text-slate-600 leading-relaxed text-[15px]">
+						<p className="text-slate-600 leading-relaxed text-sm md:text-base">
 							When a transaction is initiated, both the buyer's funds and the
 							seller's hardware enter a
-							<span className="mx-1.5 px-2 py-0.5 bg-violet-600 text-white text-xs font-bold rounded-md uppercase tracking-wider">
+							<span className="mx-1.5 px-2 py-0.5 bg-violet-600 text-white text-xs md:text-sm font-bold rounded-md uppercase tracking-wider">
 								Locked State
 							</span>
 							within our secure escrow system. This ensures neither party can
@@ -60,7 +60,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 						</p>
 
 						<div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-200/60 shadow-sm transition-all hover:shadow-md">
-							<p className="font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
+							<p className="font-black text-sm md:text-base uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
 								<Clock size={14} className="text-violet-400" /> Conditions for
 								release
 							</p>
@@ -92,10 +92,10 @@ const TOSModal = ({ isOpen, onClose }) => {
 											{item.id}
 										</span>
 										<div>
-											<p className="text-sm font-bold text-slate-900 mb-1">
+											<p className="text-sm md:text-base font-bold text-slate-900 mb-1">
 												{item.t}
 											</p>
-											<p className="text-sm text-slate-500 leading-snug">
+											<p className="text-sm md:text-base text-slate-500 leading-snug">
 												{item.d}
 											</p>
 										</div>
@@ -106,7 +106,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 
 						<div className="flex items-center gap-2 px-2">
 							<div className="h-px flex-1 bg-slate-200"></div>
-							<p className="text-[10px] text-slate-400 font-medium uppercase tracking-tight italic">
+							<p className="text-sm md:text-base text-slate-400 font-medium uppercase tracking-tight italic">
 								Cryptographic Ledger Timestamped
 							</p>
 							<div className="h-px flex-1 bg-slate-200"></div>
@@ -156,10 +156,10 @@ const TOSModal = ({ isOpen, onClose }) => {
 									key={i}
 									className="relative pl-4 border-l-2 border-violet-100 hover:border-violet-500 transition-colors"
 								>
-									<p className="font-bold text-[11px] text-violet-700 uppercase mb-1.5 tracking-wide">
+									<p className="font-bold text-sm md:text-base text-violet-700 uppercase mb-1.5 tracking-wide">
 										{item.t}
 									</p>
-									<p className="text-xs text-slate-500 leading-relaxed font-medium">
+									<p className="text-xs md:text-sm text-slate-500 leading-relaxed font-medium">
 										{item.d}
 									</p>
 								</div>
@@ -174,7 +174,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 					icon={<AlertTriangle className="text-amber-500" size={24} />}
 				>
 					<div className="space-y-8">
-						<p className="text-slate-600 leading-relaxed text-[15px]">
+						<p className="text-slate-600 leading-relaxed text-sm md:text-base">
 							TechTrade operates a{" "}
 							<span className="font-extrabold text-pink-600 border-b-2 border-pink-200 pb-0.5">
 								Zero-Tolerance Strike System
@@ -209,7 +209,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 								<div className="p-2 bg-violet-50 rounded-lg shrink-0">
 									<ShieldCheck className="text-violet-600" size={20} />
 								</div>
-								<p className="text-[13px] text-slate-600 leading-snug">
+								<p className="text-sm md:text-base text-slate-600 leading-snug">
 									<span className="font-bold text-slate-900 block mb-1">
 										Build-Doctor Integration
 									</span>
@@ -224,7 +224,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 								<div className="p-2 bg-amber-50 rounded-lg shrink-0">
 									<AlertTriangle className="text-amber-500" size={20} />
 								</div>
-								<p className="text-[13px] text-slate-600 leading-snug">
+								<p className="text-sm md:text-base text-slate-600 leading-snug">
 									<span className="font-bold text-slate-900 block mb-1">
 										Fraud Reporting
 									</span>
@@ -243,7 +243,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 				>
 					<div className="space-y-8">
 						<div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4">
-							<p className="text-slate-700 text-sm leading-relaxed">
+							<p className="text-slate-700 text-sm md:text-base leading-relaxed">
 								We provide{" "}
 								<span className="font-bold italic text-emerald-700">
 									Hardware Intelligence
@@ -254,7 +254,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 						</div>
 
 						<div className="space-y-6">
-							<p className="font-black text-[10px] uppercase tracking-[0.25em] text-slate-400 px-1">
+							<p className="font-black text-sm md:text-base uppercase tracking-[0.25em] text-slate-400 px-1">
 								User Responsibility Matrix
 							</p>
 							<ul className="space-y-5">
@@ -280,7 +280,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 										<div className="h-6 w-6 rounded-full bg-violet-100 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-violet-600 transition-colors">
 											<div className="h-1.5 w-1.5 rounded-full bg-violet-600 group-hover:bg-white"></div>
 										</div>
-										<p className="text-sm text-slate-600">
+										<p className="text-sm md:text-base text-slate-600">
 											<span className="font-bold text-slate-900 mr-2">
 												{item.t}:
 											</span>
@@ -296,7 +296,7 @@ const TOSModal = ({ isOpen, onClose }) => {
 				{/* Legal Footer Section */}
 				<div className="mt-8 pt-10 border-t-2 border-slate-100">
 					<div className="max-w-md mx-auto text-center space-y-8">
-						<p className="text-slate-500 text-[13px] font-medium leading-relaxed italic px-4">
+						<p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed italic px-4">
 							"Final hardware verification is your responsibility; TechTrade SA
 							serves as a facilitator, not a guarantor."
 						</p>
@@ -308,15 +308,15 @@ const TOSModal = ({ isOpen, onClose }) => {
 							/>
 
 							<div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2">
-								<span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+								<span className="text-sm md:text-base text-slate-400 font-bold uppercase tracking-widest">
 									v{docVersion}
 								</span>
 								<div className="h-1 w-1 rounded-full bg-slate-300"></div>
-								<span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+								<span className="text-sm md:text-base text-slate-400 font-bold uppercase tracking-widest">
 									Released: {lastUpdated}
 								</span>
 								<div className="h-1 w-1 rounded-full bg-slate-300"></div>
-								<span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-violet-400">
+								<span className="text-sm md:text-base text-slate-400 font-bold uppercase tracking-widest text-violet-400">
 									TECHTRADE-01-SECURE
 								</span>
 							</div>

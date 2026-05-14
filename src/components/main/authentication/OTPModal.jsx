@@ -61,7 +61,7 @@ export const OTPModal = ({
                     <h1 className="text-purple-600 text-4xl md:text-5xl font-black uppercase tracking-tighter">
                         OTP Verification
                     </h1>
-                    <p className="text-gray-600 text-xs font-medium leading-tight mt-4">
+                    <p className="text-gray-600 text-xs md:text-base font-medium leading-tight mt-4">
                         Please enter the 4-digit code sent to your registered email to complete verification.
                     </p>
                 </div>
@@ -85,7 +85,7 @@ export const OTPModal = ({
 
                     {/* Timer Box */}
                     <div className="flex justify-between items-center bg-slate-100 p-4 rounded-2xl border border-slate-200">
-                        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        <div className="text-xs md:text-base font-bold uppercase tracking-wider text-slate-500">
                             Expires in: <span className="text-pink-600 ml-1">
                                 00:{timer < 10 ? `0${timer}` : timer}s
                             </span>
@@ -119,11 +119,11 @@ export const OTPModal = ({
                 </form>
 
                 {/* FAQ Link */}
-                <p className="text-center text-[10px] text-gray-400 font-bold uppercase tracking-tight">
+                <p className="text-center text-sm md:text-base text-gray-400 font-bold uppercase tracking-tight">
                     Wondering how we use this code for verification?
                     <button
                         onClick={onSwitchToData} 
-                        className="text-violet-800 ml-1 underline"
+                        className="text-violet-800 text-sm md:text-xl ml-1 underline"
                     >
                         Know here
                     </button>

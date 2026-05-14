@@ -106,7 +106,7 @@ export default function MarketPlace() {
 					<h1 className="text-purple-600 text-4xl font-black uppercase tracking-tighter">
 						{location.state?.appliedFilters?.category || "Main Marketplace"}
 					</h1>
-					<p className="text-gray-500 text-lg font-medium h-7">
+					<p className="mt-4 text-sm md:text-base lg:text-lg font-bold text-slate-500 uppercase tracking-widest">
 						{loading
 							? "Updating results..."
 							: `Showing ${displayListings.length} items`}

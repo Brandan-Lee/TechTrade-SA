@@ -77,7 +77,7 @@ export default function Pillars({ onOpenLogin }) {
 								<h3 className="text-white text-2xl font-bold leading-tight">
 									{pillar.title}
 								</h3>
-								<p className="text-white/80.text-sm.leading-relaxed">
+								<p className="text-white/80.text-sm md:text-base leading-relaxed">
 									{pillar.desc}
 								</p>
 							</div>

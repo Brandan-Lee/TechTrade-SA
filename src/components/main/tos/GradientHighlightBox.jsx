@@ -6,11 +6,11 @@ export const GradientHighlightBox = ({ title, children, icon }) => (
 			<div className="text-white shrink-0">{icon}</div>
 
 			<div className="flex flex-col gap-2">
-				<h4 className="text-white text-sm font-black uppercase tracking-widest">
+				<h4 className="text-white text-sm md:text-base font-black uppercase tracking-widest">
 					{title}
 				</h4>
 
-				<div className="text-white/90 text-xs leading-5">{children}</div>
+				<div className="text-white/90 text-xs md:text-sm leading-5">{children}</div>
 			</div>
 		</div>
 	</div>

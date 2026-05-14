@@ -44,14 +44,14 @@ export default function Profile() {
 						</div>
 
 						<div>
-							<p className="text-[10px] text-white/80 font-bold tracking-widest uppercase">
+							<p className="text-sm md:text-base text-white/80 font-bold tracking-widest uppercase">
 								Trust Integrity
 							</p>
 							<p className="text-xl font-black text-white">4.9 / 5.0</p>
 						</div>
 					</div>
 
-					<div className="bg-purple-700 px-3 py-1 rounded text-white font-bold text-xs">
+					<div className="bg-purple-700 px-3 py-1 rounded text-white font-bold text-xs md:text-sm">
 						24 Trades
 					</div>
 				</div>
@@ -83,7 +83,7 @@ export default function Profile() {
 					<div className="flex border-b bg-gradient-to-r from-violet-800 to-purple-700">
 						<button 
                             onClick={() => setActiveTab("active")}
-                            className={`flex-1 py-4 font-black text-sm transition-all duration-200 ${
+                            className={`flex-1 py-4 font-black text-sm md:text-base transition-all duration-200 ${
                                 activeTab === "active" 
                                 ? "text-pink-500 border-b-4 border-pink-500 bg-white/10" 
                                 : "text-white/60 hover:text-white border-b-4 border-transparent"
@@ -93,7 +93,7 @@ export default function Profile() {
                         </button>
                         <button 
                             onClick={() => setActiveTab("history")}
-                            className={`flex-1 py-4 font-black text-sm transition-all duration-200 ${
+                            className={`flex-1 py-4 font-black text-sm md:text-base transition-all duration-200 ${
                                 activeTab === "history" 
                                 ? "text-pink-500 border-b-4 border-pink-500 bg-white/10" 
                                 : "text-white/60 hover:text-white border-b-4 border-transparent"
@@ -155,7 +155,7 @@ export default function Profile() {
                         className="w-full max-w-xs h-[56px] rounded-md border-2 border-red-500/50 
                                 text-red-500 font-bold tracking-tight hover:bg-red-500 
                                 hover:text-white hover:border-red-500 transition-all 
-                                duration-300 uppercase text-sm active:scale-95"
+                                duration-300 uppercase text-sm md:text-base active:scale-95"
                         onClick={() => {
                             if(window.confirm("Are you sure you want to delete your account? This action is permanent.")) {
                                 console.log("Account deleted");

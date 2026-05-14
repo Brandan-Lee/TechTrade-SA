@@ -47,7 +47,7 @@ export default function ListingCard({
 						className={`absolute top-3 left-3 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg shadow-md flex items-center gap-1.5 z-10`}
 					>
 						<Award className="w-3.5 h-3.5 text-white" />
-						<span className="text-white text-xs font-black tracking-tight">
+						<span className="text-white text-xs md:text-sm font-black tracking-tight">
 							Featured
 						</span>
 					</div>
@@ -55,7 +55,7 @@ export default function ListingCard({
 
 				{/* Condition Badge */}
 				<div
-					className={`absolute top-3 right-3 px-3 py-2 bg-white/95 rounded-lg shadow-md text-gray-800 text-xs font-bold`}
+					className={`absolute top-3 right-3 px-3 py-2 bg-white/95 rounded-lg shadow-md text-gray-800 text-xs md:text-sm font-bold`}
 				>
 					{condition}
 				</div>
@@ -66,7 +66,7 @@ export default function ListingCard({
 						className={`px-3 py-1 rounded-full outline outline-2 flex items-center gap-2 ${statusStyles[status] || statusStyles["Available Now"]}`}
 					>
 						<div className={`w-2 h-2 rounded-full animate-pulse bg-current`} />
-						<span className="text-[10px] font-bold uppercase">{status}</span>
+						<span className="text-sm md:text-base font-bold uppercase">{status}</span>
 					</div>
 				</div>
 			</div>
@@ -80,17 +80,17 @@ export default function ListingCard({
 				<div className="pb-3 border-b-2 border-pink-600 space-y-2">
 					<div className="flex items-center gap-2 text-gray-500">
 						<User className="w-4 h-4 text-purple-700" />
-						<span className="text-sm font-semibold">Sold by {seller}</span>
+						<span className="text-sm md:text-base font-semibold">Sold by {seller}</span>
 					</div>
 					<div className="flex items-center gap-2 text-purple-600">
 						<MapPin className="w-4 h-4" />
-						<span className="text-xs font-bold">{location}</span>
+						<span className="text-xs md:text-sm font-bold">{location}</span>
 					</div>
 				</div>
 
 				<div className="flex items-baseline gap-2 pt-2">
 					<span className="text-purple-700 text-3xl font-black">{price}</span>
-					<span className="text-gray-400 text-sm font-semibold">
+					<span className="text-gray-400 text-sm md:text-base font-semibold">
 						or best offer
 					</span>
 				</div>

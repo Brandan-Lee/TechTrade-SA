@@ -16,19 +16,21 @@ export default function SellGear() {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			className="min-h-screen bg-neutral-100 pb-20"
+			initial={{ opacity: 0, y: 15 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: -15 }} // Smooth exit if you use AnimatePresence
+			transition={{ duration: 0.4, ease: "easeOut" }}
+			className="w-full min-h-screen bg-neutral-100"
 		>
 			{/* Left-Aligned Header */}
-			<div className="w-full px-6 md:px-10 py-8">
+			<div className="w-full max-w-[1440px] px-6 md:px-10 py-8">
 				<h1 className="text-purple-600 text-4xl font-black uppercase tracking-tighter">
 					Add Listing
 				</h1>
 			</div>
 
 			{/* MAIN CONTENT GRID: Fills the screen width */}
-			<div className="w-full px-6 md:px-10">
+			<div className="w-full px-6 md:px-10 mb-10">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 					{/* LEFT COLUMN: Intelligence & Context */}
 					<div className="flex flex-col gap-6">

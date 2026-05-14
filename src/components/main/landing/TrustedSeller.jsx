@@ -49,12 +49,12 @@ export default function TrustedSellers() {
 				<div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
 					<div>
 						<div className="flex items-center gap-3">
-							<h2 className="text-white text-3xl font-black">
+							<h2 className="text-white text-3xl md:text-4xl font-black">
 								Trusted Sellers
 							</h2>
 						</div>
 
-						<p className="text-purple-100/70 text-sm mt-1">
+						<p className="text-purple-100 text-sm md:text-base mt-1">
 							Elite Verified Merchants
 						</p>
 					</div>

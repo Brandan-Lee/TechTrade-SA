@@ -36,7 +36,7 @@ export default function GallerySection({ formData, setFormData }) {
 				<h2 className="text-white text-2xl font-bold uppercase tracking-tight">
 					Hardware Gallery
 				</h2>
-				<p className="text-pink-300/80 text-xs mt-1 font-semibold">
+				<p className="text-pink-300/80 text-xs md:text-sm mt-1 font-semibold">
 					Primary photo will be the first slot.
 				</p>
 			</div>
@@ -77,7 +77,7 @@ export default function GallerySection({ formData, setFormData }) {
 						) : (
 							<div className="text-center text-white/40">
 								<ImagePlus size={24} className="mx-auto mb-1" />
-								<span className="text-[10px] font-bold">SLOT {index + 1}</span>
+								<span className="text-sm md:text-base font-bold">SLOT {index + 1}</span>
 							</div>
 						)}
 					</div>

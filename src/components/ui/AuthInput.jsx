@@ -10,7 +10,7 @@ const AuthInput = ({
     ...props 
 }) => (
     <div className="w-full space-y-1.5">
-        <label className="text-violet-600 text-[10px] font-black uppercase tracking-[0.2em] ml-1">
+        <label className="text-violet-600 text-base font-black uppercase tracking-[0.2em] ml-1">
             {label}
         </label>
         
@@ -22,7 +22,7 @@ const AuthInput = ({
                         ? (showPassword ? "text" : "password") 
                         : props.type
                 }
-                className={`w-full h-12 md:h-14 bg-slate-100 rounded-xl px-4 border transition-all text-gray-900 pr-12 ${
+                className={`w-full h-12 md:h-14 text-sm bg-slate-100 rounded-xl px-4 border transition-all text-gray-900 pr-12 placeholder:text-gray-500 ${
                     error 
                         ? 'border-red-500 ring-1 ring-red-500' 
                         : 'border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-600'

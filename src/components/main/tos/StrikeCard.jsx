@@ -23,11 +23,11 @@ export const StrikeCard = ({
 			)}
 
 			<div className="flex flex-col">
-				<h5 className="text-white font-bold text-sm mb-1 uppercase tracking-tight">
+				<h5 className="text-white font-bold text-sm md:text-base mb-1 uppercase tracking-tight">
 					{title}
 				</h5>
 
-				<p className="text-white/90 text-xs leading-5">{description}</p>
+				<p className="text-white/90 text-xs md:text-sm leading-5">{description}</p>
 			</div>
 		</div>
 	);

@@ -68,10 +68,10 @@ const ManageOffer = ({ openCounterModal }) => {
 									</h2>
 
 									<div className="flex items-center gap-3 mt-1">
-										<span className="text-white/70 text-sm line-through font-medium">
+										<span className="text-white/70 text-sm md:text-base line-through font-medium">
 											{offerData.originalPrice}
 										</span>
-										<span className="bg-gradient-to-r from-pink-600 to-pink-400 px-2 py-0.5 rounded text-white text-[10px] font-black uppercase tracking-wider">
+										<span className="bg-gradient-to-r from-pink-600 to-pink-400 px-2 py-0.5 rounded text-white text-sm md:text-base font-black uppercase tracking-wider">
 											1 Active Offer
 										</span>
 									</div>
@@ -107,14 +107,14 @@ const ManageOffer = ({ openCounterModal }) => {
 									<Star className="w-4 h-4" />
 								</div>
 
-								<span className="text-white text-sm font-semibold">
+								<span className="text-white text-sm md:text-base font-semibold">
 									{offerData.buyerRating} ({offerData.buyerReviews} reviews)
 								</span>
 							</div>
 
 							<div className="bg-gradient-to-r from-pink-600 to-pink-400 px-4 py-1.5 rounded-xl flex items-center gap-2 mb-4">
 								<ShieldCheck className="w-4 h-4 text-white" />
-								<span className="text-white text-sm font-bold tracking-tight uppercase">
+								<span className="text-white text-sm md:text-base font-bold tracking-tight uppercase">
 									Verified TechTrader
 								</span>
 							</div>
@@ -122,12 +122,12 @@ const ManageOffer = ({ openCounterModal }) => {
 							<div className="space-y-1 text-white/90">
 								<div className="flex items-center justify-center gap-2">
 									<MapPin className="w-4 h-4" />
-									<span className="text-sm font-medium">
+									<span className="text-sm md:text-base font-medium">
 										{offerData.buyerLocation}
 									</span>
 								</div>
 
-								<p className="text-xs opacity-75">
+								<p className="text-xs md:text-sm opacity-75">
 									Member since {offerData.memberSince}
 								</p>
 							</div>
@@ -138,7 +138,7 @@ const ManageOffer = ({ openCounterModal }) => {
 					<div className="flex flex-col gap-6">
 						{/* Offer Amount Card */}
 						<div className="w-full p-8 bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-2xl border-2 border-pink-600 flex flex-col items-center">
-							<span className="text-white text-sm font-bold uppercase tracking-widest opacity-80 mb-2">
+							<span className="text-white text-sm md:text-base font-bold uppercase tracking-widest opacity-80 mb-2">
 								Offer Amount
 							</span>
 
@@ -146,7 +146,7 @@ const ManageOffer = ({ openCounterModal }) => {
 								{offerData.offerPrice}
 							</div>
 
-							<div className="flex items-center gap-1 text-white/70 text-xs mb-8">
+							<div className="flex items-center gap-1 text-white/70 text-xs md:text-sm mb-8">
 								<Clock className="w-3 h-3" />
 								<span>Received {offerData.timeReceived}</span>
 							</div>
@@ -156,11 +156,11 @@ const ManageOffer = ({ openCounterModal }) => {
 						<div className="w-full bg-white p-4 rounded-xl border border-purple-200 flex gap-3">
 							<MessageSquare className="w-5 h-5 text-purple-700 shrink-0 mt-1" />
 							<div>
-								<span className="text-slate-500 text-[10px] font-black uppercase tracking-wider block">
+								<span className="text-slate-500 text-sm md:text-base font-black uppercase tracking-wider block">
 									Buyer's Note
 								</span>
 
-								<p className="text-slate-800 text-sm font-medium italic">
+								<p className="text-slate-800 text-sm md:text-base font-medium italic">
 									{offerData.buyerNote}
 								</p>
 							</div>
@@ -183,7 +183,7 @@ const ManageOffer = ({ openCounterModal }) => {
 							<div className="p-4 bg-gradient-to-r from-pink-600 to-pink-400 rounded-xl border border-violet-800 flex gap-3">
 								<AlertCircle className="w-6 h-6 text-white shrink-0" />
 
-								<p className="text-white text-xs font-medium leading-relaxed">
+								<p className="text-white text-xs md:text-sm font-medium leading-relaxed">
 									Accepting this offer will initiate the{" "}
 									<strong>Escrow State Machine</strong>, generate a whatsapp{" "}
 									<strong>TTL Bridge</strong> and lock the listing.

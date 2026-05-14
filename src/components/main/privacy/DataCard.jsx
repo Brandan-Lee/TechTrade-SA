@@ -13,11 +13,11 @@ const DataCard = ({
 	>
 		<div className="flex justify-between items-start mb-4">
 			<div className="flex flex-col gap-2">
-				<span className="w-fit px-2 py-1 bg-pink-600/50 rounded text-[10px] font-bold tracking-widest uppercase">
+				<span className="w-fit px-2 py-1 bg-pink-600 rounded text-sm md:text-base font-bold tracking-widest uppercase text-white">
 					{label}
 				</span>
 
-				<h3 className="text-sm font-bold font-inter leading-tight">{title}</h3>
+				<h3 className="text-sm md:text-base font-bold font-inter leading-tight text-white">{title}</h3>
 			</div>
 
 			{type === "toggle" ? (
@@ -31,7 +31,7 @@ const DataCard = ({
 			)}
 		</div>
 
-		<p className="text-xs font-medium font-inter leading-5 opacity-90">
+		<p className="text-xs md:text-sm font-medium font-inter leading-5 opacity-90 text-white">
 			{description}
 		</p>
 	</div>

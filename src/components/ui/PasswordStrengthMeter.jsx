@@ -45,11 +45,11 @@ const PasswordStrengthMeter = ({ password }) => {
 
 			{/* Label Display */}
 			<div className="flex justify-start items-center">
-				<span className="text-violet-600 text-[10px] font-normal uppercase tracking-wider">
+				<span className="text-violet-600 text-sm md:text-base font-normal uppercase tracking-wider">
 					Password strength:{" "}
 				</span>
 				<span
-					className={`ml-2 text-[10px] font-black uppercase tracking-widest transition-colors duration-500 ${
+					className={`ml-2 text-sm md:text-base font-black uppercase tracking-widest transition-colors duration-500 ${
 						strength > 0 ? "text-violet-800" : "text-slate-400"
 					}`}
 				>
@@ -60,15 +60,15 @@ const PasswordStrengthMeter = ({ password }) => {
 			{/* Security Requirements */}
 			<div className="flex flex-col gap-1 border-t border-slate-100 pt-3">
 				<ul className="space-y-1">
-					<li className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-tighter font-medium">
+					<li className="flex items-center gap-2 text-sm text-gray-400 uppercase tracking-tighter font-medium">
 						<div className="w-1 h-1 rounded-full bg-pink-600" />
 						More than 8 Characters
 					</li>
-					<li className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-tighter font-medium">
+					<li className="flex items-center gap-2 text-sm text-gray-400 uppercase tracking-tighter font-medium">
 						<div className="w-1 h-1 rounded-full bg-pink-600" />
 						Must include both uppercase and lowercase letters.
 					</li>
-					<li className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-tighter font-medium">
+					<li className="flex items-center gap-2 text-sm text-gray-400 uppercase tracking-tighter font-medium">
 						<div className="w-1 h-1 rounded-full bg-pink-600" />
 						Must include numbers and symbols
 					</li>

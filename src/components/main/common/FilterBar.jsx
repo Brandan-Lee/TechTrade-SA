@@ -129,14 +129,14 @@ export default function FilterBar() {
 					<div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 grow">
 						<div className="flex items-center gap-2 pr-4 border-r border-gray-200 shrink-0">
 							<SlidersHorizontal className="w-4 h-4 text-purple-700" />
-							<span className="text-gray-500 text-sm font-semibold uppercase">
+							<span className="text-gray-500 text-sm md:text-base font-semibold uppercase">
 								FILTER
 							</span>
 						</div>
 
 						<button
 							onClick={clearFilters}
-							className={`h-9 px-5 rounded-lg text-sm font-bold shrink-0 transition-all shadow-md ${
+							className={`h-9 px-5 rounded-lg text-sm md:text-base font-bold shrink-0 transition-all shadow-md ${
 								!isAnyFilterActive
 									? "bg-gradient-to-r from-purple-700 to-purple-600 text-white"
 									: "bg-white border border-gray-200 text-gray-500 hover:text-purple-700"
@@ -151,7 +151,7 @@ export default function FilterBar() {
 								data-id={dropdown.id}
 								onClick={(e) => handleToggle(e, dropdown.id)}
 								onMouseEnter={(e) => handleMouseEnter(e, dropdown.id)}
-								className={`h-9 px-5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all shadow-md shrink-0 border ${
+								className={`h-9 px-5 rounded-lg flex items-center gap-2 text-sm md:text-base font-bold transition-all shadow-md shrink-0 border ${
 									filters.category === dropdown.label ||
 									openDropdown === dropdown.id
 										? "bg-gradient-to-r from-purple-700 to-purple-600 text-white border-transparent"
@@ -167,7 +167,7 @@ export default function FilterBar() {
 
 						<button
 							onClick={() => applyFilter({ category: "PC Cases" })}
-							className={`h-9 px-5 rounded-lg text-sm font-bold shadow-md transition-all shrink-0 border ${
+							className={`h-9 px-5 rounded-lg text-sm md:text-base font-bold shadow-md transition-all shrink-0 border ${
 								filters.category === "PC Cases"
 									? "bg-gradient-to-r from-purple-700 to-purple-600 text-white border-transparent"
 									: "bg-white border-gray-200 text-gray-500 hover:text-purple-700"
@@ -189,7 +189,7 @@ export default function FilterBar() {
 									data-id={dropdown.id}
 									onClick={(e) => handleToggle(e, dropdown.id)}
 									onMouseEnter={(e) => handleMouseEnter(e, dropdown.id)}
-									className={`h-9 px-5 rounded-lg flex items-center gap-2 text-sm font-bold transition-all shadow-md shrink-0 border ${
+									className={`h-9 px-5 rounded-lg flex items-center gap-2 text-sm md:text-base font-bold transition-all shadow-md shrink-0 border ${
 										isSet || openDropdown === dropdown.id
 											? "bg-gradient-to-r from-purple-700 to-purple-600 text-white border-transparent"
 											: "bg-white border border-gray-200 text-gray-500 hover:text-purple-700"
@@ -225,7 +225,7 @@ export default function FilterBar() {
 															: { category: item },
 													)
 												}
-												className="w-full h-11 flex items-center px-4 rounded-xl text-white text-sm font-semibold hover:bg-white/20 transition-all"
+												className="w-full h-11 flex items-center px-4 rounded-xl text-white text-sm md:text-base font-semibold hover:bg-white/20 transition-all"
 											>
 												{item}
 											</button>
@@ -239,14 +239,14 @@ export default function FilterBar() {
 												value={tempPrice.min}
 												onChange={(e) => handlePriceInput(e, "min")}
 												placeholder="Min"
-												className="w-full h-10 bg-white/10 border border-white/20 rounded-lg px-3 text-white placeholder:text-white/50 text-sm outline-none"
+												className="w-full h-10 bg-white/10 border border-white/20 rounded-lg px-3 text-white placeholder:text-white/50 text-sm md:text-base outline-none"
 											/>
 											<input
 												type="text"
 												value={tempPrice.max}
 												onChange={(e) => handlePriceInput(e, "max")}
 												placeholder="Max"
-												className="w-full h-10 bg-white/10 border border-white/20 rounded-lg px-3 text-white placeholder:text-white/50 text-sm outline-none"
+												className="w-full h-10 bg-white/10 border border-white/20 rounded-lg px-3 text-white placeholder:text-white/50 text-sm md:text-base outline-none"
 											/>
 										</div>
 										<button

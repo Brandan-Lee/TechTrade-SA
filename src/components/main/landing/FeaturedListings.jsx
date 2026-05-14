@@ -47,10 +47,10 @@ export default function FeaturedListings() {
 			<div className="max-w-[1440px] mx-auto">
 				{/* Header */}
 				<div className="mb-8">
-					<h2 className="text-purple-600 text-3xl font-black uppercase tracking-tighter">
+					<h1 className="text-purple-600 text-4xl font-black uppercase tracking-tighter">
 						Featured Listings
-					</h2>
-					<p className="text-gray-500 text-sm font-medium">
+					</h1>
+					<p className="mt-4 text-sm md:text-base lg:text-lg font-bold text-slate-500 uppercase tracking-widest">
 						Hand-picked premium hardware deals in your area
 					</p>
 				</div>

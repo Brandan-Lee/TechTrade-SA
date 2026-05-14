@@ -22,7 +22,7 @@ export default function TradeHistoryCard({
 				</h3>
 
 				<span
-					className={`shrink-0 px-3 py-1 bg-gradient-to-br ${statusStyles} rounded-full text-white text-[10px] font-black tracking-widest uppercase shadow-lg`}
+					className={`shrink-0 px-3 py-1 bg-gradient-to-br ${statusStyles} rounded-full text-white text-sm md:text-base font-black tracking-widest uppercase shadow-lg`}
 				>
 					{status}
 				</span>
@@ -31,14 +31,14 @@ export default function TradeHistoryCard({
 			{/* Bottom Row */}
 			<div className="flex justify-between items-end">
 				<div className="flex flex-col">
-					<p className="text-white text-xs font-medium leading-5">
+					<p className="text-white text-xs md:text-sm font-medium leading-5">
 						Buyer:{" "}
 						<span className="text-pink-400 font-bold group-hover:text-pink-300 transition-colors">
 							{buyer}
 						</span>
 					</p>
 					<div className="flex items-center gap-2">
-						<p className="text-white/60 text-[11px] font-medium uppercase tracking-tighter">
+						<p className="text-white/60 text-sm md:text-base font-medium uppercase tracking-tighter">
 							{date}
 						</p>
 						{/* Small indicator for In Progress */}

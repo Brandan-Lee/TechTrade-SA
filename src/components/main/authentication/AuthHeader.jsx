@@ -47,14 +47,14 @@ export default function AuthHeader() {
 					<ShieldCheck className="w-8 h-8 text-violet-600" />
 				</div>
 				{/* Live Indicator */}
-				<div className="flex items-center gap-2 text-violet-600 font-bold tracking-widest text-sm uppercase">
+				<div className="flex items-center gap-2 text-violet-600 font-bold tracking-widest text-sm md:text-base uppercase">
 					<Radio className="w-4 h-4 text-green-500 animate-pulse" />
 					Live
 				</div>
 
 				{/* Message Slider */}
-				<div className="h-16 flex items-center justify-center text-center">
-					<p className="text-gray-600 text-sm font-medium font-['Inter'] leading-relaxed transition-all duration-500">
+				<div className="h-auto flex items-center justify-center text-center">
+					<p className="text-gray-600 text-sm md:text-base font-medium font-['Inter'] leading-relaxed transition-all duration-500">
 						{messages[currentSlide]}
 					</p>
 				</div>

@@ -19,9 +19,9 @@ export default function BuildDoctor() {
 			className="min-h-screen bg-neutral-100 font-['Inter']"
 		>
 			<header className="w-full px-6 md:px-12 py-8">
-				<h2 className="text-purple-600 text-3xl font-black uppercase tracking-tighter">
+				<h1 className="text-purple-600 sm:text-xl md:text-2xl lg:text-4xl font-black uppercase tracking-tighter">
 					Build Doctor
-				</h2>
+				</h1>
 			</header>
 
 			<div className="max-w-4xl mx-auto px-6 pb-20 flex flex-col gap-6">

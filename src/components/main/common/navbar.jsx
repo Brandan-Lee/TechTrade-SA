@@ -31,7 +31,7 @@ export default function NavBar({ toggleMenu, onLoginClick, onNotificationClick }
         { name: "Sell your Gear", path: "/sell" },
         { name: "Build Doctor", path: "/build-doctor" },
         { name: "Login/Register", isModal: true },
-        { name: "Contact Us", path: "/contact" },
+        { name: "Contact Us", path: "/contact-us" },
     ];
 
     useEffect(() => {
@@ -80,7 +80,7 @@ export default function NavBar({ toggleMenu, onLoginClick, onNotificationClick }
                                     key={idx}
                                     to={item.path}
                                     onClick={() => setIsUserDropdownOpen(false)}
-                                    className={`w-full h-11 flex items-center gap-3 px-4 rounded-xl text-sm font-bold transition-all ${
+                                    className={`w-full h-11 flex items-center gap-3 px-4 rounded-xl text-sm md:text-base font-bold transition-all ${
                                         item.isDanger
                                             ? "text-red-100 hover:bg-red-500/30"
                                             : "text-white hover:bg-white/20 hover:translate-x-1"
@@ -102,7 +102,7 @@ export default function NavBar({ toggleMenu, onLoginClick, onNotificationClick }
     return (
         <div className="w-full max-w-[1440px] flex flex-col lg:flex-row items-center gap-4 lg:gap-10 px-2 lg:px-8 py-4 lg:py-2 mx-auto">
             {/* Header Section */}
-            <div className="flex items-center justify-between w-full lg:w-auto lg:justify-start gap-3">
+            <div className="flex items-center justify-between w-full h-auto lg:w-auto lg:justify-start gap-3">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={toggleMenu}

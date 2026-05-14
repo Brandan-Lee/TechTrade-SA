@@ -45,7 +45,7 @@ const NotificationItem = ({
 			if (status === "accepted") {
 				return (
 					<span>
-						Your offer of <span className="font-bold">R{offerAmount}</span> for
+						Your offer of <span className="font-bold text-sm md:text-base">R{offerAmount}</span> for
 						[{listingName}] was{" "}
 						<span className="text-green-600 font-bold uppercase">Accepted</span>{" "}
 						by {sellerName}.
@@ -152,7 +152,7 @@ const NotificationItem = ({
 					<div className="flex justify-between items-start">
 						<div className="flex items-center gap-2">
 							<h4
-								className={`text-base font-bold leading-5 ${isRead ? "text-neutral-600" : "text-violet-900"}`}
+								className={`text-base md:text-lg font-bold leading-5 ${isRead ? "text-neutral-600" : "text-violet-900"}`}
 							>
 								{title}
 							</h4>
@@ -160,13 +160,13 @@ const NotificationItem = ({
 								<Circle className="w-2 h-2 fill-pink-600 text-pink-600" />
 							)}
 						</div>
-						<span className="text-violet-800 text-xs font-medium flex items-center gap-1 shrink-0 mr-6">
+						<span className="text-violet-800 text-xs md:text-base font-medium flex items-center gap-1 shrink-0 mr-6">
 							<Clock className="w-3 h-3" /> {time}
 						</span>
 					</div>
 
 					<p
-						className={`text-sm leading-tight ${isRead ? "text-neutral-500" : "text-slate-700 font-medium"}`}
+						className={`text-sm md:text-base leading-tight ${isRead ? "text-neutral-500" : "text-slate-700 font-medium"}`}
 					>
 						{renderMessage()}
 					</p>

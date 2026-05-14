@@ -126,7 +126,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 
                     {/* Province Selector */}
                     <div className="space-y-1.5">
-                        <label className="text-violet-600 text-[10px] font-black uppercase tracking-widest ml-1">Province</label>
+                        <label className="text-violet-600 text-sm md:text-base font-black uppercase tracking-widest ml-1">Province</label>
                         <div className="relative">
                             <select
                                 name="province"
@@ -143,6 +143,31 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
                             <ChevronDown className="absolute right-4 top-3.5 text-slate-500 pointer-events-none" size={18} />
                         </div>
                     </div>
+
+                    <div className="p-6 bg-white rounded-2xl border border-slate-100 space-y-4">
+						<h3 className="text-violet-600 text-sm md:text-base font-black uppercase tracking-widest">
+							Register As:
+						</h3>
+						<div className="flex flex-wrap gap-4">
+							{["buyer", "seller", "both"].map((type) => (
+								<label
+									key={type}
+									className="flex items-center gap-2 cursor-pointer group"
+								>
+									<input
+										type="radio"
+										name="regType"
+										className="w-4 h-4 accent-pink-600"
+										checked={formData.regType === type}
+										onChange={() => setFormData({ ...formData, regType: type })}
+									/>
+									<span className="text-xs md:text-sm font-bold text-violet-600 capitalize">
+										{type}
+									</span>
+								</label>
+							))}
+						</div>
+					</div>
 
                     {/* Terms and Conditions Section */}
                     <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -163,7 +188,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
                                 />
                             </div>
                             
-                            <span className="text-sm font-medium text-slate-600 leading-relaxed">
+                            <span className="text-sm md:text-base font-medium text-slate-600 leading-relaxed">
                                 I agree to the{" "}
                                 <button
                                     type="button"

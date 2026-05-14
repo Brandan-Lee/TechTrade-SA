@@ -33,10 +33,10 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName }) => {
                     
                     {/* Information Header */}
                     <div className="flex flex-col gap-1 text-left">
-                        <p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.2em]">
+                        <p className="text-slate-600 text-sm md:text-base font-black uppercase tracking-[0.2em]">
                             You are making a counter offer for:
                         </p>
-                        <span className="text-violet-900 font-bold underline decoration-pink-500">
+                        <span className=" text-sm md:text-base text-violet-900 font-bold underline decoration-pink-500 mt-3">
                             {listingName || "Selected Listing"}
                         </span>
                     </div>
@@ -44,11 +44,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName }) => {
                     {/* Input Section */}
                     <div className="w-full flex flex-col gap-3">
                         <div className="relative group w-full">
-                            {/* 
-                                2. CLICK FIX: 'pointer-events-none' ensures you can 
-                                click "through" the 'R' to focus the input.
-                            */}
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold z-10 pointer-events-none">
+                            <span className="absolute left-4 top-1/2 translate-y-1/2 text-slate-400 font-bold z-10 pointer-events-none">
                                 R
                             </span>
                             <AuthInput
@@ -66,7 +62,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName }) => {
                     <div className="w-full">
                         <PurpleGradientButton
                             onClick={handleSubmit}
-                            label="Submit Counter Offer"
+                            label="SUBMIT COUNTER OFFER"
                         />
                     </div>
                 </div>

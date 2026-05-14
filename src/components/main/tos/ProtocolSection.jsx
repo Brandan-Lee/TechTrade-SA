@@ -10,6 +10,6 @@ export const ProtocolSection = ({ title, icon, children }) => (
 			</h3>
 		</div>
 
-		<div className="space-y-4 text-slate-600 text-sm leading-6">{children}</div>
+		<div className="space-y-4 text-slate-600 text-sm md:text-base leading-6">{children}</div>
 	</div>
 );

@@ -31,13 +31,13 @@ export default function IncomingOfferCard({
 						className="w-20 h-20 rounded-lg object-cover bg-white/10 shrink-0"
 					/>
 					<div className="flex flex-col justify-center">
-						<h3 className="text-white text-sm font-bold leading-tight uppercase tracking-tight">
+						<h3 className="text-white text-sm md:text-base font-bold leading-tight uppercase tracking-tight">
 							{product.brand}
 						</h3>
-						<p className="text-white/80 text-xs font-medium mb-1">
+						<p className="text-white/80 text-xs md:text-sm font-medium mb-1">
 							{product.model}
 						</p>
-						<span className="text-pink-400 text-sm font-black italic">
+						<span className="text-pink-400 text-sm md:text-base font-black italic">
 							{originalPrice}
 						</span>
 					</div>
@@ -59,13 +59,13 @@ export default function IncomingOfferCard({
 
 						<div>
 							<div className="flex items-center gap-2">
-								<span className="text-white text-sm font-bold">
+								<span className="text-white text-sm md:text-base font-bold">
 									{buyer.name}
 								</span>
-								<span className="text-white/30 text-xs">//</span>
+								<span className="text-white text-xs md:text-sm">//</span>
 								<div className="flex items-center gap-1 text-amber-400">
 									<Star size={12} fill="currentColor" />
-									<span className="text-white text-[10px] font-bold">
+									<span className="text-white text-sm md:text-base font-bold">
 										5 Stars
 									</span>
 								</div>
@@ -74,7 +74,7 @@ export default function IncomingOfferCard({
 					</div>
 
 					<div className="bg-gray-50 rounded p-3 border border-gray-200 shadow-inner">
-						<p className="text-slate-600 text-xs font-medium leading-relaxed italic">
+						<p className="text-slate-600 text-xs md:text-sm font-medium leading-relaxed italic">
 							"{message}"
 						</p>
 					</div>
@@ -89,7 +89,7 @@ export default function IncomingOfferCard({
 							<div className="text-pink-500 text-2xl lg:text-3xl font-black italic leading-none">
 								{offerAmount}
 							</div>
-							<div className="flex items-center justify-end gap-1 text-white/50 text-[10px] mt-1">
+							<div className="flex items-center justify-end gap-1 text-white text-sm md:text-base mt-1">
 								<Clock size={10} />
 								<span>{timeAgo}</span>
 							</div>

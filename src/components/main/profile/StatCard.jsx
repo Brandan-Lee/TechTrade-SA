@@ -4,7 +4,7 @@ const StatCard = ({ icon, label, value }) => (
             {icon}
         </div>
 
-        <div className="text-[10px] font-bold uppercase tracking-widest text-center leading-tight mb-2">
+        <div className="text-sm md:text-base font-bold uppercase tracking-widest text-center leading-tight mb-2">
             {label}
         </div>
         

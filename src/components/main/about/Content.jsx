@@ -19,7 +19,7 @@ export default function Content() {
 					</div>
 
 					<div className="bg-white p-6 md:10 rounded-2xl shadow-sm border border-neutral-200 space-y-6">
-						<p className="text-gray-700 text-base md:text-lg leading-relaxed font-medium">
+						<p className="text-gray-700 text-base md:text-lg leading-relaxed">
 							TechTrade SA was born from a critical need in South Africa's
 							rapidly evolving technology landscape. As hardware enthusiasts and
 							cybersecurity professionals, we witnessed firsthand the risks
@@ -46,7 +46,7 @@ export default function Content() {
 					initial={{ opacity: 0, y: 20 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
-					className="bg-neutral-100 p-8 rounded-2xl border-2 border-dashed border-purple-200"
+					className="bg-neutral-100 p-8 rounded-2xl border-2 border-dashed border-purple-300"
 				>
 					<p className="text-gray-700 text-base md:text-lg leading-relaxed italic text-center">
 						"TechTrade SA is a specialized ecosystem designed to professionalize

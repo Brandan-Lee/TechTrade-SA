@@ -21,7 +21,9 @@ export default function ComponentCard({
 	];
 
 	return (
-		<div className="w-full p-px bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-2xl shadow-xl outline outline-1 outline-pink-600 overflow-hidden">
+		<>
+			<div className="grid grid-cols-1">
+				<div className="w-full grid grid-cols-1 md:grid- p-px bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-2xl shadow-xl outline outline-1 outline-pink-600 overflow-hidden">
 			{/* Card Header */}
 			<div className="h-16 px-5 border-b border-pink-600/50 flex items-center gap-3">
 				<div className="w-10 h-10 bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -36,7 +38,7 @@ export default function ComponentCard({
 				<div className="space-y-2">
 					<label
 						htmlFor=""
-						className="text-pink-200 text-[10px] font-black uppercase tracking-[0.2em]"
+						className="text-pink-200 text-sm md:text-base font-black uppercase tracking-[0.2em]"
 					>
 						Component Name
 					</label>
@@ -49,9 +51,10 @@ export default function ComponentCard({
 					/>
 				</div>
 			</div>
+		</div>
 
-			{/* Technical Specifications */}
-			<div className="bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-xl p-6 shadow-xl text-white">
+		{/* Technical Specifications */}
+			<div className="hidden bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-xl p-6 shadow-xl text-white">
 				<h2 className="text-xl font-black mb-6 uppercase tracking-tight">
 					Technical Specifications
 				</h2>
@@ -61,16 +64,20 @@ export default function ComponentCard({
 							key={idx}
 							className="flex justify-between items-center py-3 border-b border-pink-600/30 last:border-0 hover:bg-white/5 transition-colors px-2 rounded"
 						>
-							<span className="text-white/60 text-sm font-semibold">
+							<span className="text-white text-sm md:text-base font-semibold">
 								{spec.label}
 							</span>
-							<span className="text-white text-sm font-bold text-right ml-4">
+							<span className="text-white text-sm md-text-base font-bold text-right ml-4">
 								{spec.value}
 							</span>
 						</div>
 					))}
 				</div>
 			</div>
-		</div>
+			</div>
+		
+		</>
+		
+		
 	);
 }

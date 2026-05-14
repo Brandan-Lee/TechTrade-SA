@@ -31,7 +31,7 @@ export default function IntelSection({ formData, setFormData }) {
 				<h2 className="text-white text-2xl font-black uppercase tracking-tighter italic mb-8">
 					Component Intelligence
 				</h2>
-				<label className="label text-pink-200 text-[10px] font-black uppercase tracking-[0.25em] mb-2 ml-1">
+				<label className="label text-pink-200 text-sm md:text-base font-black uppercase tracking-[0.25em] mb-2 ml-1">
 					Select Category
 				</label>
 				<button
@@ -59,7 +59,7 @@ export default function IntelSection({ formData, setFormData }) {
 										className="flex flex-col gap-1 mb-4 last:mb-0"
 									>
 										<div className="flex items-center gap-3 px-4 py-1 mb-1">
-											<span className="text-[10px] font-black text-white uppercase tracking-[0.2em] drop-shadow-md">
+											<span className="text-sm md:text-base font-black text-white uppercase tracking-[0.2em] drop-shadow-md">
 												{group.label}
 											</span>
 											<div className="flex-1 h-[1px] bg-white/20" />
@@ -72,7 +72,7 @@ export default function IntelSection({ formData, setFormData }) {
 													setFormData({ ...formData, category: item });
 													setIsOpen(false);
 												}}
-												className="w-full h-11 flex items-center px-4 rounded-xl text-white text-sm font-bold hover:bg-white/10 transition-all text-left"
+												className="w-full h-11 flex items-center px-4 rounded-xl text-white text-sm md:text-base font-bold hover:bg-white/10 transition-all text-left"
 											>
 												{item}
 											</button>
@@ -87,14 +87,14 @@ export default function IntelSection({ formData, setFormData }) {
 
 			{/* 2. COMPONENT NAME INPUT */}
 			<div className="form-control w-full mb-10">
-				<label className="label text-pink-200 text-[10px] font-black uppercase tracking-[0.25em] mb-2 ml-1">
+				<label className="label text-pink-200 text-sm md:text-base font-black uppercase tracking-[0.25em] mb-2 ml-1">
 					Component Name
 				</label>
 				<div className="flex gap-3">
 					<input
 						type="text"
 						placeholder="e.g., RTX 4090, Ryzen 9 7950X"
-						className="flex-1 bg-white h-16 rounded-2xl px-6 text-gray-900 font-bold text-sm focus:outline-none focus:ring-4 ring-pink-500/30 shadow-lg"
+						className="flex-1 bg-white h-16 rounded-2xl px-6 text-gray-900 font-bold text-sm md:text-base focus:outline-none focus:ring-4 ring-pink-500/30 shadow-lg"
 						value={formData.name || ""}
 						onChange={(e) => setFormData({ ...formData, name: e.target.value })}
 					/>
@@ -108,18 +108,20 @@ export default function IntelSection({ formData, setFormData }) {
 				<span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold z-10 pointer-events-none">
 					R
 				</span>
-				<AuthInput
-					label="Enter your asking price"
-					type="number"
-					value={amount}
-					onChange={(e) => setAmount(e.target.value)}
-					// Added padding-left (pl-10) so text doesn't overlap the 'R'
-					className="pl-10 w-full"
-				/>
+				<label className="label text-pink-200 text-sm md:text-base font-black uppercase tracking-[0.25em] mb-2 ml-1">
+					ENTER YOUR ASKING PRICE
+				</label>
+				<div className="flex gap-3">
+					<input
+						type="number"
+						placeholder=""
+						className="flex-1 bg-white h-16 rounded-2xl px-6 text-gray-900 font-bold text-sm md:text-base focus:outline-none focus:ring-4 ring-pink-500/30 shadow-lg"
+					/>
+				</div>
 			</div>
 
 			{/* 3. VERIFIED SPECS BOX (Optimized & Static) */}
-			<div className="w-full bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 rounded-2xl p-[2px] shadow-xl">
+			<div className="w-full bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 rounded-2xl p-[2px] shadow-xl mt-5">
 				<div className="bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 rounded-[14px] p-6 border-2 border-violet-800">
 					{/* Header */}
 					<div className="flex items-center gap-3 mb-6">

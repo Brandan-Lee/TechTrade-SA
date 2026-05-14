@@ -10,7 +10,7 @@ export default function ContextSection({ formData, setFormData }) {
 			<div className="space-y-8">
 				{/* CONDITION SELECTOR */}
 				<div className="form-control">
-					<label className="label text-pink-200 text-[10px] font-black uppercase tracking-[0.25em] mb-3 ml-1">
+					<label className="label text-pink-200 text-sm md:text-base font-black uppercase tracking-[0.25em] mb-3 ml-1">
 						Component Condition
 					</label>
 					<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -21,7 +21,7 @@ export default function ContextSection({ formData, setFormData }) {
 									key={c}
 									type="button"
 									onClick={() => setFormData({ ...formData, condition: c })}
-									className={`h-14 rounded-2xl font-bold uppercase tracking-wider text-sm transition-all shadow-lg border-2
+									className={`h-14 rounded-2xl font-bold uppercase tracking-wider text-sm md:text-base transition-all shadow-lg border-2
                     ${
 											isSelected
 												? "bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 border-violet-800 text-white"
@@ -37,7 +37,7 @@ export default function ContextSection({ formData, setFormData }) {
 
 				{/* DESCRIPTION AREA */}
 				<div className="form-control">
-					<label className="label text-pink-200 text-[10px] font-black uppercase tracking-[0.25em] mb-3 ml-1">
+					<label className="label text-pink-200 text-sm md:text-base font-black uppercase tracking-[0.25em] mb-3 ml-1">
 						Detailed Description
 					</label>
 					<textarea

@@ -203,7 +203,7 @@ export default function ViewListing() {
                     </div>
 
                     {/* Make an offer card */}
-                    <div className="bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 rounded-xl p-6 shadow-xl border border-pink-600/30 text-white">
+                    <div className="bg-gradient-to-r from-pink-600 via-pink-400 to-pink-600 rounded-xl p-6 shadow-xl border border-pink-600/30 text-white">
                         <h3 className="text-xl font-black mb-4 uppercase tracking-tight">Make an offer</h3>
                         <div className="flex flex-col gap-3">
                             <div className="relative">
@@ -216,8 +216,12 @@ export default function ViewListing() {
                                 />
                             </div>
 
+                            <label className="text-violet-600 text-[10px] font-black uppercase tracking-[0.2em] ml-1">
+                                Buyers Note
+                            </label>
                             <textarea
-                                className="w-full h-48 bg-white text-gray-900 p-6 focus:outline-none focus:ring-4 ring-pink-500/30 text-base font-medium leading-relaxed rounded-[2rem] shadow-inner placeholder:text-gray-500"
+                                className="w-full h-48 bg-slate-100 rounded-xl px-4 border transition-all text-gray-900 pr-12 focus:outline-none focus:ring-2 ring-pink-500 text-base font-medium leading-relaxed rounded-[2rem] shadow-inner placeholder:text-gray-500"
+                                placeholder="Buyers Note"
                                 placeholder="Buyers Note"
                                 value={description}
                                 onChange={(e) =>

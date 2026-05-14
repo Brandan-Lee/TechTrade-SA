@@ -82,7 +82,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
     const notificationActions = (
         <button 
             onClick={markAllAsRead}
-            className="text-pink-400 hover:text-pink-200 text-sm font-bold flex items-center gap-1 transition-colors"
+            className="text-pink-400 hover:text-pink-200 text-sm md:text-lg font-bold flex items-center gap-1 transition-colors"
         >
             <CheckCheck className="w-4 h-4" />
             <span className="hidden sm:inline">Mark all as read</span>
@@ -107,7 +107,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
                 {/* UNREAD SECTION */}
                 {unreadNotifications.length > 0 && (
                     <div className="flex flex-col gap-2">
-                        <h3 className="text-[10px] font-black text-pink-500 uppercase tracking-[0.2em] px-1">
+                        <h3 className="text-sm md:text-lg font-black text-pink-500 uppercase tracking-[0.2em] px-1">
                             New
                         </h3>
                         {unreadNotifications.map((notif) => (
@@ -124,7 +124,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
                 {/* READ SECTION */}
                 {readNotifications.length > 0 && (
                     <div className="flex flex-col gap-2">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">
+                        <h3 className="text-sm md:text-lg font-black text-slate-400 uppercase tracking-[0.2em] px-1">
                             Earlier
                         </h3>
                         {readNotifications.map((notif) => (

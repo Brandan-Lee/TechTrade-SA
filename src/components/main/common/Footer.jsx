@@ -21,19 +21,18 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 	const navigationLinks = [
 		{ name: "About Us", path: "/about" },
 		{ name: "Privacy Policy", isModal: true },
-		{ name: "Contact Support", path: "/contact" },
 		{ name: "Terms of Service", isModal: true },
 		{ name: "Marketplace", path: "/market" },
 		{ name: "Sell your Gear", path: "/sell" },
 		{ name: "Build Doctor", path: "/build-doctor" },
 		{ name: "Login/Register", isModal: true },
-		{ name: "Contact Us", path: "/contact" },
+		{ name: "Contact Us", path: "/contact-us" },
 	];
 
 	return (
 		<footer className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 border-t-4 border-pink-600 font-inter">
 			{/* Escrow Process Section */}
-			<section className="w-full py-10 px-4 text-white">
+			<section className="w-full py-5 px-4 text-white">
 				<div className="max-w-[1200px] mx-auto text-center">
 					<h2 className="text-3xl md:text-4xl font-black mb-2 italic">
 						5-Step Escrow Process
@@ -51,7 +50,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 									>
 										{step.id}
 									</div>
-									<span className="text-xs font-bold uppercase tracking-widest mt-1">
+									<span className="text-xs md:text-sm font-bold uppercase tracking-widest mt-1">
 										{step.label}
 									</span>
 								</div>
@@ -81,7 +80,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 
 					<div className="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full border border-white/20">
 						<div className="w-3 h-3 bg-emerald-500 rounded-full shadow-[0_0_15px_#10b981] animate-pulse" />
-						<span className="text-white text-[10px] font-black tracking-widest">
+						<span className="text-white text-sm md:text-base font-black tracking-widest">
 							LIVE
 						</span>
 					</div>
@@ -89,10 +88,10 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 			</div>
 
 			{/* Main Footer Content */}
-			<section className="w-full pt-16 pb-8 px-4 text-white">
+			<section className="w-full py-5 px-4 text-white">
 				<div className="max-w-[1200px] mx-auto">
 					{/* Security Protocols */}
-					<div className="flex flex-wrap justify-center gap-12 md:gap-24 mb-16">
+					<div className="flex flex-wrap justify-center gap-12 md:gap-24 my-5">
 						{securityIcons.map((item) => (
 							<div
 								key={item.label}
@@ -112,10 +111,10 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 				</div>
 
 				{/* Navigation Links */}
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center border-t-2 border-b-2 border-pink-500/20 py-8 mb-10">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center border-t-2 border-b-2 border-pink-500/50 py-5">
 					{navigationLinks.map((link) => {
 						// Common CSS for both links and buttons
-						const linkStyles = "text-sm font-bold uppercase tracking-tight hover:text-pink-400 transition-colors py-2 text-center block w-full";
+						const linkStyles = "text-sm md:text-base font-bold uppercase tracking-tight hover:text-pink-400 transition-colors py-2 text-center block w-full";
 
 						if (link.isModal) {
 							return (
@@ -124,8 +123,9 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 									onClick={() => {
 										if (link.name === "Login/Register") {
 											onLoginClick();
-										} else {
+										} else if (link.name === "Terms of Service") {
 											onTOSClick();
+										} else {
 											onDataClick();
 										}
 									}}
@@ -164,7 +164,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 						</h3>
 					</div>
 					<div className="text-center space-y-1">
-						<p className="text-white text-[10px] font-medium">
+						<p className="text-white text-sm md:text-base font-medium">
 							&copy; 2026 TechTrade SA. All Rights Reserved.
 						</p>
 					</div>

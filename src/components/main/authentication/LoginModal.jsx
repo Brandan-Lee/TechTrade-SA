@@ -52,7 +52,7 @@ export const LoginModal = ({
                         <button
                             type="button"
                             onClick={onSwitchToForgot}
-                            className="text-violet-800 text-xs font-bold uppercase tracking-widest w-full text-right py-1 hover:text-pink-600 transition-colors"
+                            className="text-violet-800 text-xs md:text-base font-bold uppercase tracking-widest w-full text-right py-1 hover:text-pink-600 transition-colors"
                         >
                             Forgot Password?
                         </button>
@@ -67,7 +67,7 @@ export const LoginModal = ({
 
                 {/* Footer Section */}
                 <div className="pt-8 border-t border-gray-200 flex flex-col items-center gap-4">
-                    <span className="text-slate-400 text-xs font-bold uppercase">
+                    <span className="text-slate-400 text-xs md:text-base font-bold uppercase">
                         New to TechTrade?
                     </span>
                     <button

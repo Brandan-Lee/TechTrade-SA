@@ -13,6 +13,7 @@ import Market from "./pages/main/Market";
 import SellGear from "./pages/main/SellGear";
 import BuildDoctor from "./pages/main/BuildDoctor";
 import Profile from "./pages/main/Profile";
+import ContactUs from "./pages/main/ContactUs";
 
 // Auth Modals
 import LoginModal from "./components/main/authentication/LoginModal";
@@ -114,6 +115,7 @@ function App() {
                     <Route path="offers" element={<MyOffers />} />
                     <Route path="view-listing" element={<ViewListing />} />
                     <Route path="manage-offer" element={<ManageOffer openCounterModal={() => setIsCounterModalOpen(true)} />} />
+                    <Route path="contact-us" element={<ContactUs />} />
                 </Route>
             </Routes>
 
