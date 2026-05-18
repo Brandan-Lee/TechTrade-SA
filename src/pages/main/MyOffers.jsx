@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Terminal, ShieldAlert } from "lucide-react";
 import IncomingOfferCard from "../../components/main/profile/IncomingOfferCard";
 
 export default function MyOffers() {
@@ -34,31 +35,49 @@ export default function MyOffers() {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 10 }}
+			initial={{ opacity: 0, y: 15 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-			className="min-h-screen bg-neutral-100 font-['Inter']"
+			transition={{ duration: 0.4, ease: "easeOut" }}
+			className="min-h-screen bg-[#050506] text-slate-300 pb-20 relative overflow-hidden font-mono selection:bg-fuchsia-500/30 selection:text-white"
 		>
-			<header className="w-full px-6 md:px-12 py-8">
-				<h2 className="text-purple-600 text-3xl font-black uppercase tracking-tighter">
-					My Offers
-				</h2>
+			{/* Ambient System Cyber Grid Backdrop Matrix */}
+			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808003_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+			<div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
+
+			{/* DASHBOARD TERMINAL HEADER */}
+			<header className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-10 pb-6 border-b border-white/5 relative z-10">
+				<h1 className="text-white text-2xl sm:text-3xl font-black uppercase tracking-tight">
+					INCOMING OFFERS
+				</h1>
 			</header>
 
-			<div className="max-w-4xl mx-auto px-6 pb-20 flex flex-col gap-6">
+			{/* DATA TRANSACTION PACKET LAYER */}
+			<main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 mt-8 flex flex-col gap-6 relative z-10">
 				{offers.length > 0 ? (
-					offers.map((offer) => <IncomingOfferCard key={offer.id} {...offer} />)
+					<div className="space-y-4">
+						{offers.map((offer) => (
+							<motion.div
+								key={offer.id}
+								layout
+								initial={{ opacity: 0, scale: 0.98 }}
+								animate={{ opacity: 1, scale: 1 }}
+								transition={{ duration: 0.2 }}
+							>
+								<IncomingOfferCard {...offer} />
+							</motion.div>
+						))}
+					</div>
 				) : (
-					<div className="py-20 text-center flex flex-col items-center gap-4">
-						<div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-							<Search size={24} className="text-gray-400" />
+					<div className="py-20 border border-dashed border-white/10 rounded-2xl bg-[#0c0c0e]/40 backdrop-blur-sm text-center flex flex-col items-center justify-center p-6 max-w-xl mx-auto mt-12 shadow-[inset_0_0_30px_rgba(0,0,0,0.5)]">
+						<div className="w-12 h-12 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-center justify-center text-amber-400/80 mb-4 shadow-[0_0_15px_rgba(245,158,11,0.05)]">
+							<ShieldAlert size={20} />
 						</div>
-						<p className="text-gray-500 font-medium italic">
-							No offers found matching your criteria.
-						</p>
+						<h2 className="text-white font-bold text-sm uppercase tracking-wider mb-1">
+							NO INCOMING OFFERS HAS BEEN FOUND
+						</h2>
 					</div>
 				)}
-			</div>
+			</main>
 		</motion.div>
 	);
 }

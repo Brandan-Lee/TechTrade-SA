@@ -1,146 +1,189 @@
-import { BellRing, CheckCheck } from "lucide-react";
-import React, { useState } from "react"; // Added useState for deletion logic
+import React, { useState } from "react";
+import { Terminal, CheckCheck, Eye, EyeOff } from "lucide-react";
 import BaseModal from "../../ui/BaseModal";
 import NotificationItem from "./NotificationItem";
 
 const NotificationModal = ({ isOpen, onClose }) => {
-    // 1. Initial Mock Data reflecting all required types and statuses
+    // 1. Unified State Core Matrix with coherent boolean markers
     const [notifications, setNotifications] = useState([
         {
             id: 1,
-            type: 'offer',
-            status: 'pending',
-            title: 'New Offer Received',
-            time: '2m ago',
-            offerAmount: '8,500',
-            listingName: 'RTX 3080',
-            buyerName: 'Thabo M.',
-            read: false
+            type: "offer",
+            status: "pending",
+            title: "OFFER_RECEIVED",
+            time: "2M_AGO",
+            offerAmount: "8,500",
+            listingName: "RTX 3080",
+            buyerName: "Thabo M.",
+            isRead: false
         },
         {
             id: 2,
-            type: 'bridge',
-            status: 'active',
-            title: 'Secure Bridge Active',
-            time: '1h ago',
-            listingName: 'PlayStation 5',
-            sellerName: 'Sarah K.',
-            read: false
+            type: "bridge",
+            status: "active",
+            title: "SECURE_BRIDGE_ONLINE",
+            time: "1H_AGO",
+            listingName: "PlayStation 5",
+            sellerName: "Sarah K.",
+            isRead: false
         },
         {
             id: 3,
-            type: 'counter',
-            status: 'pending',
-            title: 'Counter-Offer Received',
-            time: '3h ago',
-            offerAmount: '9,000',
-            listingName: 'Gaming Chair',
-            sellerName: 'Mike D.',
-            actionLabel: 'VIEW COUNTER-OFFER',
-            read: false
+            type: "counter",
+            status: "pending",
+            title: "COUNTER_MUTATION_ALERT",
+            time: "3H_AGO",
+            offerAmount: "9,000",
+            listingName: "Gaming Chair",
+            sellerName: "Mike D.",
+            isRead: false
         },
         {
             id: 4,
-            type: 'offer',
-            status: 'accepted',
-            title: 'Offer Accepted!',
-            time: '5h ago',
-            offerAmount: '12,000',
-            listingName: 'AMD Ryzen 9 7950X',
-            read: false
+            type: "offer",
+            status: "accepted",
+            title: "PAYLOAD_TRANSFER_SUCCESS",
+            time: "5H_AGO",
+            offerAmount: "12,000",
+            listingName: "AMD Ryzen 9 7950X",
+            isRead: false
         },
         {
             id: 5,
-            type: 'offer',
-            status: 'declined',
-            title: 'Offer Declined',
-            time: '1d ago',
-            listingName: 'RTX 3060 Ti',
-            read: true
+            type: "offer",
+            status: "declined",
+            title: "TRANSACTION_TERMINATED",
+            time: "1D_AGO",
+            listingName: "RTX 3060 Ti",
+            isRead: true
         },
         {
             id: 6,
-            type: 'bridge',
-            status: 'expired',
-            title: 'Bridge Expired',
-            time: '2d ago',
-            listingName: 'Mechanical Keyboard',
-            read: true
+            type: "bridge",
+            status: "expired",
+            title: "LINK_DEGRADATION_SIGNAL",
+            time: "2D_AGO",
+            listingName: "Mechanical Keyboard",
+            isRead: true
         }
     ]);
 
-    // 2. Handler to delete a notification
+    // 2. Data Disposal Pipeline
     const handleDelete = (id) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
-    // 3. Mark all as read logic
-    const markAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    // 3. Operational State Mutator (Accept / Decline logs)
+    const handleAction = (id, actionType) => {
+        setNotifications(prev => prev.map(n => {
+            if (n.id === id) {
+                return { 
+                    ...n, 
+                    status: actionType === "accept" ? "accepted" : "declined",
+                    isRead: true 
+                };
+            }
+            return n;
+        }));
     };
 
-    const notificationActions = (
+    // 4. Global Override Index Update
+    const markAllAsRead = () => {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    };
+
+    const hasUnread = notifications.some(n => !n.isRead);
+
+    // Interactive Action Block Header Link Custom Asset
+    const notificationActions = notifications.length > 0 ? (
         <button 
             onClick={markAllAsRead}
-            className="text-pink-400 hover:text-pink-200 text-sm md:text-lg font-bold flex items-center gap-1 transition-colors"
+            disabled={!hasUnread}
+            className={`font-mono text-[10px] sm:text-xs font-black uppercase tracking-widest flex items-center gap-1.5 px-2 py-1 rounded border transition-all focus:outline-none ${
+                hasUnread
+                    ? "text-fuchsia-400 border-fuchsia-500/20 bg-fuchsia-500/[0.02] hover:bg-fuchsia-500/[0.08] hover:border-fuchsia-500/50 cursor-pointer focus:ring-1 focus:ring-fuchsia-400"
+                    : "text-slate-600 border-white/5 bg-transparent cursor-not-allowed opacity-40"
+            }`}
         >
-            <CheckCheck className="w-4 h-4" />
-            <span className="hidden sm:inline">Mark all as read</span>
+            <CheckCheck size={12} />
+            <span>MARK_READ_ALL</span>
         </button>
-    );
+    ) : null;
 
-    // Derived state for sections
-    const unreadNotifications = notifications.filter(n => !n.read);
-    const readNotifications = notifications.filter(n => n.read);
+    // Derived operational streams
+    const unreadNotifications = notifications.filter(n => !n.isRead);
+    const readNotifications = notifications.filter(n => n.isRead);
 
     return (
         <BaseModal
             isOpen={isOpen}
             onClose={onClose}
             title="User Notifications"
-            icon={<BellRing className="w-5 h-5 text-white" />}
+            icon={<Terminal size={16} className="text-fuchsia-500" />}
             headerAction={notificationActions}
             footerText={`${unreadNotifications.length} unread notifications`}
             centerContent={false}
+            className="bg-[#08080a] border border-purple-500/20 rounded-xl max-w-2xl w-full mx-auto shadow-[0_0_30px_rgba(0,0,0,0.8)]"
         >
-            <div className="flex flex-col gap-6">
-                {/* UNREAD SECTION */}
+            <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1 select-none scrollbar-thin scrollbar-thumb-purple-900/40 scrollbar-track-transparent">
+                
+                {/* ACTIVE BROADCAST MATRIX SECTION */}
                 {unreadNotifications.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-sm md:text-lg font-black text-pink-500 uppercase tracking-[0.2em] px-1">
-                            New
-                        </h3>
-                        {unreadNotifications.map((notif) => (
-                            <NotificationItem
-                                key={notif.id}
-                                {...notif}
-                                isRead={false}
-                                onDelete={handleDelete}
-                            />
-                        ))}
+                    <div className="flex flex-col gap-2.5">
+                        <div className="flex items-center gap-2 text-fuchsia-500 px-1">
+                            <Eye size={12} className="animate-pulse" />
+                            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em]">
+                                NEW
+                            </h3>
+                        </div>
+                        <div className="space-y-2">
+                            {unreadNotifications.map((notif) => (
+                                <NotificationItem
+                                    key={notif.id}
+                                    {...notif}
+                                    onAction={handleAction}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
                     </div>
                 )}
 
-                {/* READ SECTION */}
+                {/* ARCHIVED DATA HISTORIC LOGS SECTION */}
                 {readNotifications.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-sm md:text-lg font-black text-slate-400 uppercase tracking-[0.2em] px-1">
-                            Earlier
-                        </h3>
-                        {readNotifications.map((notif) => (
-                            <NotificationItem
-                                key={notif.id}
-                                {...notif}
-                                isRead={true}
-                                onDelete={handleDelete}
-                            />
-                        ))}
+                    <div className="flex flex-col gap-2.5">
+                        <div className="flex items-center gap-2 text-slate-500 px-1">
+                            <EyeOff size={12} />
+                            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em]">
+                                EARLIER
+                            </h3>
+                        </div>
+                        <div className="space-y-2">
+                            {readNotifications.map((notif) => (
+                                <NotificationItem
+                                    key={notif.id}
+                                    {...notif}
+                                    onAction={handleAction}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
                     </div>
                 )}
 
+                {/* ZERO STATE CONNECTION LINK BROKEN TERMINAL */}
                 {notifications.length === 0 && (
-                    <div className="py-10 text-center text-slate-400 text-sm italic">
-                        No notifications to show.
+                    <div 
+                        role="status" 
+                        aria-live="polite"
+                        className="py-12 px-4 border border-dashed border-white/5 bg-black/20 rounded-lg text-center font-mono space-y-2"
+                    >
+                        <p className="text-slate-600 text-xs uppercase tracking-widest font-bold">
+                            [STATUS_CLEARED]: NO_ACTIVE_STREAM_DETECTIONS
+                        </p>
+                        <p className="text-[10px] text-slate-700 uppercase tracking-wider">
+                            Awaiting incoming network diagnostics connection...
+                        </p>
                     </div>
                 )}
             </div>

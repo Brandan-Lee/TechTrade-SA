@@ -1,5 +1,5 @@
 import React from "react";
-import GradientButton from "../../ui/PurpleGradientButton";
+import GradientButton from "../../ui/CyberActionButton";
 import AlternateButton from "../../ui/AlternateButton";
 
 const AuthFooter = ({ 
@@ -10,7 +10,6 @@ const AuthFooter = ({
 }) => {
     return (
         <div className="w-full pt-2 flex flex-col items-center">
-            {/* Divider */}
             {showDivider && (
                 <div className="flex flex-col items-center gap-4 pt-4 border-t border-slate-100">
                     <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
@@ -19,7 +18,6 @@ const AuthFooter = ({
                 </div>
             )}
 
-            {/* Secondary Action using our GradientButton */}
             <AlternateButton
                 label={label}
                 onClick={onClick}

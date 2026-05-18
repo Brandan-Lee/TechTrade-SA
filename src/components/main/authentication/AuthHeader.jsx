@@ -1,70 +1,112 @@
-import { Radio, ShieldCheck } from "lucide-react";
+import { Radio, ShieldCheck, Activity, Cpu } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import logo from "../../../assets/logo.png";
 
 export default function AuthHeader() {
 	const [currentSlide, setCurrentSlide] = useState(0);
 
 	const messages = [
-		"Escrow Protocol Engaged. The Transactional State Machine is monitoring all active negotiations to ensure funds and hardware are released only upon mutual verification.",
-		"Hardware Intelligence Active. All listings in your region are currently verified via the Managed Trust &amp; Negotiation Hub.",
-		"Node-to-Node Security Active. Every device listed has hhundergone a multi-point credential audit to mitigate the risk of fraudulent listings in the South African tech market.",
+		"Escrow Protocol Engaged. The Transactional State Machine is monitoring all active negotiations.",
+		"Hardware Intelligence Active. All local nodes are verified via the Managed Trust Hub.",
+		"Multi-point credential audit complete. Mitigating regional risk in the SA tech market.",
 	];
 
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setCurrentSlide((prev) => (prev + 1) % messages.length);
 		}, 5000);
-
 		return () => clearInterval(timer);
 	}, [messages.length]);
 
 	return (
-		<div className="w-full h-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 flex flex-col items-center justify-center py-8 lg:py-12 px-4 gap-12">
+		<div className="w-full h-full bg-[#050505] flex flex-col items-center justify-center py-12 lg:py-16 px-6 gap-10 relative overflow-hidden">
+			{/* Background Aesthetic: Grid & Glow */}
+			<div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
+			<div className="absolute -top-24 -left-24 w-64 h-64 bg-fuchsia-600/10 blur-[100px] rounded-full" />
+
 			{/* Branding Section */}
-			<div className="flex flex-col items-center gap-4">
-				<div className="relative w-24 h-24 lg:w-32 lg:h-32 flex items-center justify-center">
-					<div className="absolute inset-0 bg-pink-600/40 rounded-full blur-xl animate-pulse" />
-					<div className="absolute inset-0 bg-violet-500/20 rounded-full blur-2xl" />
-					<img
-						src={logo}
-						alt="Logo"
-						className="relative z-10 w-24 h-24 lg:w-32 lg:h-32 object-cover"
-					/>
+			<div className="flex flex-col items-center gap-6 relative z-10">
+				<div className="relative group">
+					{/* Multi-layered Glow */}
+					<div className="absolute inset-0 bg-fuchsia-500/30 rounded-full blur-2xl group-hover:bg-fuchsia-500/50 transition-all duration-500" />
+					<div className="absolute -inset-1 bg-gradient-to-r from-fuchsia-600 to-violet-600 rounded-full opacity-20 group-hover:opacity-40 transition-opacity" />
+
+					<div className="relative bg-black rounded-full p-2 border border-white/10 shadow-2xl">
+						<img
+							src={logo}
+							alt="TechTrade Logo"
+							className="w-20 h-20 lg:w-28 lg:h-28 object-contain brightness-110"
+						/>
+					</div>
 				</div>
 
-				<div className="text-center spacy-y-1">
-					<h1 className="text-white text-3xl lg:text-5xl font-bold font-['Space_Grotesk'] tracking-tight">
-						TechTrade SA
+				<div className="text-center space-y-2">
+					<h1 className="text-white text-4xl lg:text-5xl font-black italic uppercase tracking-tighter leading-none">
+						TechTrade
+						<span className="ml-2 text-fuchsia-500 not-italic font-light">
+							SA
+						</span>
 					</h1>
+					<div className="flex items-center justify-center gap-2">
+						<span className="h-[1px] w-8 bg-gradient-to-r from-transparent to-fuchsia-500/50" />
+						<span className="h-[1px] w-8 bg-gradient-to-l from-transparent to-fuchsia-500/50" />
+					</div>
 				</div>
 			</div>
 
-			{/* Status Card (Tablet and Desktop) */}
-			<div className="hidden md:flex flex-col items-center w-full max-w-2xl bg-neutral-100 rounded-xl p-6 shadow-2xl gap-4 animate-in fade-in slide-in-from-top-4 duration-500 ">
-				{/* Shield Icon */}
-				<div className="p-2 bg-violet-100 rounded-full">
-					<ShieldCheck className="w-8 h-8 text-violet-600" />
-				</div>
-				{/* Live Indicator */}
-				<div className="flex items-center gap-2 text-violet-600 font-bold tracking-widest text-sm md:text-base uppercase">
-					<Radio className="w-4 h-4 text-green-500 animate-pulse" />
-					Live
+			{/* Status Terminal (Tablet and Desktop) */}
+			<div className="hidden md:flex flex-col items-center w-full max-w-lg bg-black/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative">
+				{/* Decorative Tech Corners */}
+				<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-fuchsia-500/30 rounded-tl-xl" />
+				<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-fuchsia-500/30 rounded-br-xl" />
+
+				<div className="flex items-center justify-between w-full mb-6">
+					<div className="flex items-center gap-3">
+						<div className="p-2 bg-fuchsia-500/10 rounded-lg border border-fuchsia-500/20">
+							<ShieldCheck className="w-5 h-5 text-fuchsia-500" />
+						</div>
+						<div className="flex flex-col">
+							<span className="text-[10px] text-slate-500 font-black uppercase tracking-widest leading-none">
+								System Status
+							</span>
+							<span className="text-xs text-white font-bold flex items-center gap-1.5">
+								<span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]" />
+								ONLINE / ENCRYPTED
+							</span>
+						</div>
+					</div>
+					<Activity className="text-slate-800 w-8 h-8" />
 				</div>
 
-				{/* Message Slider */}
-				<div className="h-auto flex items-center justify-center text-center">
-					<p className="text-gray-600 text-sm md:text-base font-medium font-['Inter'] leading-relaxed transition-all duration-500">
-						{messages[currentSlide]}
-					</p>
+				{/* Message Slider with Framer Motion for better UX */}
+				<div className="w-full h-20 overflow-hidden relative flex items-center justify-center">
+					<AnimatePresence mode="wait">
+						<motion.p
+							key={currentSlide}
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.4 }}
+							className="text-slate-400 text-sm font-medium leading-relaxed italic text-center px-4"
+						>
+							{messages[currentSlide]}
+						</motion.p>
+					</AnimatePresence>
 				</div>
 
-				{/* Pagination Dots */}
-				<div className="flex gap-2">
+				{/* Pagination (Terminal Style) */}
+				<div className="flex gap-3 mt-6">
 					{messages.map((_, i) => (
-						<div
+						<button
 							key={i}
-							className={`w-2 h-2 rounded-full transition-all ${currentSlide === i ? "bg-violet-600 w-4" : "bg-violet-200"}`}
+							onClick={() => setCurrentSlide(i)}
+							className={`h-1 transition-all duration-500 rounded-full ${
+								currentSlide === i
+									? "bg-fuchsia-500 w-8 shadow-[0_0_10px_#d946ef]"
+									: "bg-white/10 w-4 hover:bg-white/20"
+							}`}
+							aria-label={`Go to slide ${i + 1}`}
 						/>
 					))}
 				</div>

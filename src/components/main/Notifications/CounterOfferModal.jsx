@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import BaseModal from "../../ui/BaseModal";
 import { Handshake } from "lucide-react";
 import AuthInput from "../../ui/AuthInput";
-import PurpleGradientButton from "../../ui/PurpleGradientButton";
+import CyberActionButton from "../../ui/CyberActionButton";
 
 const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName }) => {
     // Use a simple string state for better reliability in this specific form
@@ -60,7 +60,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName }) => {
 
                     {/* Submit Button */}
                     <div className="w-full">
-                        <PurpleGradientButton
+                        <CyberActionButton
                             onClick={handleSubmit}
                             label="SUBMIT COUNTER OFFER"
                         />

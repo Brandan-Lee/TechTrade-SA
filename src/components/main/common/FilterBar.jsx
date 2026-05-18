@@ -1,296 +1,227 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { SlidersHorizontal, ChevronDown, Banknote, X } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
+import { SlidersHorizontal, ChevronDown, Banknote, X, Zap } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { useNavigate } from "react-router-dom"; // Uncomment this in your app
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function FilterBar() {
-	const navigate = useNavigate();
-	const location = useLocation();
-	const [openDropdown, setOpenDropdown] = useState(null);
-	const [menuPos, setMenuPos] = useState({ left: 0, top: 0 });
-	const [tempPrice, setTempPrice] = useState({ min: "", max: "" });
-	const [filters, setFilters] = useState({
-		category: null,
-		priceMin: "",
-		priceMax: "",
-		condition: null,
-	});
-	const dropdownRef = useRef(null);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [openDropdown, setOpenDropdown] = useState(null);
+    const [menuPos, setMenuPos] = useState({ left: 0, top: 0 });
+    const [tempPrice, setTempPrice] = useState({ min: "", max: "" });
+    const [filters, setFilters] = useState({
+        category: null,
+        priceMin: "",
+        priceMax: "",
+        condition: null,
+    });
+    const dropdownRef = useRef(null);
 
-	const navConfig = [
-		{
-			id: "components",
-			label: "Components",
-			type: "list",
-			items: ["GPUs", "CPUs", "Motherboards", "PSUs", "Memory"],
-		},
-		{
-			id: "cooling",
-			label: "Cooling",
-			type: "list",
-			items: ["AIO", "Air Coolers", "Case Fans"],
-		},
-		{ id: "storage", label: "Storage", type: "list", items: ["SSDs", "HDDs"] },
-		{ id: "price", label: "price", type: "price", icon: Banknote },
-		{
-			id: "condition",
-			label: "condition",
-			type: "list",
-			items: ["New", "Like New", "Good", "Fair"],
-		},
-	];
+    const navConfig = [
+        { id: "components", label: "Components", type: "list", items: ["GPUs", "CPUs", "Motherboards", "PSUs", "Memory"] },
+        { id: "cooling", label: "Cooling", type: "list", items: ["AIO", "Air Coolers", "Case Fans"] },
+        { id: "storage", label: "Storage", type: "list", items: ["SSDs", "HDDs"] },
+        { id: "price", label: "Price", type: "price", icon: Banknote },
+        { id: "condition", label: "Condition", type: "list", items: ["New", "Like New", "Good", "Fair"] },
+    ];
 
-	const applyFilter = (updates) => {
-		setFilters((prev) => ({ ...prev, ...updates }));
-		setOpenDropdown(null);
-	};
+    // --- LOGIC: Filter Management ---
+    const applyFilter = (updates) => {
+        setFilters((prev) => ({ ...prev, ...updates }));
+        setOpenDropdown(null);
+    };
 
-	const clearFilters = () => {
-		setFilters({ category: null, priceMin: "", priceMax: "", condition: null });
-		setTempPrice({ min: "", max: "" });
+    const clearFilters = () => {
+        setFilters({ category: null, priceMin: "", priceMax: "", condition: null });
+        setTempPrice({ min: "", max: "" });
+        if (location.pathname !== "/marketplace") navigate("/marketplace");
+    };
 
-		if (location.pathname !== "/marketplace") {
-			navigate("/marketplace");
-		}
-	};
+    // --- LOGIC: The "Portal" Positioning Fix ---
+    const updatePosition = useCallback((el) => {
+        if (el) {
+            const rect = el.getBoundingClientRect();
+            // Since the bar is sticky/fixed, we use the viewport coordinates
+            // We add 8px for that "floating HUD" cyberpunk gap
+            setMenuPos({ 
+                left: rect.left, 
+                top: rect.bottom + 8 
+            });
+        }
+    }, []);
 
-	useEffect(() => {
-		const hasActiveFilters =
-			filters.category ||
-			filters.condition ||
-			filters.priceMax ||
-			filters.priceMin;
-		if (hasActiveFilters) {
-			navigate("/marketplace", { state: null });
-		}
-	}, [filters, navigate, location.pathname]);
+    const handleToggle = (e, id) => {
+        e.stopPropagation();
+        if (openDropdown === id) {
+            setOpenDropdown(null);
+        } else {
+            updatePosition(e.currentTarget);
+            setOpenDropdown(id);
+        }
+    };
 
-	const updatePosition = useCallback((el) => {
-		if (el) {
-			const rect = el.getBoundingClientRect();
-			setMenuPos({ left: rect.left, top: rect.bottom });
-		}
-	}, []);
+    // Close on outside click
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                // If using portal, we also need to check if the click was inside the portal
+                if (!event.target.closest(".portal-dropdown")) {
+                    setOpenDropdown(null);
+                }
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-	const handleToggle = (e, id) => {
-		e.stopPropagation();
-		if (openDropdown === id) {
-			setOpenDropdown(null);
-		} else {
-			updatePosition(e.currentTarget);
-			setOpenDropdown(id);
-		}
-	};
+    // Helpers
+    const activeFiltersList = [
+        filters.category,
+        filters.condition,
+        (filters.priceMin || filters.priceMax) ? `R${filters.priceMin || '0'} - R${filters.priceMax || 'Any'}` : null
+    ].filter(Boolean);
 
-	const handlePriceInput = (e, key) => {
-		const val = e.target.value.replace(/\D/g, "");
-		setTempPrice((prev) => ({ ...prev, [key]: val }));
-	};
+    const isAnyFilterActive = activeFiltersList.length > 0;
+    const activeConfig = navConfig.find((d) => d.id === openDropdown);
 
-	const getPriceLabel = () => {
-		const { priceMin: min, priceMax: max } = filters;
-		if (!min && !max) return null;
-		if (min && !max) return `Min: $${min}`;
-		if (!min && max) return `Max: $${max}`;
-		return `$${min} - $${max}`;
-	};
+    return (
+        <div ref={dropdownRef} className="w-full sticky top-0 z-[100] bg-[#050505]/90 backdrop-blur-xl border-b border-white/10">
+            <nav className="max-w-[1440px] mx-auto h-16 px-4 flex items-center gap-4">
+                
+                {/* Branding Icon */}
+                <div className="flex items-center gap-2 pr-4 border-r border-white/10 shrink-0">
+                    <SlidersHorizontal className="w-4 h-4 text-fuchsia-500" />
+                    <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] hidden md:block">
+                        FILTER
+                    </span>
+                </div>
 
-	const activeFiltersList = [
-		filters.category,
-		filters.condition,
-		getPriceLabel(),
-	].filter(Boolean);
+                {/* Scrollable Nav Area */}
+                <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 grow">
+                    <button
+                        onClick={clearFilters}
+                        className={`h-9 px-4 rounded-md text-[11px] font-black uppercase tracking-widest transition-all shrink-0 border ${
+                            !isAnyFilterActive
+                                ? "bg-fuchsia-600 text-white border-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.3)]"
+                                : "bg-white/5 text-slate-400 border-white/10 hover:border-fuchsia-500/50"
+                        }`}
+                    >
+                        [ ALL HARDWARE ]
+                    </button>
 
-	const handleMouseEnter = (e, id) => {
-		if (window.matchMedia("(pointer: fine)").matches) {
-			updatePosition(e.currentTarget);
-			setOpenDropdown(id);
-		}
-	};
+                    {navConfig.map((dropdown) => {
+                        const isSet = 
+                            (dropdown.id === "condition" && filters.condition) ||
+                            (dropdown.id === "price" && (filters.priceMin || filters.priceMax)) ||
+                            (filters.category === dropdown.label);
+                        
+                        return (
+                            <button
+                                key={dropdown.id}
+                                onClick={(e) => handleToggle(e, dropdown.id)}
+                                className={`h-9 px-4 rounded-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all shrink-0 border ${
+                                    isSet || openDropdown === dropdown.id
+                                        ? "bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.2)]"
+                                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+                                }`}
+                            >
+                                {dropdown.label}
+                                <ChevronDown size={12} className={`transition-transform duration-300 ${openDropdown === dropdown.id ? "rotate-180" : ""}`} />
+                            </button>
+                        );
+                    })}
+                </div>
+            </nav>
 
-	useEffect(() => {
-		const handleClickOutside = (event) => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-				setOpenDropdown(null);
-			}
-		};
+            {/* Active Filters Bar */}
+            <AnimatePresence>
+                {isAnyFilterActive && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-fuchsia-500/5 border-t border-white/5"
+                    >
+                        <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-3">
+                            <span className="text-fuchsia-500/50 text-[9px] font-black uppercase tracking-widest shrink-0">Active_Params:</span>
+                            <div className="flex flex-wrap gap-2">
+                                {activeFiltersList.map((f, i) => (
+                                    <div key={i} className="flex items-center gap-2 px-2 py-0.5 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded text-fuchsia-400 text-[10px] font-bold uppercase">
+                                        {f}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, []);
-
-	const activeConfig = navConfig.find((d) => d.id === openDropdown);
-	const isAnyFilterActive = activeFiltersList.length > 0;
-
-	return (
-		<div ref={dropdownRef} className="w-full bg-white">
-			<nav className="w-full bg-white/95 z-40 shadow-sm border-b border-gray-100">
-				<div className="max-w-[1440px] mx-auto h-16 px-4 flex items-center gap-4 relative">
-					<div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 grow">
-						<div className="flex items-center gap-2 pr-4 border-r border-gray-200 shrink-0">
-							<SlidersHorizontal className="w-4 h-4 text-purple-700" />
-							<span className="text-gray-500 text-sm md:text-base font-semibold uppercase">
-								FILTER
-							</span>
-						</div>
-
-						<button
-							onClick={clearFilters}
-							className={`h-9 px-5 rounded-lg text-sm md:text-base font-bold shrink-0 transition-all shadow-md ${
-								!isAnyFilterActive
-									? "bg-gradient-to-r from-purple-700 to-purple-600 text-white"
-									: "bg-white border border-gray-200 text-gray-500 hover:text-purple-700"
-							}`}
-						>
-							ALL HARDWARE
-						</button>
-
-						{navConfig.slice(0, 3).map((dropdown) => (
-							<button
-								key={dropdown.id}
-								data-id={dropdown.id}
-								onClick={(e) => handleToggle(e, dropdown.id)}
-								onMouseEnter={(e) => handleMouseEnter(e, dropdown.id)}
-								className={`h-9 px-5 rounded-lg flex items-center gap-2 text-sm md:text-base font-bold transition-all shadow-md shrink-0 border ${
-									filters.category === dropdown.label ||
-									openDropdown === dropdown.id
-										? "bg-gradient-to-r from-purple-700 to-purple-600 text-white border-transparent"
-										: "bg-white border-gray-200 text-gray-500 hover:text-purple-700"
-								}`}
-							>
-								{dropdown.label}
-								<ChevronDown
-									className={`w-3 h-3 transition-transform ${openDropdown === dropdown.id ? "rotate-180" : ""}`}
-								/>
-							</button>
-						))}
-
-						<button
-							onClick={() => applyFilter({ category: "PC Cases" })}
-							className={`h-9 px-5 rounded-lg text-sm md:text-base font-bold shadow-md transition-all shrink-0 border ${
-								filters.category === "PC Cases"
-									? "bg-gradient-to-r from-purple-700 to-purple-600 text-white border-transparent"
-									: "bg-white border-gray-200 text-gray-500 hover:text-purple-700"
-							}`}
-						>
-							PC Cases
-						</button>
-
-						<div className="w-px h-8 bg-pink-500 mx-1 shrink-0" />
-
-						{navConfig.slice(3).map((dropdown) => {
-							const isSet =
-								(dropdown.id === "condition" && filters.condition) ||
-								(dropdown.id === "price" &&
-									(filters.priceMin || filters.priceMax));
-							return (
-								<button
-									key={dropdown.id}
-									data-id={dropdown.id}
-									onClick={(e) => handleToggle(e, dropdown.id)}
-									onMouseEnter={(e) => handleMouseEnter(e, dropdown.id)}
-									className={`h-9 px-5 rounded-lg flex items-center gap-2 text-sm md:text-base font-bold transition-all shadow-md shrink-0 border ${
-										isSet || openDropdown === dropdown.id
-											? "bg-gradient-to-r from-purple-700 to-purple-600 text-white border-transparent"
-											: "bg-white border border-gray-200 text-gray-500 hover:text-purple-700"
-									}`}
-								>
-									{dropdown.id === "price" && <Banknote className="w-4 h-4" />}
-									{dropdown.label}
-									<ChevronDown
-										className={`w-3 h-3 transition-transform ${openDropdown === dropdown.id ? "rotate-180" : ""}`}
-									/>
-								</button>
-							);
-						})}
-					</div>
-
-					{openDropdown && activeConfig && (
-						<div
-							onMouseEnter={() => setOpenDropdown(openDropdown)}
-							onMouseLeave={() => setOpenDropdown(null)}
-							style={{ left: `${menuPos.left}px`, top: `${menuPos.top}px` }}
-							className="fixed w-64 z-[100] animate-in fade-in slide-in-from-top-2 duration-200"
-						>
-							<div className="bg-gradient-to-b from-pink-600 via-pink-500 to-pink-600 rounded-2xl shadow-2xl border border-white/20 p-3">
-								{activeConfig.type === "list" ? (
-									<div className="flex flex-col gap-1">
-										{activeConfig.items.map((item, idx) => (
-											<button
-												key={idx}
-												onClick={() =>
-													applyFilter(
-														activeConfig.id === "condition"
-															? { condition: item }
-															: { category: item },
-													)
-												}
-												className="w-full h-11 flex items-center px-4 rounded-xl text-white text-sm md:text-base font-semibold hover:bg-white/20 transition-all"
-											>
-												{item}
-											</button>
-										))}
-									</div>
-								) : (
-									<div className="flex flex-col gap-3 p-1">
-										<div className="flex items-center gap-2">
-											<input
-												type="text"
-												value={tempPrice.min}
-												onChange={(e) => handlePriceInput(e, "min")}
-												placeholder="Min"
-												className="w-full h-10 bg-white/10 border border-white/20 rounded-lg px-3 text-white placeholder:text-white/50 text-sm md:text-base outline-none"
-											/>
-											<input
-												type="text"
-												value={tempPrice.max}
-												onChange={(e) => handlePriceInput(e, "max")}
-												placeholder="Max"
-												className="w-full h-10 bg-white/10 border border-white/20 rounded-lg px-3 text-white placeholder:text-white/50 text-sm md:text-base outline-none"
-											/>
-										</div>
-										<button
-											onClick={() =>
-												applyFilter({
-													priceMin: tempPrice.min,
-													priceMax: tempPrice.max,
-												})
-											}
-											className="w-full h-10 bg-white text-pink-600 rounded-lg font-bold text-xs uppercase"
-										>
-											Apply Price
-										</button>
-									</div>
-								)}
-							</div>
-						</div>
-					)}
-				</div>
-			</nav>
-
-			{isAnyFilterActive && (
-				<div className="max-w-[1440px] mx-auto w-full px-4 py-3 flex items-center gap-3 border-t border-gray-100 bg-gray-50/50">
-					<span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest shrink-0">
-						Filters Active:
-					</span>
-					<div className="flex flex-wrap gap-2 items-center">
-						{activeFiltersList.map((f, i) => (
-							<div
-								key={i}
-								className="flex items-center gap-1.5 px-3 py-1 bg-white border border-purple-100 rounded-full text-purple-700 text-[11px] font-bold shadow-sm"
-							>
-								{f}
-							</div>
-						))}
-						<button
-							onClick={clearFilters}
-							className="flex items-center gap-1 ml-2 px-2 py-1 text-pink-600 hover:text-pink-700 text-[11px] font-bold"
-						>
-							<X className="w-3 h-3" /> Clear All
-						</button>
-					</div>
-				</div>
-			)}
-		</div>
-	);
+            {/* THE PORTAL: Renders dropdown outside the local hierarchy */}
+            {openDropdown && activeConfig && createPortal(
+                <div className="portal-dropdown fixed inset-0 z-[999] pointer-events-none">
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ 
+                            position: 'fixed',
+                            left: `${menuPos.left}px`, 
+                            top: `${menuPos.top}px`,
+                            pointerEvents: 'auto'
+                        }}
+                        className="w-64"
+                    >
+                        <div className="bg-[#0c0c0e] border border-fuchsia-500/40 rounded-lg shadow-[0_15px_50px_rgba(0,0,0,0.8)] p-2 relative overflow-hidden">
+                            {/* Visual Detail: Scanning Line */}
+                            <div className="absolute top-0 left-0 w-full h-[1px] bg-fuchsia-500/30 animate-[scan_3s_linear_infinite]" />
+                            
+                            {activeConfig.type === "list" ? (
+                                <div className="flex flex-col gap-1">
+                                    {activeConfig.items.map((item, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => applyFilter(activeConfig.id === "condition" ? { condition: item } : { category: item })}
+                                            className="w-full h-10 flex items-center justify-between px-3 rounded text-slate-300 text-[11px] font-bold uppercase hover:bg-fuchsia-600 hover:text-white transition-all group"
+                                        >
+                                            {item}
+                                            <Zap size={10} className="opacity-0 group-hover:opacity-100" />
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-2 flex flex-col gap-3">
+                                    <div className="flex gap-2">
+                                        <input
+                                            autoFocus
+                                            type="text"
+                                            value={tempPrice.min}
+                                            onChange={(e) => setTempPrice(p => ({...p, min: e.target.value.replace(/\D/g, "")}))}
+                                            placeholder="MIN_ZAR"
+                                            className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={tempPrice.max}
+                                            onChange={(e) => setTempPrice(p => ({...p, max: e.target.value.replace(/\D/g, "")}))}
+                                            placeholder="MAX_ZAR"
+                                            className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => applyFilter({ priceMin: tempPrice.min, priceMax: tempPrice.max })}
+                                        className="w-full h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded text-[10px] font-black uppercase tracking-widest transition-colors"
+                                    >
+                                        EXECUTE_FILTER
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                </div>,
+                document.body
+            )}
+        </div>
+    );
 }

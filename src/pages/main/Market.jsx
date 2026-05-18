@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import MarketPlace from "../../components/main/market/MarketPlace";
+import FilterBar from "../../components/main/common/FilterBar";
 
 export default function Market() {
 	return (
@@ -11,6 +12,7 @@ export default function Market() {
 			transition={{ duration: 0.4, ease: "easeOut" }}
 			className="w-full min-h-screen bg-neutral-100"
 		>
+			<FilterBar />
 			<MarketPlace />
 		</motion.div>
 	);

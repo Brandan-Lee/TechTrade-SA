@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Cpu, Terminal, Zap, Activity } from "lucide-react";
 import ListingCard from "../../ListingCard.jsx";
 
 export default function FeaturedListings() {
@@ -42,29 +43,90 @@ export default function FeaturedListings() {
 		},
 	];
 
+	// Framer Motion Variants for staggered entry
+	const containerVariants = {
+		hidden: { opacity: 0 },
+		visible: {
+			opacity: 1,
+			transition: {
+				staggerChildren: 0.1, // Each card appears 0.1s after the previous
+			},
+		},
+	};
+
+	const cardVariants = {
+		hidden: { y: 20, opacity: 0 },
+		visible: { y: 0, opacity: 1 },
+	};
+
 	return (
-		<section className="w-full bg-neutral-100 py-12 px-4">
-			<div className="max-w-[1440px] mx-auto">
-				{/* Header */}
-				<div className="mb-8">
-					<h1 className="text-purple-600 text-4xl font-black uppercase tracking-tighter">
-						Featured Listings
-					</h1>
-					<p className="mt-4 text-sm md:text-base lg:text-lg font-bold text-slate-500 uppercase tracking-widest">
-						Hand-picked premium hardware deals in your area
-					</p>
+		<section className="w-full bg-[#050505] py-20 px-4 relative overflow-hidden border-y border-fuchsia-500/10">
+			{/* Background Tech Decor */}
+			<div className="absolute top-0 right-0 p-8 opacity-20 hidden lg:block">
+				<Terminal size={300} className="text-fuchsia-500/10" />
+			</div>
+
+			<div className="max-w-[1440px] mx-auto relative z-10">
+				{/* Header Section */}
+				<div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+					<div className="space-y-4">
+						<div className="flex items-center gap-2 bg-fuchsia-500/10 w-max px-3 py-1 rounded-full border border-fuchsia-500/20">
+							<Activity size={14} className="text-fuchsia-500 animate-pulse" />
+							<span className="text-[10px] font-black uppercase tracking-[0.3em] text-fuchsia-400">
+								Live Marketplace Feed
+							</span>
+						</div>
+
+						<h2 className="text-white text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-none">
+							Featured{" "}
+							<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 to-violet-500">
+								Hardware
+							</span>
+						</h2>
+
+						<p className="max-w-2xl text-slate-500 text-xs md:text-sm font-bold uppercase tracking-[0.2em] leading-relaxed">
+							Hand-picked premium hardware deals in your area
+						</p>
+					</div>
+
+					{/* Stats Counter (Purely visual but adds "System" feel) */}
+					<div className="hidden xl:flex items-center gap-8 border-l border-white/10 pl-8">
+						<div>
+							<span className="block text-white font-mono text-2xl font-black">
+								2.4k
+							</span>
+							<span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+								Active Nodes
+							</span>
+						</div>
+						<div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+							<Zap size={20} className="text-fuchsia-500" />
+						</div>
+					</div>
 				</div>
 
+				{/* Grid with Staggered Animation */}
 				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5 }}
-					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+					variants={containerVariants}
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true }}
+					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
 				>
 					{listings.map((item, index) => (
-						<ListingCard key={index} {...item} isFeatured={true} />
+						<motion.div key={index} variants={cardVariants}>
+							{/* Assuming ListingCard will be styled to match the Dark Cyberpunk theme */}
+							<ListingCard {...item} isFeatured={true} />
+						</motion.div>
 					))}
 				</motion.div>
+
+				{/* Bottom Decorative Line */}
+				<div className="mt-20 w-full h-[1px] bg-gradient-to-r from-transparent via-fuchsia-500/20 to-transparent flex justify-center">
+					<div className="bg-[#050505] px-4 -mt-2">
+						<Cpu size={16} className="text-fuchsia-900" />
+					</div>
+				</div>
 			</div>
 		</section>
 	);

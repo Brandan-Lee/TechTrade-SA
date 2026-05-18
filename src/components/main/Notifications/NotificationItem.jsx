@@ -1,15 +1,15 @@
+import React from "react";
 import {
 	Clock,
 	DollarSign,
 	Handshake,
 	MessageSquare,
 	Shield,
-	Circle,
 	Trash2,
 	X,
 	Check,
+	AlertCircle,
 } from "lucide-react";
-import React from "react";
 
 const NotificationItem = ({
 	id,
@@ -17,8 +17,7 @@ const NotificationItem = ({
 	time,
 	type, // 'offer', 'bridge', 'counter'
 	status, // 'pending', 'accepted', 'declined', 'expired'
-	actionLabel,
-	onAction,
+	onAction, // Triggered via onAction(id, "accept" | "decline")
 	onDelete,
 	isRead,
 	offerAmount,
@@ -26,29 +25,37 @@ const NotificationItem = ({
 	buyerName,
 	sellerName,
 }) => {
+	// Icon matrix selector for explicit data feeds
 	const getIcon = () => {
+		const iconSize = 16;
 		switch (type) {
 			case "offer":
-				return <DollarSign className="w-5 h-5 text-white" />;
+				return <DollarSign size={iconSize} className="text-fuchsia-400" />;
 			case "bridge":
-				return <Shield className="w-5 h-5 text-white" />;
+				return <Shield size={iconSize} className="text-cyan-400" />;
 			case "counter":
-				return <Handshake className="w-5 h-5 text-white" />;
+				return <Handshake size={iconSize} className="text-amber-400" />;
 			default:
-				return <MessageSquare className="w-5 h-5 text-white" />;
+				return <MessageSquare size={iconSize} className="text-purple-400" />;
 		}
 	};
 
+	// Live-rendered decryption feed strings
 	const renderMessage = () => {
-		//Offer Types
+		const highlightedCipher = "text-fuchsia-400 font-bold tracking-wide";
+		const successCipher =
+			"text-emerald-400 font-black tracking-widest uppercase";
+		const failureCipher = "text-red-400 font-black tracking-widest uppercase";
+
 		if (type === "offer") {
 			if (status === "accepted") {
 				return (
 					<span>
-						Your offer of <span className="font-bold text-sm md:text-base">R{offerAmount}</span> for
-						[{listingName}] was{" "}
-						<span className="text-green-600 font-bold uppercase">Accepted</span>{" "}
-						by {sellerName}.
+						Your offer of{" "}
+						<span className={highlightedCipher}>R{offerAmount}</span> for{" "}
+						<span className="text-white">[{listingName}]</span> was{" "}
+						<span className={successCipher}>ACCEPTED</span> by{" "}
+						{sellerName || "NODE_SELLER"}.
 					</span>
 				);
 			}
@@ -56,32 +63,31 @@ const NotificationItem = ({
 			if (status === "declined") {
 				return (
 					<span>
-						Your offer for [{listingName}] was{" "}
-						<span className="text-red-600 font-bold uppercase">Declined</span>{" "}
-						by {sellerName}
+						Your offer for <span className="text-white">[{listingName}]</span>{" "}
+						was <span className={failureCipher}>DECLINED</span> by{" "}
+						{sellerName || "NODE_SELLER"}.
 					</span>
 				);
 			}
 
 			return (
 				<span>
-					<span className="font-bold text-violet-900">
-						New Offer: R{offerAmount}
-					</span>{" "}
-					received for [{listingName}] from {buyerName}.
+					Incoming transaction payload of{" "}
+					<span className={highlightedCipher}>R{offerAmount}</span> detected for{" "}
+					<span className="text-white">[{listingName}]</span> via{" "}
+					{buyerName || "UNKNOWN_NODE"}.
 				</span>
 			);
 		}
 
-		//Counter Offer Types
 		if (type === "counter") {
 			if (status === "accepted") {
 				return (
 					<span>
-						Counter-offer of <span className="font-bold">R{offerAmount}</span>{" "}
-						for [{listingName}] has been{" "}
-						<span className="text-green-600 font-bold uppercase">Accepted</span>
-						.
+						Counter-negotiation value{" "}
+						<span className={highlightedCipher}>R{offerAmount}</span> for{" "}
+						<span className="text-white">[{listingName}]</span> has been
+						finalized to <span className={successCipher}>ACCEPTED</span>.
 					</span>
 				);
 			}
@@ -89,101 +95,141 @@ const NotificationItem = ({
 			if (status === "declined") {
 				return (
 					<span>
-						Counter-offer for [{listingName}] was{" "}
-						<span className="text-red-600 font-bold uppercase">Declined</span>.
+						Counter-negotiation parameter for{" "}
+						<span className="text-white">[{listingName}]</span> was{" "}
+						<span className={failureCipher}>DECLINED</span>.
 					</span>
 				);
 			}
 
 			return (
 				<span>
-					<span className="font-bold text-violet-900">{sellerName}</span> sent a
-					counter-offer of{" "}
-					<span className="font-bold text-violet-900">R{offerAmount}</span> for
-					your request.
+					<span className="text-white font-bold">
+						{sellerName || "SELLER_NODE"}
+					</span>{" "}
+					pushed a counter-override allocation of{" "}
+					<span className={highlightedCipher}>R{offerAmount}</span> for your
+					active terminal request.
 				</span>
 			);
 		}
 
-		//Bridge Types
 		if (type === "bridge") {
-			if (status === "expired")
+			if (status === "expired") {
 				return (
-					<span className="text-neutral-500 italic font-medium">
-						The Secure Bridge for [{listingName}] has expired.
+					<span className="text-slate-600 italic">
+						[SIGNAL_LOSS]: Secure encryption bridge for [{listingName}] has
+						dropped offline.
 					</span>
 				);
+			}
 			return (
 				<span>
-					Secure Bridge Established. Your contact window with {sellerName} for{" "}
-					{listingName} is active for 24 hours.
+					Secure bridge data channel active. Comm-window with{" "}
+					{sellerName || "HOST_NODE"} for{" "}
+					<span className="text-white">[{listingName}]</span> remains clear for
+					24 hours.
 				</span>
 			);
 		}
 
-		return <span>Generic update for [{listingName}].</span>;
+		return (
+			<span className="text-slate-400">
+				Standard system log update recorded for [{listingName}].
+			</span>
+		);
 	};
 
 	return (
 		<div
-			className={`group relative self-stretch min-h-[80px] pl-4 pr-5 py-4 transition-all rounded-lg shadow-sm border-l-4 flex flex-col gap-3 ${
+			role="status"
+			className={`relative w-full p-4 sm:p-5 font-mono border rounded-lg flex flex-col gap-3.5 transition-all duration-300 selection:bg-fuchsia-500/30 ${
 				isRead
-					? "bg-neutral-100 border-neutral-300 opacity-75"
-					: "bg-pink-400/20 border-pink-600 shadow-md"
+					? "bg-[#0c0c0e]/40 border-white/5 opacity-60 hover:opacity-80"
+					: "bg-[#110d1a]/90 border-purple-500/30 shadow-[inset_0_0_12px_rgba(168,85,247,0.05)] shadow-black/50"
 			}`}
 		>
-			{/* Delete Button (Visible on Hover) */}
-			<button
-				onClick={() => onDelete(id)}
-				className="absolute top-2 right-2 p-1.5 rounded-md text-neutral-400 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-			>
-				<Trash2 className="w-4 h-4" />
-			</button>
-
-			<div className="self-stretch flex justify-start items-start gap-4">
-				<div
-					className={`w-10 h-10 shrink-0 rounded-full flex justify-center items-center shadow-md bg-gradient-to-r 
-                    ${isRead ? "from-gray-500 to-gray-400" : "from-violet-800 via-purple-600 to-violet-800"}`}
-				>
-					{getIcon()}
-				</div>
-
-				<div className="flex-1 flex flex-col gap-1">
-					<div className="flex justify-between items-start">
-						<div className="flex items-center gap-2">
-							<h4
-								className={`text-base md:text-lg font-bold leading-5 ${isRead ? "text-neutral-600" : "text-violet-900"}`}
-							>
-								{title}
-							</h4>
-							{!isRead && (
-								<Circle className="w-2 h-2 fill-pink-600 text-pink-600" />
-							)}
-						</div>
-						<span className="text-violet-800 text-xs md:text-base font-medium flex items-center gap-1 shrink-0 mr-6">
-							<Clock className="w-3 h-3" /> {time}
-						</span>
+			{/* Top Interactive Metric Data Header Line */}
+			<div className="w-full flex justify-between items-start gap-4">
+				<div className="flex items-start gap-3 sm:gap-4">
+					{/* Hardened Matrix Type Telemetry Icon */}
+					<div
+						className={`w-9 h-9 sm:w-10 sm:h-10 rounded shrink-0 flex items-center justify-center border transition-colors ${
+							isRead
+								? "bg-slate-900 border-white/5"
+								: "bg-purple-950/40 border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.1)]"
+						}`}
+					>
+						{getIcon()}
 					</div>
 
-					<p
-						className={`text-sm md:text-base leading-tight ${isRead ? "text-neutral-500" : "text-slate-700 font-medium"}`}
-					>
-						{renderMessage()}
-					</p>
+					{/* Meta String Configuration Block */}
+					<div className="space-y-0.5 sm:space-y-1">
+						<div className="flex flex-wrap items-center gap-2">
+							<h4
+								className={`text-xs sm:text-sm md:text-base font-black uppercase tracking-tight ${
+									isRead ? "text-slate-500" : "text-white"
+								}`}
+							>
+								{title || "SYSTEM_BROADCAST"}
+							</h4>
 
-					{/* Counter Offer Accept/Decline Actions */}
-					{type === "counter" && status === "pending" && (
-						<div className="flex gap-2 mt-3">
-							<button className="flex-1 h-10 bg-gradient-to-r from-violet-800 to-purple-600 rounded-lg text-white font-bold text-xs tracking-wider flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
-								<Check className="w-4 h-4" /> ACCEPT
-							</button>
-							<button className="flex-1 h-10 border-2 border-pink-600 rounded-lg text-pink-600 font-bold text-xs tracking-wider flex items-center justify-center gap-2 hover:bg-pink-50 active:scale-95 transition-all">
-								<X className="w-4 h-4" /> DECLINE
-							</button>
+							{/* Live Alert Tracking Micro-Pill */}
+							{!isRead && (
+								<span
+									className="inline-flex items-center gap-1 bg-fuchsia-500/10 border border-fuchsia-500/30 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] text-fuchsia-400 font-extrabold tracking-widest uppercase animate-pulse"
+									aria-label="Unread broadcast"
+								>
+									<AlertCircle size={8} /> LIVE
+								</span>
+							)}
 						</div>
-					)}
+
+						{/* Network Datetime Readout Link */}
+						<div className="text-[10px] sm:text-xs text-slate-500 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+							<Clock size={11} className="text-slate-600" />
+							<span>{time || "00:00_SYS"}</span>
+						</div>
+					</div>
 				</div>
+
+				{/* Secure Data Disposal Link Action */}
+				<button
+					onClick={() => onDelete?.(id)}
+					aria-label={`Purge log entry ${title}`}
+					className="p-1.5 sm:p-2 rounded border border-transparent text-slate-600 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all focus:outline-none focus:border-red-500/30"
+				>
+					<Trash2 size={14} />
+				</button>
 			</div>
+
+			{/* Core Message Readout Shell */}
+			<div
+				className={`text-[11px] sm:text-xs md:text-sm leading-relaxed tracking-wide ${
+					isRead ? "text-slate-500" : "text-slate-300 font-medium"
+				}`}
+			>
+				{renderMessage()}
+			</div>
+
+			{type === "counter" && status === "pending" && (
+				<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
+					<button
+						onClick={() => onAction?.(id, "accept")}
+						className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.2)] transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-fuchsia-400"
+					>
+						<Check size={12} strokeWidth={3} />
+						<span>ACCEPT</span>
+					</button>
+					<button
+						onClick={() => onAction?.(id, "decline")}
+						className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-red-400"
+					>
+						<X size={12} strokeWidth={3} />
+						<span>DECLINE</span>
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };

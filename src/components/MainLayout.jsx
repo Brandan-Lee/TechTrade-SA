@@ -31,7 +31,7 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openN
 			/>
 
 			{/* Constant Top Components */}
-			<header className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800 border-b-4 border-pink-600 flex justify-center px-4">
+			<header className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800">
 				<NavBar
 					toggleMenu={() => setIsMenuOpen(true)}
 					onLoginClick={openLogin}
@@ -40,7 +40,6 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openN
 			</header>
 
 			<WelcomeBanner />
-			<FilterBar />
 
 			{/* Dynamic Page Content */}
 			<main className="flex-grow">

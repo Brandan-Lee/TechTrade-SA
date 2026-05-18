@@ -1,94 +1,136 @@
-import React, { useState } from "react";
-import { X } from "lucide-react";
+import React, { useEffect } from "react";
+import { X, Terminal, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 	const location = useLocation();
 
+	// Prevent background scrolling when navigation layer dashboard overlay is active
+	useEffect(() => {
+		if (isOpen) {
+			document.body.style.overflow = "hidden";
+		} else {
+			document.body.style.overflow = "unset";
+		}
+		return () => {
+			document.body.style.overflow = "unset";
+		};
+	}, [isOpen]);
+
 	const menuItems = [
-		{ name: "Home", path: "/" },
-		{ name: "About Us", path: "/about" },
-		{ name: "Main Marketplace", path: "/marketplace" },
-		{ name: "Sell Your Gear", path: "/sell" },
-		{ name: "Build Doctor", path: "/build-doctor" },
+		{ name: "HOME", label: "Home", path: "/" },
+		{ name: "ABOUT", label: "About Us", path: "/about" },
+		{ name: "MARKET", label: "Main Marketplace", path: "/marketplace" },
+		{ name: "Sell Your Gear", label: "Sell Your Gear", path: "/sell" },
+		{ name: "Build Doctor", label: "Build Doctor", path: "/build-doctor" },
 		{ name: "divider", path: null },
-		{ name: "Contact Us", path: "/contact" },
-		{ name: "Log in/Register", path: "/login", isModal: true },
+		{ name: "Contact Us", label: "Contact Us", path: "/contact" },
+		{
+			name: "Login/Register",
+			label: "Log in / Register",
+			path: "/login",
+			isModal: true,
+		},
 	];
 
 	return (
 		<>
-			{/* Close Menu when clicking outside */}
+			{/* Blurry Interface Terminal Backdrop Veil Dimmer */}
 			<div
-				className={`fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300 
+				className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 
                 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
 				onClick={closeMenu}
+				aria-hidden="true"
 			/>
 
-			{/* Drawer Panel */}
+			{/* STRUCTURAL INTERFACE NAVIGATION DIALOG DRAW PANEL */}
 			<aside
-				className={`fixed top-0 left-0 w-72 h-full z-[70] bg-gradient-to-b from-pink-600 via-pink-400 to-pink-600 shadow-2xl transition-transform duration-300 ease-in-out transform ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+				aria-modal="true"
+				role="dialog"
+				aria-label="System Navigation Menu"
+				className={`fixed top-0 left-0 w-80 max-w-[85vw] h-full z-[70] bg-[#09090b]/95 border-r border-white/10 shadow-[5px_0_40px_rgba(0,0,0,0.6)] backdrop-blur-md transition-transform duration-300 ease-in-out font-mono text-slate-300 ${
+					isOpen ? "translate-x-0" : "-translate-x-full"
+				}`}
 			>
-				<div className="flex flex-col h-full px-6 pt-6 gap-8">
-					{/* Header  */}
-					<div className="flex justify-between items-center w-full">
-						<h2 className="text-white text-xl font-bold font-['Inter']">
-							Menu
-						</h2>
+				{/* Decorative Internal Technical Detail Accent */}
+				<div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-fuchsia-500/0 via-fuchsia-500/20 to-fuchsia-500/0" />
+
+				<div className="flex flex-col h-full p-5 sm:p-6 gap-8">
+					{/* DRAWER TOP BAR: CONSOLE HEAD */}
+					<div className="flex justify-between items-center w-full pb-4 border-b border-white/5">
+						<div className="flex items-center gap-2">
+							<Terminal size={14} className="text-fuchsia-500 animate-pulse" />
+							<h2 className="text-white text-xs font-black uppercase tracking-[0.25em]">
+								NAVIGATION
+							</h2>
+						</div>
 						<button
 							onClick={closeMenu}
-							className="p-1 hover:bg-white/10 rounded-full transition-colors"
+							aria-label="Close Navigation Menu"
+							className="p-1.5 hover:bg-white/5 rounded-lg border border-white/0 hover:border-white/10 text-slate-400 hover:text-fuchsia-400 transition-all outline-none focus-visible:ring-1 focus-visible:ring-fuchsia-500"
 						>
-							<X className="w-8 h-8 text-violet-800" />
+							<X size={16} />
 						</button>
 					</div>
 
-					{/* Navigation Links */}
-					<nav className="flex flex-col items-end gap-[-3px]">
+					{/* INTERFACE ACCESS SYSTEM LINK TREE */}
+					<nav className="flex flex-col gap-1.5 w-full items-start">
 						{menuItems.map((item, index) => {
 							if (item.name === "divider") {
 								return (
 									<div
-										key={index}
-										className="w-56 h-px my-2 border-t border-violet-800"
+										key={`div-${index}`}
+										className="w-full h-[1px] my-3 bg-gradient-to-r from-white/10 to-transparent"
+										aria-hidden="true"
 									/>
 								);
 							}
 
 							const isActive = location.pathname === item.path;
+							const Element = item.isModal ? "button" : Link;
 
-							if (item.isModal) {
-								return (
-									<button
-										key={index}
-										onClick={() => {
+							// Interactive parameters config binding
+							const elementProps = item.isModal
+								? {
+										onClick: () => {
 											closeMenu();
 											onSwitchToLogin();
-										}}
-										className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden ${
-											isActive
-												? "bg-white/30 shadow-inner translate-x-[-8px] scale-105"
-												: "hover:bg-white/10"
-										}`}
-									>
-										<span className={isActive ? "pl-2" : ""}>{item.name}</span>
-									</button>
-								);
-							}
+										},
+									}
+								: {
+										to: item.path,
+										onClick: closeMenu,
+									};
 
 							return (
-								<Link
-									key={index}
-									to={item.path}
-									onClick={closeMenu}
-									className={`w-56 h-12 flex items-center px-4 rounded-lg text-white text-base font-semibold font-['Inter'] relative overflow-hidden ${
-										isActive
-											? "bg-white/30 shadow-inner translate-x-[-8px] scale-105"
-											: "hover:bg-white/10"
-									}`}
+								<Element
+									key={item.name}
+									{...elementProps}
+									className={`w-full group flex flex-col justify-center px-4 py-3 rounded-lg relative overflow-hidden transition-all text-left outline-none border border-transparent
+                                        ${
+																					isActive
+																						? "bg-fuchsia-500/10 border-fuchsia-500/20 text-white shadow-[inset_0_0_15px_rgba(217,70,239,0.05)]"
+																						: "hover:bg-white/[0.02] hover:border-white/5 text-slate-400 hover:text-white"
+																				}
+                                        focus-visible:ring-1 focus-visible:ring-fuchsia-500 focus-visible:bg-fuchsia-500/5
+                                    `}
 								>
-									<span className={isActive ? "pl-2" : ""}>{item.name}</span>
-								</Link>
+									{/* Action Route Pointer Tag Decor */}
+									{isActive && (
+										<div className="absolute left-0 top-2 bottom-2 w-[3px] bg-fuchsia-500 rounded-r" />
+									)}
+
+									{/* Visual Clean Name String Block */}
+									<div className="flex items-center justify-between w-full">
+										<span className="text-xs sm:text-sm font-bold tracking-wide transition-transform group-hover:translate-x-0.5">
+											{item.label}
+										</span>
+										<ChevronRight
+											size={12}
+											className="text-slate-600 group-hover:text-fuchsia-400 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0"
+										/>
+									</div>
+								</Element>
 							);
 						})}
 					</nav>

@@ -1,331 +1,309 @@
 import React from "react";
 import BaseModal from "../../ui/BaseModal";
 import {
-	AlertCircle,
-	AlertTriangle,
-	CircleCheck,
-	MessageSquare,
-	ShieldAlert,
-	ShieldCheck,
-	UserX,
-	Clock,
+    AlertCircle,
+    AlertTriangle,
+    CircleCheck,
+    MessageSquare,
+    ShieldAlert,
+    ShieldCheck,
+    UserX,
+    Clock,
 } from "lucide-react";
 import { ProtocolSection } from "./ProtocolSection";
 import { GradientHighlightBox } from "./GradientHighlightBox";
 import { StrikeCard } from "./StrikeCard";
-import PurpleGradientButton from "../../ui/PurpleGradientButton";
+import CyberActionButton from "../../ui/CyberActionButton";
 
 const TOSModal = ({ isOpen, onClose }) => {
-	const lastUpdated = "13 May 2026";
-	const docVersion = "1.0";
+    const lastUpdated = "13 May 2026";
+    const docVersion = "1.0";
 
-	return (
-		<BaseModal
-			isOpen={isOpen}
-			onClose={onClose}
-			title="Terms Of Service"
-			icon={<ShieldCheck className="w-5 h-5 text-white" />}
-			footerText={`v${docVersion} | ${lastUpdated}`}
+    return (
+        <BaseModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Terms Of Service"
+            icon={<ShieldCheck className="w-4 h-4 text-fuchsia-400" />}
+            footerText={`v${docVersion} | System Registry: ${lastUpdated}`}
             centerContent={false}
-		>
-			<div className="flex flex-col gap-16 py-8 max-w-2xl mx-auto px-4">
-				{/* Intro/Hero Text */}
-				<div className="relative overflow-hidden bg-gradient-to-r from-violet-50 to-white border-l-4 border-violet-600 p-6 rounded-r-2xl shadow-sm">
-					<p className="text-violet-900 text-sm md:text-base leading-relaxed relative z-10">
-						These protocols are legally binding and constitute the operational
-						framework of
-						<span className="font-bold text-violet-700 ml-1">TechTrade SA</span>
-						. By using this platform, you agree to comply with all outlined
-						systems and procedures.
-					</p>
-					<div className="absolute top-[-20%] right-[-5%] opacity-10 pointer-events-none">
-						<ShieldCheck size={120} className="text-violet-600" />
-					</div>
-				</div>
+        >
+            <div className="flex flex-col gap-10 sm:gap-14 py-4 max-w-2xl mx-auto px-1 select-none font-mono selection:bg-fuchsia-500/30">
+                
+                {/* Intro/Hero Core Core Warning Block */}
+                <div className="relative overflow-hidden bg-[#0d0915] border-l-2 border-fuchsia-500 p-4 sm:p-5 rounded-r-lg shadow-md shadow-black/40">
+                    <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed relative z-10 font-medium">
+                        These protocols are legally binding and constitute the operational framework of 
+                        <span className="font-black text-fuchsia-400 ml-1.5 tracking-wider">TECHTRADE SA</span>. 
+                        By using this platform, you agree to comply with all outlined subsystems, safeguards, and procedures.
+                    </p>
+                    <div className="absolute top-[-20%] right-[-5%] opacity-[0.02] pointer-events-none" aria-hidden="true">
+                        <ShieldCheck size={140} className="text-purple-500" />
+                    </div>
+                </div>
 
-				{/* Escrow Section */}
-				<ProtocolSection
-					title="The Escrow Protocol"
-					icon={<ShieldCheck className="text-violet-600" size={24} />}
-				>
-					<div className="space-y-6">
-						<p className="text-slate-600 leading-relaxed text-sm md:text-base">
-							When a transaction is initiated, both the buyer's funds and the
-							seller's hardware enter a
-							<span className="mx-1.5 px-2 py-0.5 bg-violet-600 text-white text-xs md:text-sm font-bold rounded-md uppercase tracking-wider">
-								Locked State
-							</span>
-							within our secure escrow system. This ensures neither party can
-							unilaterally withdraw without consensus or mediation.
-						</p>
+                {/* Escrow System Panel Section */}
+                <ProtocolSection
+                    title="The Escrow Protocol"
+                    icon={<ShieldCheck className="text-fuchsia-400" size={16} />}
+                >
+                    <div className="space-y-5">
+                        <p className="text-slate-300 leading-relaxed text-[11px] sm:text-xs md:text-sm font-medium">
+                            When a transaction is initiated, both the buyer's funds and the seller's hardware enter a
+                            <span className="mx-1.5 px-2 py-0.5 bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 text-[10px] sm:text-xs font-black rounded uppercase tracking-widest">
+                                Locked State
+                            </span>
+                            within our secure escrow ecosystem. This ensures neither party can unilaterally withdraw without platform consensus or formal mediation.
+                        </p>
 
-						<div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-200/60 shadow-sm transition-all hover:shadow-md">
-							<p className="font-black text-sm md:text-base uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-								<Clock size={14} className="text-violet-400" /> Conditions for
-								release
-							</p>
-							<ul className="grid grid-cols-1 gap-5">
-								{[
-									{
-										id: "01",
-										t: "Buyer Confirmation",
-										d: "Upon inspection, the buyer must confirm receipt within 24 hours to release funds.",
-									},
-									{
-										id: "02",
-										t: "Seller Protection",
-										d: "Auto-release occurs if the window expires without a dispute.",
-									},
-									{
-										id: "03",
-										t: "Dispute Resolution",
-										d: "Command & Control reviews communication logs and photographic evidence during locks.",
-									},
-									{
-										id: "04",
-										t: "Mutual Cancellation",
-										d: "Full refund to buyer and listing restoration upon mutual agreement.",
-									},
-								].map((item) => (
-									<li key={item.id} className="flex gap-4 group">
-										<span className="text-violet-300 font-black text-lg group-hover:text-violet-500 transition-colors leading-none">
-											{item.id}
-										</span>
-										<div>
-											<p className="text-sm md:text-base font-bold text-slate-900 mb-1">
-												{item.t}
-											</p>
-											<p className="text-sm md:text-base text-slate-500 leading-snug">
-												{item.d}
-											</p>
-										</div>
-									</li>
-								))}
-							</ul>
-						</div>
+                        {/* Conditions Sub-Matrix Element */}
+                        <div className="bg-[#0c0915] rounded-lg p-4 sm:p-5 border border-purple-500/20 shadow-md">
+                            <h4 className="font-black text-[11px] sm:text-xs uppercase tracking-[0.2em] text-purple-400 mb-4 flex items-center gap-2">
+                                <Clock size={12} className="text-purple-400 animate-pulse" /> Conditions For Release
+                            </h4>
+                            <ol className="grid grid-cols-1 gap-4 sm:gap-5 list-none">
+                                {[
+                                    {
+                                        id: "01",
+                                        t: "Buyer Confirmation",
+                                        d: "Upon inspection, the buyer must confirm receipt within 24 hours to trigger release functions.",
+                                    },
+                                    {
+                                        id: "02",
+                                        t: "Seller Protection",
+                                        d: "Auto-release matrices execute if the validation window expires without an active dispute.",
+                                    },
+                                    {
+                                        id: "03",
+                                        t: "Dispute Resolution",
+                                        d: "Command & Control reviews all communication logs and encrypted photographic evidence.",
+                                    },
+                                    {
+                                        id: "04",
+                                        t: "Mutual Cancellation",
+                                        d: "Full balance restoration to buyer and item listing recovery upon verified mutual agreement.",
+                                    },
+                                ].map((item) => (
+                                    <li key={item.id} className="flex gap-3.5 group items-start">
+                                        <span className="text-fuchsia-500/50 font-black text-xs sm:text-sm group-hover:text-fuchsia-400 transition-colors leading-none pt-0.5">
+                                            {item.id}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="text-xs sm:text-sm font-black text-white uppercase tracking-wider mb-0.5">
+                                                {item.t}
+                                            </p>
+                                            <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+                                                {item.d}
+                                            </p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
 
-						<div className="flex items-center gap-2 px-2">
-							<div className="h-px flex-1 bg-slate-200"></div>
-							<p className="text-sm md:text-base text-slate-400 font-medium uppercase tracking-tight italic">
-								Cryptographic Ledger Timestamped
-							</p>
-							<div className="h-px flex-1 bg-slate-200"></div>
-						</div>
-					</div>
-				</ProtocolSection>
+                        {/* Stylized Section Break Divider */}
+                        <div className="flex items-center gap-3 px-1 py-2" aria-hidden="true">
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent"></div>
+                            <p className="text-[9px] sm:text-[10px] text-slate-600 font-bold uppercase tracking-[0.25em]">
+                                Cryptographic Ledger Feed
+                            </p>
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent"></div>
+                        </div>
+                    </div>
+                </ProtocolSection>
 
-				{/* WhatsApp TTL Bridge */}
-				<ProtocolSection
-					title="The WhatsApp TTL Bridge"
-					icon={<MessageSquare className="text-violet-600" size={24} />}
-				>
-					<div className="space-y-8">
-						<GradientHighlightBox
-							title="24-HOUR-TIME-TO-LIVE PRIVACY WINDOW"
-							icon={<MessageSquare size={20} />}
-						>
-							Once a transaction is confirmed, a temporary encrypted WhatsApp
-							bridge is established. This channel exists for exactly 24 hours.
-							<strong>
-								{" "}
-								After the TTL expires, the bridge is destroyed
-							</strong>{" "}
-							and all contact info is permanently removed.
-						</GradientHighlightBox>
+                {/* WhatsApp TTL Bridge Section */}
+                <ProtocolSection
+                    title="The WhatsApp TTL Bridge"
+                    icon={<MessageSquare className="text-fuchsia-400" size={16} />}
+                >
+                    <div className="space-y-6">
+                        <GradientHighlightBox
+                            title="24-HOUR TIME-TO-LIVE PRIVACY WINDOW"
+                            icon={<MessageSquare size={14} />}
+                        >
+                            Once a transaction is confirmed, a temporary encrypted WhatsApp bridge is established. This data channel exists for exactly 24 hours. After the TTL expires, the interface is destroyed and all contact info is permanently removed from runtime arrays.
+                        </GradientHighlightBox>
 
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 px-2">
-							{[
-								{
-									t: "Automatic Activation",
-									d: "Activates immediately upon trading confirmation.",
-								},
-								{
-									t: "Encrypted Channel",
-									d: "Routed through secure relays to hide personal numbers.",
-								},
-								{
-									t: "Self-Destruct Timer",
-									d: "Live countdown visible to both parties.",
-								},
-								{
-									t: "Zero Data Retention",
-									d: "Only basic metadata stored for dispute resolution.",
-								},
-							].map((item, i) => (
-								<div
-									key={i}
-									className="relative pl-4 border-l-2 border-violet-100 hover:border-violet-500 transition-colors"
-								>
-									<p className="font-bold text-sm md:text-base text-violet-700 uppercase mb-1.5 tracking-wide">
-										{item.t}
-									</p>
-									<p className="text-xs md:text-sm text-slate-500 leading-relaxed font-medium">
-										{item.d}
-									</p>
-								</div>
-							))}
-						</div>
-					</div>
-				</ProtocolSection>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 px-1">
+                            {[
+                                {
+                                    t: "Automatic Activation",
+                                    d: "Activates immediately upon peer trading validation.",
+                                },
+                                {
+                                    t: "Encrypted Channel",
+                                    d: "Routed through secure relays to hide host phone arrays.",
+                                },
+                                {
+                                    t: "Self-Destruct Timer",
+                                    d: "Live countdown telemetry visible to both network nodes.",
+                                },
+                                {
+                                    t: "Zero Data Retention",
+                                    d: "Only tracking metadata is signed for conflict mitigation.",
+                                },
+                            ].map((item, i) => (
+                                <div
+                                    key={i}
+                                    className="relative pl-3.5 border-l border-purple-500/20 hover:border-fuchsia-500/50 transition-colors"
+                                >
+                                    <p className="font-black text-xs sm:text-sm text-fuchsia-400 uppercase mb-1 tracking-wider">
+                                        {item.t}
+                                    </p>
+                                    <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+                                        {item.d}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </ProtocolSection>
 
-				{/* Integrity System */}
-				<ProtocolSection
-					title="Integrity and Ban System"
-					icon={<AlertTriangle className="text-amber-500" size={24} />}
-				>
-					<div className="space-y-8">
-						<p className="text-slate-600 leading-relaxed text-sm md:text-base">
-							TechTrade operates a{" "}
-							<span className="font-extrabold text-pink-600 border-b-2 border-pink-200 pb-0.5">
-								Zero-Tolerance Strike System
-							</span>{" "}
-							enforced through hardware-level identification (HWID) to maintain
-							marketplace integrity.
-						</p>
+                {/* Integrity & Penalties Section */}
+                <ProtocolSection
+                    title="Integrity and Ban System"
+                    icon={<AlertTriangle className="text-amber-400" size={16} />}
+                >
+                    <div className="space-y-5">
+                        <p className="text-slate-300 leading-relaxed text-[11px] sm:text-xs md:text-sm font-medium">
+                            TechTrade operates a 
+                            <span className="font-black text-red-400 mx-1.5 underline decoration-red-500/40 underline-offset-4 tracking-wide uppercase">
+                                Zero-Tolerance Strike System
+                            </span> 
+                            enforced through hardware-level identification (HWID) to safeguard our distributed marketplace ecosystems.
+                        </p>
 
-						<div className="flex flex-col gap-4">
-							<StrikeCard
-								title="Strike 1: Warning"
-								description="Minor infractions like late shipments or unresponsive communication. Account flagged for review."
-								variant="warning"
-								icon={<AlertCircle />}
-							/>
-							<StrikeCard
-								title="Strike 2: Temporary Suspension"
-								description="Misrepresented component condition or repeated complaints. 30-day suspension."
-								variant="danger"
-								icon={<ShieldAlert />}
-							/>
-							<StrikeCard
-								title="Strike 3: Permanent HWID Ban"
-								description="Confirmed fraud or escrow manipulation. Permanent device-level ban from the Command and Control Center."
-								variant="critical"
-								icon={<UserX />}
-							/>
-						</div>
+                        <div className="flex flex-col gap-3">
+                            <StrikeCard
+                                title="Strike 1: Warning"
+                                description="Minor infractions like late logistics processing or unresponsive communication lines. Account profile flagged."
+                                variant="warning"
+                                icon={<AlertCircle />}
+                            />
+                            <StrikeCard
+                                title="Strike 2: Suspension"
+                                description="Misrepresented asset descriptions or consecutive customer complaints. 30-day structural lock out."
+                                variant="danger"
+                                icon={<ShieldAlert />}
+                            />
+                            <StrikeCard
+                                title="Strike 3: HWID Permanent Ban"
+                                description="Confirmed fraud vectors or escrow routing bypass. Full physical device lockout from network clusters."
+                                variant="critical"
+                                icon={<UserX />}
+                            />
+                        </div>
 
-						<div className="grid grid-cols-1 gap-4">
-							<div className="flex items-start gap-4 p-5 bg-white border border-slate-200 rounded-2xl shadow-sm">
-								<div className="p-2 bg-violet-50 rounded-lg shrink-0">
-									<ShieldCheck className="text-violet-600" size={20} />
-								</div>
-								<p className="text-sm md:text-base text-slate-600 leading-snug">
-									<span className="font-bold text-slate-900 block mb-1">
-										Build-Doctor Integration
-									</span>
-									High-value transactions{" "}
-									<span className="text-violet-700 font-bold px-1 bg-violet-50 rounded">
-										Over R5,000
-									</span>{" "}
-									require a mandatory hardware verification scan.
-								</p>
-							</div>
-							<div className="flex items-start gap-4 p-5 bg-white border border-slate-200 rounded-2xl shadow-sm">
-								<div className="p-2 bg-amber-50 rounded-lg shrink-0">
-									<AlertTriangle className="text-amber-500" size={20} />
-								</div>
-								<p className="text-sm md:text-base text-slate-600 leading-snug">
-									<span className="font-bold text-slate-900 block mb-1">
-										Fraud Reporting
-									</span>
-									Verified reports result in immediate investigation and
-									potential strikes.
-								</p>
-							</div>
-						</div>
-					</div>
-				</ProtocolSection>
+                        {/* Integration Sub-Cards Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                            <div className="flex items-start gap-3 p-4 bg-[#0c0915] border border-purple-500/20 rounded-lg shadow-sm">
+                                <div className="w-6 h-6 rounded bg-purple-950/30 border border-purple-500/30 flex justify-center items-center shrink-0 text-fuchsia-400" aria-hidden="true">
+                                    <ShieldCheck size={14} />
+                                </div>
+                                <div className="min-w-0">
+                                    <span className="font-black text-xs text-white block mb-0.5 uppercase tracking-wider">
+                                        Build-Doctor Sync
+                                    </span>
+                                    <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+                                        High-value items <span className="text-fuchsia-400 font-bold font-mono">Over R5,000</span> require hardware verification scans.
+                                    </p>
+                                </div>
+                            </div>
 
-				{/* Hardware Verification */}
-				<ProtocolSection
-					title="Hardware Verification"
-					icon={<CircleCheck className="text-emerald-500" size={24} />}
-				>
-					<div className="space-y-8">
-						<div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4">
-							<p className="text-slate-700 text-sm md:text-base leading-relaxed">
-								We provide{" "}
-								<span className="font-bold italic text-emerald-700">
-									Hardware Intelligence
-								</span>{" "}
-								data for every listing, but this is designed to assist, not
-								replace, buyer due diligence.
-							</p>
-						</div>
+                            <div className="flex items-start gap-3 p-4 bg-[#0c0915] border border-purple-500/20 rounded-lg shadow-sm">
+                                <div className="w-6 h-6 rounded bg-amber-950/30 border border-amber-500/30 flex justify-center items-center shrink-0 text-amber-400" aria-hidden="true">
+                                    <AlertTriangle size={14} />
+                                </div>
+                                <div className="min-w-0">
+                                    <span className="font-black text-xs text-white block mb-0.5 uppercase tracking-wider">
+                                        Fraud Assessment
+                                    </span>
+                                    <p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
+                                        Verified infraction logs result in swift arbitration sweeps and defensive strike penalties.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ProtocolSection>
 
-						<div className="space-y-6">
-							<p className="font-black text-sm md:text-base uppercase tracking-[0.25em] text-slate-400 px-1">
-								User Responsibility Matrix
-							</p>
-							<ul className="space-y-5">
-								{[
-									{
-										t: "Physical Inspection",
-										d: "Buyers must inspect hardware during the 24-hour window and 48 hours post-receipt.",
-									},
-									{
-										t: "Build Doctor Validation",
-										d: "For items Over R5,000, use real-time scans during meetup.",
-									},
-									{
-										t: "Dispute Window",
-										d: "You have 48 hours post-transaction to file a dispute with evidence.",
-									},
-									{
-										t: "Platform Limitations",
-										d: "We cannot guarantee performance beyond provided automated data.",
-									},
-								].map((item, i) => (
-									<li key={i} className="flex items-start gap-4 group">
-										<div className="h-6 w-6 rounded-full bg-violet-100 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-violet-600 transition-colors">
-											<div className="h-1.5 w-1.5 rounded-full bg-violet-600 group-hover:bg-white"></div>
-										</div>
-										<p className="text-sm md:text-base text-slate-600">
-											<span className="font-bold text-slate-900 mr-2">
-												{item.t}:
-											</span>
-											{item.d}
-										</p>
-									</li>
-								))}
-							</ul>
-						</div>
-					</div>
-				</ProtocolSection>
+                {/* Hardware Verification Section */}
+                <ProtocolSection
+                    title="Hardware Verification"
+                    icon={<CircleCheck className="text-emerald-400" size={16} />}
+                >
+                    <div className="space-y-5">
+                        <div className="bg-[#0a1410] border border-emerald-500/20 rounded-lg p-3.5 shadow-inner">
+                            <p className="text-slate-300 text-[11px] sm:text-xs md:text-sm leading-relaxed font-medium">
+                                We aggregate automated 
+                                <span className="font-black tracking-wider text-emerald-400 uppercase mx-1.5">
+                                    Hardware Intelligence
+                                </span> 
+                                metrics for telemetry arrays, but this is engineered to support, not substitute, system end-user due diligence.
+                            </p>
+                        </div>
 
-				{/* Legal Footer Section */}
-				<div className="mt-8 pt-10 border-t-2 border-slate-100">
-					<div className="max-w-md mx-auto text-center space-y-8">
-						<p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed italic px-4">
-							"Final hardware verification is your responsibility; TechTrade SA
-							serves as a facilitator, not a guarantor."
-						</p>
+                        <div className="space-y-4">
+                            <h4 className="font-black text-[11px] sm:text-xs uppercase tracking-[0.2em] text-purple-400 px-1">
+                                User Responsibility Matrix
+                            </h4>
+                            <ul className="space-y-3.5 list-none">
+                                {[
+                                    {
+                                        t: "Physical Inspection",
+                                        d: "Buyers must carefully evaluate hardware variables during both meetup checkups and the initial 48-hour post-receipt window.",
+                                    },
+                                    {
+                                        t: "Build Doctor Validation",
+                                        d: "For premium items exceeding R5,000, running real-time diagnostics parameters during exchanges is highly advised.",
+                                    },
+                                    {
+                                        t: "Dispute Window",
+                                        d: "Users maintain an immutable 48-hour post-transaction window to log standard arbitration tickets accompanied by explicit system data logs.",
+                                    },
+                                    {
+                                        t: "Platform Limitations",
+                                        d: "TechTrade cannot guarantee structural performance timelines or component life cycles beyond provided point-in-time automated checks.",
+                                    },
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3 group">
+                                        <div className="h-4 w-4 rounded border border-purple-500/30 bg-purple-950/30 flex items-center justify-center shrink-0 mt-0.5 group-hover:border-fuchsia-400 transition-colors" aria-hidden="true">
+                                            <div className="h-1.5 w-1.5 bg-purple-500 group-hover:bg-fuchsia-400 rounded-sm transition-colors"></div>
+                                        </div>
+                                        <p className="text-[11px] sm:text-xs md:text-sm text-slate-400 leading-relaxed font-medium">
+                                            <span className="font-black text-white uppercase tracking-wider mr-1.5">
+                                                {item.t}:
+                                            </span>
+                                            {item.d}
+                                        </p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </ProtocolSection>
 
-						<div className="space-y-6">
-							<PurpleGradientButton
-								label="CLOSE TERMS AND CONDITIONS"
-								onClick={onClose}
-							/>
+                {/* Technical System Core Action Footer Block */}
+                <div className="mt-4 pt-6 border-t border-purple-500/10">
+                    <div className="max-w-md mx-auto text-center space-y-6">
+                        <p className="text-slate-500 text-[11px] sm:text-xs leading-relaxed font-medium tracking-wide italic px-4">
+                            "Final hardware confirmation rests entirely with the interface operators; TechTrade SA operates as a peer matching facilitator, not a transaction guarantor."
+                        </p>
 
-							<div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2">
-								<span className="text-sm md:text-base text-slate-400 font-bold uppercase tracking-widest">
-									v{docVersion}
-								</span>
-								<div className="h-1 w-1 rounded-full bg-slate-300"></div>
-								<span className="text-sm md:text-base text-slate-400 font-bold uppercase tracking-widest">
-									Released: {lastUpdated}
-								</span>
-								<div className="h-1 w-1 rounded-full bg-slate-300"></div>
-								<span className="text-sm md:text-base text-slate-400 font-bold uppercase tracking-widest text-violet-400">
-									TECHTRADE-01-SECURE
-								</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</BaseModal>
-	);
+                        <div className="space-y-5">
+                            <div className="inline-flex w-full justify-center">
+                                <CyberActionButton
+                                    label="ACKNOWLEDGE & TERMINATE PROTOCOL"
+                                    onClick={onClose}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </BaseModal>
+    );
 };
 
 export default TOSModal;

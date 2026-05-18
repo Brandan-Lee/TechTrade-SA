@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PurpleGradientButton from "../../components/ui/PurpleGradientButton";
+import CyberActionButton from "../../components/ui/CyberActionButton";
 import AlternateButton from "../../components/ui/AlternateButton";
 
 const ManageOffer = ({ openCounterModal }) => {
@@ -168,8 +168,8 @@ const ManageOffer = ({ openCounterModal }) => {
 
 						{/* Action Buttons and Gaurdrail */}
 						<div className="flex flex-col gap-4">
-							<PurpleGradientButton label="DECLINE" />
-							<PurpleGradientButton label="ACCEPT" />
+							<CyberActionButton label="DECLINE" />
+							<CyberActionButton label="ACCEPT" />
 							<AlternateButton
 								label="COUNTER-OFFER"
 								onClick={openCounterModal} 
