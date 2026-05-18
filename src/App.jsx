@@ -22,6 +22,7 @@ import ForgotModal from "./components/main/authentication/ForgotModal";
 import OTPModal from "./components/main/authentication/OTPModal";
 import ResetModal from "./components/main/authentication/ResetModal";
 import MyOffers from "./pages/main/MyOffers";
+import MyTransactions from "./pages/main/MyTransactions";
 import ViewListing from "./pages/main/ViewListing";
 import ManageOffer from "./pages/main/ManageOffer";
 import NotificationModal from "./components/main/Notifications/NotificationModal";
@@ -29,6 +30,11 @@ import CounterOfferModal from "./components/main/Notifications/CounterOfferModal
 import TOSModal from "./components/main/tos/TOSModal";
 import PrivacyModal from "./components/main/privacy/PrivacyModal";
 import ListingReportPage from "./pages/main/ListingReport";
+import PaymentGateWay from "./pages/main/PaymentGateWay";
+import EscrowTrackerPage from "./pages/main/EscrowTrackerPage";
+import ReviewPage from "./pages/main/ReviewPage";
+import ReportUser from "./pages/main/ReportUser";
+import LaunchDisputePage from "./pages/main/LaunchDispute";
 
 function App() {
     // --- UI State ---
@@ -114,10 +120,15 @@ function App() {
                     <Route path="build-doctor" element={<BuildDoctor />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="offers" element={<MyOffers />} />
+                    <Route path="transactions" element={<MyTransactions />} />
                     <Route path="view-listing" element={<ViewListing />} />
                     <Route path="manage-offer" element={<ManageOffer openCounterModal={() => setIsCounterModalOpen(true)} />} />
                     <Route path="contact-us" element={<ContactUs />} />
                     <Route path="listing-report" element={<ListingReportPage />} />
+                    <Route path="escrow-tracker" element={<EscrowTrackerPage />} />
+                    <Route path="review" element={<ReviewPage />} />
+                    <Route path="report-user" element={<ReportUser />} />
+                    <Route path="dispute" element={<LaunchDisputePage />} />
                 </Route>
             </Routes>
 

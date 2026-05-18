@@ -24,6 +24,7 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 		{ name: "Sell Your Gear", label: "Sell Your Gear", path: "/sell" },
 		{ name: "Build Doctor", label: "Build Doctor", path: "/build-doctor" },
 		{ name: "divider", path: null },
+		{ name: "My Transactions", label: "My Transactions", path: "/transactions" },
 		{ name: "Contact Us", label: "Contact Us", path: "/contact" },
 		{
 			name: "Login/Register",

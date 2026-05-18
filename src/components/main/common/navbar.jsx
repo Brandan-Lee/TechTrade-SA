@@ -6,7 +6,6 @@ import {
     User,
     UserCircle,
     File,
-    Settings,
     LogOut,
 } from "lucide-react";
 import SearchBar from "./searchbar";
@@ -26,7 +25,7 @@ export default function NavBar({
     const menuItems = [
         { label: "Manage Profile", icon: <UserCircle size={18} />, path: "/profile" },
         { label: "View Offers", icon: <File size={18} />, path: "/offers" },
-        { label: "Settings", icon: <Settings size={18} />, path: "/settings" },
+        { label: "My Transactions", icon: <File size={18} />, path: "/transactions" },
         { label: "Logout", icon: <LogOut size={18} />, path: "/logout", isDanger: true },
     ];
 

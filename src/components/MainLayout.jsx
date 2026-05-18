@@ -42,7 +42,7 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openN
 			<WelcomeBanner />
 
 			{/* Dynamic Page Content */}
-			<main className="flex-grow">
+			<main className="flex-grow bg-[#090614]">
 				<ScrollToTop />
 				<Outlet />
 			</main>

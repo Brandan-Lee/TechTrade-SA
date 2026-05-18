@@ -149,7 +149,7 @@ export default function IntelSection({ formData, setFormData }) {
 					</div>
 				</div>
 
-				{/* 4. VERIFIED SPECS BOX */}
+				{/* VERIFIED SPECS BOX */}
 				<div className="w-full bg-[#050506] rounded-xl p-5 md:p-6 border border-fuchsia-500/20 relative overflow-hidden">
 					{/* Corner Accent Graphic */}
 					<div className="absolute top-0 right-0 w-2 h-2 bg-fuchsia-500/40 [clip-path:polygon(100%_0,100%_100%,0_0)]" />
