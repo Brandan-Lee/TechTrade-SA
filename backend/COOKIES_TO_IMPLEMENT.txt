@@ -1,0 +1,165 @@
+================================================================================
+TechTrade SA — Cookies to Implement
+RESTful PHP API + React (Vite) frontend
+================================================================================
+
+Context
+-------
+- API domain and app domain may differ (e.g. api.techtrade.co.za vs www.techtrade.co.za).
+- Prefer HttpOnly cookies set by PHP for auth; use localStorage only for non-sensitive UI prefs if needed.
+- South Africa: align with POPIA — disclose cookies, get consent for non-essential cookies, document in Privacy Policy.
+
+--------------------------------------------------------------------------------
+1. ESSENTIAL (Strictly necessary — no marketing consent required)
+--------------------------------------------------------------------------------
+
+Name (suggested)          Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+tt_session                PHP session / API session ID     Session         HttpOnly; Secure; SameSite=Lax
+tt_csrf                   CSRF token for state-changing    Session / 2h    HttpOnly; Secure; SameSite=Strict
+                          POST/PUT/PATCH/DELETE from SPA
+
+Notes:
+- tt_session: issued after login; store user_id server-side; rotate on privilege change.
+- tt_csrf: double-submit or header X-CSRF-Token matching cookie; required for forms that use cookies.
+- Do NOT store passwords, PayFast keys, or full card data in any cookie.
+
+--------------------------------------------------------------------------------
+2. AUTHENTICATION (Essential for logged-in experience)
+--------------------------------------------------------------------------------
+
+Name                      Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+tt_access                 Short-lived access token (JWT)   15–60 min       HttpOnly; Secure; SameSite=Lax
+                          OR session continuation
+
+tt_refresh                Refresh token rotation             7–30 days       HttpOnly; Secure; SameSite=Strict
+                          (optional if using JWT)
+
+tt_remember               “Remember this device”           30 days         HttpOnly; Secure; SameSite=Lax
+                          (optional; hashed token in DB)
+
+Notes:
+- If using pure PHP sessions: tt_session may be enough; skip tt_access/tt_refresh.
+- If using JWT: keep access short, refresh in HttpOnly cookie only (never in JS-readable cookie).
+- On logout: clear all auth cookies server-side and invalidate refresh token in DB.
+
+--------------------------------------------------------------------------------
+3. SECURITY & ABUSE PREVENTION (Essential / functional)
+--------------------------------------------------------------------------------
+
+Name                      Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+tt_device_id              Anonymous device fingerprint     1 year          HttpOnly; Secure; SameSite=Lax
+                          for rate limiting (hashed)
+
+tt_login_attempt          Throttle brute-force on login    15 min          HttpOnly; Secure; SameSite=Strict
+
+Notes:
+- Store only a hash of device id server-side; not PII.
+- Pair with IP rate limits on API (login, register, OTP, report, dispute).
+
+--------------------------------------------------------------------------------
+4. CONSENT & PREFERENCES (Requires banner for non-essential)
+--------------------------------------------------------------------------------
+
+Name                      Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+tt_cookie_consent         User choice: essential only /    12 months       Secure; SameSite=Lax
+                          analytics / marketing            (not HttpOnly —
+                          (JSON: {essential,analytics})    JS may read for UI)
+
+tt_theme                  dark/light (UI only)             1 year          Secure; SameSite=Lax
+                          (optional — can use localStorage)
+
+tt_locale                 en-ZA default                    1 year          Secure; SameSite=Lax
+
+Notes:
+- tt_cookie_consent: required before setting analytics/marketing cookies.
+- Essential cookies must work even if user rejects optional categories.
+
+--------------------------------------------------------------------------------
+5. FUNCTIONAL (Improve UX — disclose in policy; consent if tracking)
+--------------------------------------------------------------------------------
+
+Name                      Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+tt_cart_context           Last viewed listing IDs          Session         HttpOnly; Secure; SameSite=Lax
+                          (optional wishlist stub)
+
+tt_offer_draft            Unsaved offer form (listing id)  24 hours        HttpOnly; Secure; SameSite=Lax
+                          (optional)
+
+tt_admin_impersonate      Staff “view as user” audit       Session         HttpOnly; Secure; SameSite=Strict
+                          (admin only — log every use)
+
+Notes:
+- Prefer server-side drafts in DB for sell/listing flows once user is logged in.
+- Never use cookies for escrow amounts or payment status — always from API + DB.
+
+--------------------------------------------------------------------------------
+6. ANALYTICS (Non-essential — consent required under POPIA)
+--------------------------------------------------------------------------------
+
+Name                      Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+_tt_ga / _tt_plausible    First-party analytics ID         13 months       Secure; SameSite=Lax
+                          (if you self-host analytics)
+
+Avoid third-party ad trackers unless explicitly consented.
+
+--------------------------------------------------------------------------------
+7. PAYFAST / PAYMENT (Do not invent custom payment cookies)
+--------------------------------------------------------------------------------
+
+- PayFast handles its own session on sandbox.payfast.co.za / payfast.co.za.
+- Your API should use:
+  - return_url / cancel_url / notify_url (server webhook)
+  - m_payment_id stored in `payments` table
+- Do NOT store PayFast merchant_key in cookies.
+- After return from PayFast, set a one-time flash cookie only if needed:
+
+Name                      Purpose                          Lifetime        Flags
+------------------------  -------------------------------  --------------  ---------------------------
+tt_payment_return         Opaque id linking to payment row  5 min           HttpOnly; Secure; SameSite=Lax
+                          for “success” page poll
+
+--------------------------------------------------------------------------------
+8. COOKIES TO AVOID
+--------------------------------------------------------------------------------
+
+- JWT or session in document.cookie readable by JS (XSS risk).
+- email, name, phone, province in cookies.
+- listing price, offer amount, transaction status (always fetch from API).
+- “is_admin=true” in client-readable cookie.
+- Wildcard Domain=.co.za on shared hosting without HTTPS everywhere.
+
+--------------------------------------------------------------------------------
+9. REACT + PHP CORS / CREDENTIALS CHECKLIST
+--------------------------------------------------------------------------------
+
+PHP (setcookie / session):
+  - Secure=true in production (HTTPS only)
+  - HttpOnly=true for auth/session/csrf
+  - SameSite=Lax (default) or Strict for csrf/refresh
+  - Path=/
+  - Domain: exact host or parent domain if SPA and API share parent
+
+React (fetch/axios):
+  - credentials: 'include' when calling API on another subdomain
+  - API must respond: Access-Control-Allow-Credentials: true
+  - Access-Control-Allow-Origin: exact frontend origin (not *)
+
+--------------------------------------------------------------------------------
+10. IMPLEMENTATION ORDER (recommended)
+--------------------------------------------------------------------------------
+
+Phase 1: tt_session, tt_csrf, auth cookies (login/logout/refresh)
+Phase 2: tt_cookie_consent + privacy modal wiring
+Phase 3: rate-limit / device cookies
+Phase 4: analytics (only after consent)
+Phase 5: optional UX cookies (theme, drafts)
+
+================================================================================
+End of file — update PrivacyModal.jsx / Privacy Policy when cookies go live.
+================================================================================

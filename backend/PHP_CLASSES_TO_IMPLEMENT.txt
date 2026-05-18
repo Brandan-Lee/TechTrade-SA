@@ -1,0 +1,447 @@
+================================================================================
+TechTrade SA — PHP REST API Class Structure
+Suggested namespaces and responsibilities (PSR-4 autoloading)
+================================================================================
+
+Recommended stack
+-----------------
+- PHP 8.2+
+- Composer + PSR-4 (e.g. namespace App\)
+- Slim 4 / Laravel API / vanilla router — patterns below work for any
+- PDO for MySQL (schema: database/schema.sql)
+- vlucas/phpdotenv for config
+- firebase/php-jwt OR native PHP sessions for auth
+
+Suggested folder layout
+-----------------------
+backend/
+  public/index.php          # front controller
+  src/
+    Config/
+    Http/
+    Middleware/
+    Controllers/
+    Services/
+    Repositories/
+    Models/
+    DTOs/
+    Validators/
+    Exceptions/
+    Integrations/
+  routes/api.php
+  config/
+  .env
+
+================================================================================
+1. CONFIG
+================================================================================
+
+App\Config\DatabaseConfig
+  - DSN, credentials, PDO options (ERRMODE_EXCEPTION, FETCH_ASSOC)
+
+App\Config\AppConfig
+  - app env, debug, base URL, CORS allowed origins, cookie domain
+
+App\Config\AuthConfig
+  - JWT secret / session name, TTLs, bcrypt cost
+
+App\Config\PayFastConfig
+  - merchant_id, merchant_key (env only), sandbox flag, notify URL
+
+App\Config\StorageConfig
+  - listing/dispute image paths, S3/local, max upload size
+
+================================================================================
+2. HTTP LAYER (request / response)
+================================================================================
+
+App\Http\Router
+  - register routes, method + path → controller action
+
+App\Http\Request
+  - wrap $_SERVER, headers, JSON body, authenticated user id
+
+App\Http\Response
+  - json(), error(), status codes, CORS headers
+
+App\Http\JsonBodyParser
+  - parse application/json for POST/PUT/PATCH
+
+================================================================================
+3. MIDDLEWARE (run before controllers)
+================================================================================
+
+App\Middleware\CorsMiddleware
+  - Allow-Origin, Allow-Credentials, preflight OPTIONS
+
+App\Middleware\JsonMiddleware
+  - Content-Type application/json
+
+App\Middleware\AuthMiddleware
+  - Validate session or JWT; attach User to request
+
+App\Middleware\RoleMiddleware
+  - Require role: buyer | seller | admin | moderator
+
+App\Middleware\CsrfMiddleware
+  - Validate tt_csrf cookie vs X-CSRF-Token header
+
+App\Middleware\RateLimitMiddleware
+  - Per-IP / per-user limits (login, OTP, reports)
+
+App\Middleware\TransactionParticipantMiddleware
+  - Ensure current user is buyer or seller on transaction id
+
+App\Middleware\ListingOwnerMiddleware
+  - Ensure current user owns listing
+
+================================================================================
+4. CONTROLLERS (thin — delegate to services)
+================================================================================
+
+App\Controllers\AuthController
+  POST   /api/v1/auth/register
+  POST   /api/v1/auth/login
+  POST   /api/v1/auth/logout
+  POST   /api/v1/auth/forgot-password
+  POST   /api/v1/auth/verify-otp
+  POST   /api/v1/auth/reset-password
+  GET    /api/v1/auth/me
+
+App\Controllers\UserController
+  GET    /api/v1/users/{id}           # public profile
+  PATCH  /api/v1/users/me
+  POST   /api/v1/users/me/avatar
+
+App\Controllers\ListingController
+  GET    /api/v1/listings             # marketplace + filters
+  GET    /api/v1/listings/{id}
+  POST   /api/v1/listings
+  PATCH  /api/v1/listings/{id}
+  DELETE /api/v1/listings/{id}
+  POST   /api/v1/listings/{id}/images
+
+App\Controllers\CategoryController
+  GET    /api/v1/categories
+
+App\Controllers\OfferController
+  GET    /api/v1/offers               # incoming (seller) / outgoing (buyer)
+  POST   /api/v1/listings/{id}/offers
+  PATCH  /api/v1/offers/{id}/accept
+  PATCH  /api/v1/offers/{id}/decline
+  POST   /api/v1/offers/{id}/counter
+
+App\Controllers\TransactionController
+  GET    /api/v1/transactions
+  GET    /api/v1/transactions/{publicId}
+  POST   /api/v1/transactions         # create from accepted offer
+  PATCH  /api/v1/transactions/{id}/escrow-step
+  POST   /api/v1/transactions/{id}/ship
+  POST   /api/v1/transactions/{id}/confirm-delivery
+  POST   /api/v1/transactions/{id}/release-payment
+
+App\Controllers\PaymentController
+  POST   /api/v1/transactions/{id}/payments/initiate   # PayFast form fields
+  POST   /api/v1/payments/payfast-webhook             # ITN notify (no auth)
+  GET    /api/v1/payments/{mPaymentId}/status
+
+App\Controllers\DisputeController
+  POST   /api/v1/transactions/{id}/disputes
+  GET    /api/v1/disputes/{id}
+  POST   /api/v1/disputes/{id}/evidence
+
+App\Controllers\ReviewController
+  POST   /api/v1/transactions/{id}/reviews
+  GET    /api/v1/users/{id}/reviews
+
+App\Controllers\ReportController
+  POST   /api/v1/reports/users
+  POST   /api/v1/reports/listings
+
+App\Controllers\WhatsAppTTLController
+  GET    /api/v1/users/me/whatsapp-ttl
+  PUT    /api/v1/users/me/whatsapp-ttl        # WhatsAppTTLPage save
+
+App\Controllers\WhatsAppBridgeController
+  GET    /api/v1/transactions/{id}/whatsapp-bridge
+  POST   /api/v1/transactions/{id}/whatsapp-bridge/activate
+  POST   /api/v1/transactions/{id}/whatsapp-bridge/revoke
+  GET    /api/v1/cron/whatsapp-bridges/expire  # internal: purge expired rows
+
+App\Controllers\NotificationController
+  GET    /api/v1/notifications
+  PATCH  /api/v1/notifications/{id}/read
+  DELETE /api/v1/notifications/{id}
+
+App\Controllers\BuildDoctorController
+  POST   /api/v1/build-doctor/analyze
+  GET    /api/v1/build-doctor/saves
+  POST   /api/v1/build-doctor/saves
+
+App\Controllers\SupportController
+  POST   /api/v1/support/messages
+
+App\Controllers\Admin\AdminDashboardController
+App\Controllers\Admin\AdminUserController
+App\Controllers\Admin\AdminListingReportController
+App\Controllers\Admin\AdminUserReportController
+App\Controllers\Admin\AdminDisputeController
+App\Controllers\Admin\AdminCategoryController      # tech database
+App\Controllers\Admin\AdminStrikeController
+
+App\Controllers\HealthController
+  GET    /api/v1/health
+
+================================================================================
+5. SERVICES (business logic)
+================================================================================
+
+App\Services\AuthService
+  - register, login, logout, password reset, OTP issue/verify
+
+App\Services\UserService
+  - profile update, trust score recalc, avatar upload
+
+App\Services\ListingService
+  - create/publish listing, status transitions, featured flag
+
+App\Services\MarketplaceService
+  - filter listings (category, price, condition, province)
+
+App\Services\OfferService
+  - create offer, accept/decline, counter-offer chain
+
+App\Services\TransactionService
+  - create transaction from offer, escrow step machine (1–5)
+
+App\Services\EscrowService
+  - advance step rules (buyer vs seller actions), 48h inspection window
+
+App\Services\PaymentService
+  - build PayFast signature, record payment, handle ITN webhook
+
+App\Services\DisputeService
+  - open dispute, freeze escrow, attach evidence (max 6 images)
+
+App\Services\ReviewService
+  - post-transaction reviews, update user trust_score
+
+App\Services\ReportService
+  - user/listing reports → admin queue
+
+App\Services\WhatsAppTTLService
+  - save user preset (24h|7d|90d|custom + days), validate custom 1–365
+
+App\Services\WhatsAppBridgeService
+  - create bridge on transaction commit, compute expires_at from user preset
+  - purge wa_deeplink / bridge_token on expire; write audit_metadata_json only
+
+App\Services\NotificationService
+  - create notifications (offer, counter, bridge), mark read
+
+App\Services\BuildDoctorService
+  - compatibility / PSU wattage logic (can call rules or external API)
+
+App\Services\FileUploadService
+  - validate MIME/size, store listing + dispute images
+
+App\Services\Admin\AdminReportQueueService
+App\Services\Admin\AdminUserModerationService
+
+================================================================================
+6. REPOSITORIES (database access only — one per aggregate)
+================================================================================
+
+App\Repositories\UserRepository
+App\Repositories\RoleRepository
+App\Repositories\ListingRepository
+App\Repositories\ListingImageRepository
+App\Repositories\ListingSpecRepository
+App\Repositories\CategoryRepository
+App\Repositories\HardwareRepository
+App\Repositories\GpuRepository
+App\Repositories\CpuRepository
+App\Repositories\MotherboardRepository
+App\Repositories\PsuRepository
+App\Repositories\MemoryRepository
+App\Repositories\AioRepository
+App\Repositories\AirCoolerRepository
+App\Repositories\CaseFanRepository
+App\Repositories\SsdRepository
+App\Repositories\HddRepository
+App\Services\HardwareCatalogService          # insert hardware + correct child spec row
+App\Repositories\OfferRepository
+App\Repositories\TransactionRepository
+App\Repositories\TransactionEventRepository
+App\Repositories\PaymentRepository
+App\Repositories\DisputeRepository
+App\Repositories\DisputeEvidenceRepository
+App\Repositories\ReviewRepository
+App\Repositories\UserReportRepository
+App\Repositories\ListingReportRepository
+App\Repositories\WhatsAppBridgeRepository
+App\Repositories\NotificationRepository
+App\Repositories\UserBuildRepository
+App\Repositories\SupportMessageRepository
+App\Repositories\UserStrikeRepository
+App\Repositories\OtpVerificationRepository
+App\Repositories\PasswordResetTokenRepository
+App\Repositories\RefreshTokenRepository          # if using JWT refresh
+
+Pattern: interfaces optional (UserRepositoryInterface) for testing.
+
+================================================================================
+7. MODELS (domain entities — map to DB rows)
+================================================================================
+
+App\Models\User
+App\Models\Listing
+App\Models\ListingImage
+App\Models\Offer
+App\Models\Transaction
+App\Models\Payment
+App\Models\Dispute
+App\Models\Review
+App\Models\Notification
+App\Models\Category
+App\Models\UserReport
+App\Models\ListingReport
+
+- Plain PHP classes with typed properties (PHP 8.2+)
+- fromArray() / toArray() for JSON serialization
+- No SQL inside models
+
+================================================================================
+8. DTOs (API input/output shapes)
+================================================================================
+
+App\DTOs\Auth\RegisterRequestDto
+App\DTOs\Auth\LoginRequestDto
+App\DTOs\Listing\CreateListingDto
+App\DTOs\Listing\ListingFilterDto
+App\DTOs\Offer\CreateOfferDto
+App\DTOs\Transaction\UpdateEscrowStepDto
+App\DTOs\Dispute\OpenDisputeDto
+App\DTOs\Review\CreateReviewDto
+App\DTOs\Report\ReportUserDto
+App\DTOs\Report\ReportListingDto
+
+App\DTOs\Responses\ListingResponseDto      # hide internal ids if needed
+App\DTOs\Responses\TransactionResponseDto  # includes escrow_step, public_id
+App\DTOs\Responses\UserPublicProfileDto
+
+================================================================================
+9. VALIDATORS
+================================================================================
+
+App\Validators\RegisterValidator
+App\Validators\ListingValidator
+App\Validators\OfferValidator
+App\Validators\DisputeValidator
+App\Validators\ReviewValidator
+
+- Return array of field errors for 422 Unprocessable Entity
+- Match frontend rules (e.g. dispute details min 15 chars)
+
+================================================================================
+10. EXCEPTIONS + HANDLER
+================================================================================
+
+App\Exceptions\HttpException                    # base
+App\Exceptions\UnauthorizedException            # 401
+App\Exceptions\ForbiddenException               # 403
+App\Exceptions\NotFoundException                # 404
+App\Exceptions\ValidationException              # 422
+App\Exceptions\ConflictException                # 409 (e.g. dispute already open)
+
+App\Exceptions\ExceptionHandler
+  - log errors, return consistent JSON: { "error": "...", "code": 422, "fields": {} }
+
+================================================================================
+11. INTEGRATIONS
+================================================================================
+
+App\Integrations\PayFast\PayFastClient
+  - generate payment form fields + signature
+
+App\Integrations\PayFast\PayFastWebhookHandler
+  - verify ITN signature, idempotent update payments + escrow step
+
+App\Integrations\Mail\MailerInterface
+App\Integrations\Mail\SmtpMailer               # OTP, password reset
+
+App\Integrations\Storage\StorageInterface
+App\Integrations\Storage\LocalStorageAdapter
+
+================================================================================
+12. UTILITIES / SUPPORT
+================================================================================
+
+App\Support\IdGenerator
+  - generate public_id like TX-9082314
+
+App\Support\Money
+  - cents ↔ ZAR display formatting
+
+App\Support\CookieManager
+  - set auth/csrf/consent cookies with correct flags
+
+App\Support\Paginator
+  - limit/offset for marketplace listings
+
+App\Security\PasswordHasher
+App\Security\JwtService                         # if JWT
+App\Security\CsrfTokenGenerator
+
+================================================================================
+13. ENUMS (PHP 8.1+ backed enums — mirror schema)
+================================================================================
+
+App\Enums\ListingStatus
+App\Enums\ListingCondition
+App\Enums\OfferStatus
+App\Enums\TransactionStatus
+App\Enums\EscrowStep
+App\Enums\PaymentStatus
+App\Enums\DisputeReason
+App\Enums\DisputeStatus
+App\Enums\NotificationType
+App\Enums\UserRole
+
+================================================================================
+14. CLASS COUNT SUMMARY (ballpark)
+================================================================================
+
+Config              ~5
+Http                ~4
+Middleware          ~7
+Controllers         ~18
+Services            ~15
+Repositories        ~20
+Models              ~12
+DTOs                ~15
+Validators          ~6
+Exceptions          ~7
+Integrations        ~6
+Support/Security    ~8
+Enums               ~10
+                    --------
+Total               ~130 classes (grow incrementally; start with ~40)
+
+================================================================================
+15. MINIMUM VIABLE API (build in this order)
+================================================================================
+
+1. DatabaseConfig + ExceptionHandler + Router + Response
+2. AuthController + AuthService + UserRepository + CookieManager + CsrfMiddleware
+3. ListingController + ListingService + ListingRepository
+4. OfferController + OfferService
+5. TransactionController + EscrowService + TransactionRepository
+6. PaymentController + PayFastWebhookHandler
+7. NotificationService (hook into offer accept / payment complete)
+8. DisputeController + ReviewController + ReportController
+9. Admin controllers last
+
+================================================================================
+End of file — pair with database/schema.sql and COOKIES_TO_IMPLEMENT.txt
+================================================================================
