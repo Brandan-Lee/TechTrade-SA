@@ -1,6 +1,11 @@
 <?php
 
+// Password Policy
 define('MIN_PASSWORD_LENGTH', 8);
+define('REQUIRE_UPPERCASE', true);
+define('REQUIRE_NUMBER', true);
+define('REQUIRE_SYMBOL', true);
+
 define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'webp']);
 define('MAX_IMAGE_SIZE', 2 * 1024 * 1024);
 

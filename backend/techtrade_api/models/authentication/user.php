@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/EncryptionEngine.php';
+require_once __DIR__ . '/../security/encryption_engine.php';
 
 class User
 {
@@ -35,7 +35,6 @@ class User
     public function __construct(PDO $db)
     {
         $this->db = $db;
-
         if (defined('ENCRYPTION_KEY')) {
             $this->crypto = new EncryptionEngine(ENCRYPTION_KEY);
         }
@@ -46,10 +45,8 @@ class User
         $stmt = $db->prepare("SELECT * FROM users WHERE id = ? AND is_deleted = 0 LIMIT 1");
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if (!$row)
             return null;
-
         $user = new self($db);
         $user->hydrate($row);
         return $user;
@@ -60,13 +57,18 @@ class User
         $stmt = $db->prepare("SELECT * FROM users WHERE email = ? AND is_deleted = 0 LIMIT 1");
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if (!$row)
             return null;
-
         $user = new self($db);
         $user->hydrate($row);
         return $user;
+    }
+
+    // --- Security Methods ---
+
+    public function verifyPassword(string $password): bool
+    {
+        return password_verify($password, $this->passwordHash);
     }
 
     private function hydrate(array $row): void
@@ -97,7 +99,6 @@ class User
         $this->deletedAt = $row['deleted_at'];
     }
 
-    // Getters
     public function getId(): int
     {
         return $this->id;
@@ -138,10 +139,6 @@ class User
     {
         return $this->isSuspended;
     }
-    public function hasBeenSuspended(): bool
-    {
-        return $this->hasBeenSuspended;
-    }
     public function isBanned(): bool
     {
         return $this->isBanned;
@@ -149,6 +146,14 @@ class User
     public function isDeleted(): bool
     {
         return $this->isDeleted;
+    }
+    public function getSuspendedReason(): ?string
+    {
+        return $this->suspendedReason;
+    }
+    public function getSuspendedUntil(): ?string
+    {
+        return $this->suspendedUntil;
     }
 
     public function getMobile(): string
@@ -167,13 +172,13 @@ class User
 
         if ($this->hasBeenSuspended && $this->strikeCount >= BAN_STRIKE_THRESHOLD) {
             $this->isBanned = true;
-            $this->banReason = empty($reason) ? 'Permanent Hardware Ban: Reached max limit (' . BAN_STRIKE_THRESHOLD . ' strikes) following a prior suspension.' : $reason;
+            $this->banReason = empty($reason) ? 'Permanent Hardware Ban' : $reason;
             $sql .= ", is_banned = 1, banned_at = NOW(), ban_reason = ?";
             $params[] = $this->banReason;
         } else if ($this->strikeCount == SUSPENSION_STRIKE_THRESHOLD) {
             $this->isSuspended = true;
             $this->hasBeenSuspended = true;
-            $this->suspendedReason = empty($reason) ? 'Automatic system suspension: Account reached ' . SUSPENSION_STRIKE_THRESHOLD . ' platform strikes.' : $reason;
+            $this->suspendedReason = empty($reason) ? 'Automatic system suspension' : $reason;
             $sql .= ", is_suspended = 1, has_been_suspended = 1, suspended_at = NOW(), suspended_until = DATE_ADD(NOW(), INTERVAL ? DAY), suspended_reason = ?";
             $params[] = SUSPENSION_DURATION_DAYS;
             $params[] = $this->suspendedReason;
@@ -191,7 +196,6 @@ class User
         $days = $customDays ?? SUSPENSION_DURATION_DAYS;
         $sql = "UPDATE users SET is_suspended = 1, has_been_suspended = 1, suspended_at = NOW(), suspended_until = DATE_ADD(NOW(), INTERVAL ? DAY), suspended_reason = ? WHERE id = ?";
         $stmt = $this->db->prepare($sql);
-
         return $stmt->execute([$days, $reason, $this->id]);
     }
 
@@ -199,7 +203,13 @@ class User
     {
         $sql = "UPDATE users SET is_suspended = 0, suspended_at = NULL, suspended_until = NULL, suspended_reason = NULL WHERE id = ?";
         $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$this->id]);
+    }
 
+    public function updateLastLogin(): bool
+    {
+        $sql = "UPDATE users SET last_login_at = NOW() WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
         return $stmt->execute([$this->id]);
     }
 }

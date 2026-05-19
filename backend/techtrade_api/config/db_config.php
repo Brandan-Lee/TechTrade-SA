@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $host = 'localhost';
-$db   = 'techtrade_za';
+$db = 'techtrade_za';
 $user = 'root';
 $pass = '';
 
@@ -20,7 +20,7 @@ try {
 } catch (PDOException $e) {
     http_response_code(500);
     die(json_encode([
-        "status" => "error", 
+        "status" => "error",
         "message" => "Database Connection Failed: " . $e->getMessage()
     ]));
 }

@@ -37,7 +37,7 @@ CREATE TABLE users (
     hardware_id VARCHAR(255) NULL,
     province VARCHAR(64) NULL,
     avatar_url VARCHAR(512) NULL,
-    reg_type ENUM ('buyer', 'seller') NOT NULL DEFAULT 'buyer',
+    reg_type ENUM ('buyer', 'seller', 'both') NOT NULL DEFAULT 'buyer',
     member_since DATE NOT NULL DEFAULT (CURRENT_DATE),
     trust_score DECIMAL(3, 2) NOT NULL DEFAULT 0.00,
     trade_count INT UNSIGNED NOT NULL DEFAULT 0,
@@ -62,6 +62,15 @@ CREATE TABLE users (
     KEY index_users_province (province),
     CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (id)
 ) ENGINE = InnoDB;
+
+CREATE TABLE user_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    selector VARCHAR(64) NOT NULL,
+    hashed_validator VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 CREATE TABLE
   password_reset_tokens (

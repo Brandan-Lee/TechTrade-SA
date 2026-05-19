@@ -13,10 +13,25 @@ import GradientButton from "../../ui/CyberActionButton";
 import PasswordStrengthMeter from "../../ui/PasswordStrengthMeter";
 import AuthFooter from "./AuthFooter";
 import CyberAlert from "../../ui/CyberAlert";
+import { useAuthModalScroll } from "./AuthModalScrollContext";
 
 const saPhoneRegex = /^(?:\+27|0)[6-8][0-9]{8}$/;
 
-const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
+const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => (
+	<AuthModalWrapper
+		isOpen={isOpen}
+		onClose={onClose}
+		onBack={onSwitchToLogin}
+	>
+		<RegisterModalContent
+			onClose={onClose}
+			onSwitchToLogin={onSwitchToLogin}
+			onSwitchToTOS={onSwitchToTOS}
+		/>
+	</AuthModalWrapper>
+);
+
+const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 	const [formData, setFormData] = useState({
 		firstName: "",
 		lastName: "",
@@ -41,34 +56,46 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 		type: "error",
 	});
 	const [errorField, setErrorField] = useState("");
+	const [shakeTick, setShakeTick] = useState(0);
+	const scrollToTop = useAuthModalScroll();
 	const [hardwareId, setHardwareId] = useState("");
 
 	useEffect(() => {
-		if (isOpen) {
-			const generateFingerprint = () => {
-				const keys = [
-					navigator.userAgent,
-					navigator.language,
-					screen.colorDepth,
-					navigator.deviceMemory || "unknown",
-					new Date().getTimezoneOffset(),
-					navigator.hardwareConcurrency || "unknown",
-				];
-				return btoa(keys.join("||")).substring(0, 32);
-			};
-			setHardwareId(generateFingerprint());
+		const generateFingerprint = () => {
+			const keys = [
+				navigator.userAgent,
+				navigator.language,
+				screen.colorDepth,
+				navigator.deviceMemory || "unknown",
+				new Date().getTimezoneOffset(),
+				navigator.hardwareConcurrency || "unknown",
+			];
+			return btoa(keys.join("||")).substring(0, 32);
+		};
+		setHardwareId(generateFingerprint());
+	}, []);
+
+	const triggerStatus = (message, type = "error", fieldName = "") => {
+		scrollToTop?.();
+		setAlert({ show: true, message, type });
+		if (type === "error" && fieldName) {
+			setErrorField("");
+			setShakeTick((tick) => tick + 1);
+			requestAnimationFrame(() => setErrorField(fieldName));
+		} else {
+			setErrorField("");
 		}
-	}, [isOpen]);
+	};
 
 	const calculateStrength = (password) => {
-        const checks = {
-            length: password.length >= 8,
-            uppercase: /[A-Z]/.test(password),
-            number: /[0-9]/.test(password),
-            symbol: /[^A-Za-z0-9]/.test(password),
-        };
-        return Object.values(checks).filter(Boolean).length;
-    };
+		const checks = {
+			length: password.length >= 8,
+			uppercase: /[A-Z]/.test(password),
+			number: /[0-9]/.test(password),
+			symbol: /[^A-Za-z0-9]/.test(password),
+		};
+		return Object.values(checks).filter(Boolean).length;
+	};
 
 	const handleInputChange = (e) => {
 		const { name, value, type, checked } = e.target;
@@ -91,13 +118,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 		}
 	};
 
-	const triggerShake = (fieldName, errorMessage) => {
-		setAlert({ show: true, message: errorMessage, type: "error" });
-		setTimeout(() => {
-			setErrorField(fieldName);
-		}, 10);
-	};
-
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
@@ -107,52 +127,61 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 		const cleanPhone = formData.mobile.replace(/\s/g, "");
 
 		if (!formData.firstName.trim()) {
-			triggerShake("firstName", "First name field cannot be empty.");
+			triggerStatus("First name field cannot be empty.", "error", "firstName");
 			return;
 		}
 
 		if (!formData.lastName.trim()) {
-			triggerShake("lastName", "Last name field cannot be empty.");
+			triggerStatus("Last name field cannot be empty.", "error", "lastName");
 			return;
 		}
 
 		if (!formData.email.trim()) {
-			triggerShake("email", "Email field cannot be empty.");
+			triggerStatus("Email field cannot be empty.", "error", "email");
 			return;
 		}
 
 		if (!formData.password) {
-			triggerShake("password", "Password field cannot be empty.");
+			triggerStatus("Password field cannot be empty.", "error", "password");
 			return;
 		}
 
 		if (formData.password !== formData.confirmPassword) {
-			triggerShake("confirmPassword", "Passwords do not match.");
+			triggerStatus("Passwords do not match.", "error", "confirmPassword");
 			return;
 		}
 
 		if (!saPhoneRegex.test(cleanPhone)) {
-			triggerShake("mobile", "Invalid South African mobile configuration.");
+			triggerStatus(
+				"Invalid South African mobile configuration.",
+				"error",
+				"mobile",
+			);
 			return;
 		}
 
 		if (!formData.province) {
-			triggerShake("province", "Province selection required.");
+			triggerStatus("Province selection required.", "error", "province");
 			return;
 		}
 
 		if (!formData.agreedToTerms) {
-			triggerShake(
-				"agreedToTerms",
+			triggerStatus(
 				"You have to agree to the terms and conditions to continue",
+				"error",
+				"agreedToTerms",
 			);
 			return;
 		}
 
 		if (calculateStrength(formData.password) < 4) {
-            triggerShake("password", "Password is too weak. Please meet all security requirements.");
-            return;
-        }
+			triggerStatus(
+				"Password is too weak. Please meet all security requirements.",
+				"error",
+				"password",
+			);
+			return;
+		}
 
 		setIsLoading(true);
 
@@ -191,44 +220,45 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 				);
 			}
 
-			setFormData({
-				firstName: "",
-				lastName: "",
-				email: "",
-				password: "",
-				confirmPassword: "",
-				mobile: "",
-				province: "",
-				regType: "buyer",
-				profilePhoto: null,
-				agreedToTerms: false,
-			});
-			setProfileImage(null);
-			onSwitchToLogin();
+			// SUCCESS: Trigger status, then wait 2 seconds
+			triggerStatus(
+				"Registration successful! Redirecting to login...",
+				"success",
+			);
+
+			setTimeout(() => {
+				setFormData({
+					firstName: "",
+					lastName: "",
+					email: "",
+					password: "",
+					confirmPassword: "",
+					mobile: "",
+					province: "",
+					regType: "buyer",
+					profilePhoto: null,
+					agreedToTerms: false,
+				});
+				setProfileImage(null);
+				onSwitchToLogin();
+				setIsLoading(false);
+			}, 2000);
 		} catch (err) {
 			try {
 				const parsedErr = JSON.parse(err.message);
-				triggerShake(
-					parsedErr.field,
+				triggerStatus(
 					`${parsedErr.message.toUpperCase()}`,
+					"error",
+					parsedErr.field,
 				);
 			} catch {
-				triggerShake(
-					"serverError",
-					`${err.message.toUpperCase()}`,
-				);
+				triggerStatus(`${err.message.toUpperCase()}`, "error", "serverError");
 			}
-		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	return (
-		<AuthModalWrapper
-			isOpen={isOpen}
-			onClose={onClose}
-			onBack={onSwitchToLogin}
-		>
 			<div className="space-y-5 sm:space-y-6 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
 				<div className="space-y-1">
 					<h1 className="text-white text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight leading-none">
@@ -257,7 +287,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 					className="space-y-4 sm:space-y-5"
 					noValidate
 				>
-					{/* Profile Visual Identity Input Cluster */}
 					<div className="w-full p-4 bg-black/20 rounded-lg border border-white/5 flex flex-col sm:flex-row items-center gap-4">
 						<div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-[#121214] border-2 border-fuchsia-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_rgba(217,70,239,0.1)]">
 							{profileImage ? (
@@ -284,9 +313,13 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						</div>
 					</div>
 
-					{/* Personal Matrix Name Data Blocks */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<AuthInput
+							key={
+								errorField === "firstName"
+									? `shake-fn-${shakeTick}`
+									: "norm-fn"
+							}
 							label="FIRST NAME"
 							name="firstName"
 							value={formData.firstName}
@@ -296,6 +329,11 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 							className={errorField === "firstName" ? "animate-shake" : ""}
 						/>
 						<AuthInput
+							key={
+								errorField === "lastName"
+									? `shake-ln-${shakeTick}`
+									: "norm-ln"
+							}
 							label="LAST NAME"
 							name="lastName"
 							value={formData.lastName}
@@ -307,6 +345,9 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 					</div>
 
 					<AuthInput
+						key={
+							errorField === "email" ? `shake-em-${shakeTick}` : "norm-em"
+						}
 						label="EMAIL"
 						type="email"
 						name="email"
@@ -317,9 +358,13 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						className={errorField === "email" ? "animate-shake" : ""}
 					/>
 
-					{/* Integrated Cipher Assignment Stack */}
 					<div className="space-y-3">
 						<AuthInput
+							key={
+								errorField === "password"
+									? `shake-pw-${shakeTick}`
+									: "norm-pw"
+							}
 							label="NEW PASSWORD"
 							type={showPassword ? "text" : "password"}
 							name="password"
@@ -335,6 +380,11 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 							<PasswordStrengthMeter password={formData.password} />
 						</div>
 						<AuthInput
+							key={
+								errorField === "confirmPassword"
+									? `shake-cpw-${shakeTick}`
+									: "norm-cpw"
+							}
 							label="CONFIRM PASSWORD"
 							type={confirmShowPassword ? "text" : "password"}
 							name="confirmPassword"
@@ -352,8 +402,10 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						/>
 					</div>
 
-					{/* Telecom Comms String Input */}
 					<AuthInput
+						key={
+							errorField === "mobile" ? `shake-mo-${shakeTick}` : "norm-mo"
+						}
 						label="MOBILE NUMBER"
 						type="text"
 						inputMode="tel"
@@ -367,8 +419,12 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						className={errorField === "mobile" ? "animate-shake" : ""}
 					/>
 
-					{/* Selector Area Terminal Custom Menu */}
 					<div
+						key={
+							errorField === "province"
+								? `shake-province-${shakeTick}`
+								: "norm-province"
+						}
 						className={`space-y-1.5 ${errorField === "province" ? "animate-shake" : ""}`}
 					>
 						<label className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest ml-0.5">
@@ -424,7 +480,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						</div>
 					</div>
 
-					{/* Operational Classification Access Toggles */}
 					<div className="p-4 bg-black/20 rounded-lg border border-white/5 space-y-3">
 						<h3 className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest">
 							REGISTER AS
@@ -450,9 +505,13 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						</div>
 					</div>
 
-					{/* TOS Checkbox container */}
 					<div
-						className={`p-3.5 bg-fuchsia-500/[0.01] rounded-lg border transition-all ${errorField === "agreedToTerms" ? "border-red-500/50 bg-red-500/[0.02] animate-shake" : "border-fuchsia-500/10"}`}
+						key={
+							errorField === "agreedToTerms"
+								? `shake-terms-${shakeTick}`
+								: "norm-terms"
+						}
+						className={`p-3.5 bg-fuchsia-500/[0.01] rounded-lg border transition-[color,background-color,border-color] ${errorField === "agreedToTerms" ? "border-red-500/50 bg-red-500/[0.02] animate-shake" : "border-fuchsia-500/10"}`}
 					>
 						<label className="flex items-start gap-3 cursor-pointer group select-none">
 							<div className="relative flex items-center pt-0.5 shrink-0">
@@ -483,7 +542,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 						</label>
 					</div>
 
-					{/* Core Executable Dispatch Stack Buttons */}
 					<div className="space-y-4 pt-2 border-t border-white/5">
 						<GradientButton
 							label={isLoading ? "SUBMITTING REGISTRATION" : "REGISTER ACCOUNT"}
@@ -502,7 +560,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => {
 					</div>
 				</form>
 			</div>
-		</AuthModalWrapper>
 	);
 };
 

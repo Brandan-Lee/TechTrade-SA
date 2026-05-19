@@ -197,6 +197,7 @@ function App() {
                 onClose={() => setIsLoginOpen(false)}
                 onSwitchToRegister={switchToRegister}
                 onSwitchToForgot={switchToForgot}
+                onSwitchToOTP={switchToOTP}
             />
 
             <RegisterModal

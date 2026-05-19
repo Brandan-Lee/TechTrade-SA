@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../models/validation/database.php';        
+require_once __DIR__ . '/../models/validation/database.php';
 require_once __DIR__ . '/../models/authentication/avatar_uploader.php';
 require_once __DIR__ . '/../models/security/encryption_engine.php';
 require_once __DIR__ . '/../models/validation/user_validator.php';
@@ -70,16 +70,17 @@ $passwordHash = password_hash($inputData['password'], PASSWORD_BCRYPT);
 
 try {
     $sql = 'INSERT INTO users (
-                first_name, 
-                last_name, 
-                email, 
-                password_hash, 
-                mobile, 
-                hardware_id, 
-                province, 
-                avatar_url, 
-                reg_type
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            first_name, 
+            last_name, 
+            email, 
+            password_hash, 
+            mobile, 
+            hardware_id, 
+            province, 
+            avatar_url, 
+            reg_type,
+            tos_accepted_at  -- ADDED THIS
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
 
     $stmt = $db->prepare($sql);
 
@@ -93,6 +94,7 @@ try {
         $inputData['province'],
         $avatarUrl,
         $inputData['regType']
+        // tos_accepted_at is handled by NOW()
     ]);
 
     http_response_code(201);
