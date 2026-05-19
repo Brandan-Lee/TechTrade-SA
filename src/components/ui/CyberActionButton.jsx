@@ -32,7 +32,7 @@ const CyberActionButton = ({ label, isLoading, className = "", ...props }) => {
 				{isLoading ? (
 					<div className="flex items-center gap-3">
 						<span className="w-4 h-4 border-2 border-fuchsia-500 border-t-transparent rounded-full animate-spin"></span>
-						<span className="text-[10px] tracking-widest animate-pulse">
+						<span className="text-sm md:text-base tracking-widest animate-pulse">
 							UPLOADING...
 						</span>
 					</div>

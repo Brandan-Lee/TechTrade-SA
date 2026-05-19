@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import FeaturedListings from "../../components/main/landing/FeaturedListings";
 import TrustedSeller from "../../components/main/landing/TrustedSeller";
@@ -9,8 +9,8 @@ export default function Home() {
 		visible: {
 			opacity: 1,
 			transition: {
-				staggerChildren: 0.15, // Delay between the two sections
-				delayChildren: 0.1, // Initial delay before starting
+				staggerChildren: 0.15,
+				delayChildren: 0.1,
 			},
 		},
 	};
@@ -29,7 +29,7 @@ export default function Home() {
 			variants={containerVariants}
 			initial="hidden"
 			animate="visible"
-			className="flex flex-col w-full"
+			className="flex flex-col w-full gap-4 p-4"
 		>
 			<motion.div variants={sectionVariants}>
 				<TrustedSeller />

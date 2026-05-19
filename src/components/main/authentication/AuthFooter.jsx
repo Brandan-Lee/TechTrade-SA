@@ -12,7 +12,7 @@ const AuthFooter = ({
         <div className="w-full pt-2 flex flex-col items-center">
             {showDivider && (
                 <div className="flex flex-col items-center gap-4 pt-4 border-t border-slate-100">
-                    <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+                    <span className="text-slate-400 text-sm md:text-base font-black uppercase tracking-[0.3em] mb-4">
                         {dividerText}
                     </span>
                 </div>

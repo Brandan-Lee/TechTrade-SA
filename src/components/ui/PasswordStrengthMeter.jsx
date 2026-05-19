@@ -43,16 +43,16 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 		<div className="w-full space-y-4 font-mono select-none animate-in fade-in duration-300">
 			{/* Real-time Metric Readout Header Block */}
 			<div
-				className="flex justify-between items-center text-[10px] sm:text-xs font-bold uppercase tracking-wider"
+				className="flex justify-between items-center text-sm md:text-base sm:text-xs font-bold uppercase tracking-wider"
 				aria-live="polite"
 				aria-atomic="true"
 			>
 				<div className="text-slate-500 flex items-center gap-1.5">
 					<Terminal size={12} className="text-fuchsia-500" />
-					<span> Password strength: </span>
+					<span className="text-sm md:text-base"> Password strength: </span>
 				</div>
 				<span
-					className={`px-2 py-0.5 rounded text-[9px] font-black tracking-widest transition-all duration-300 ${currentLevel.color}`}
+					className={`px-2 py-0.5 rounded text-sm md:text-base font-black tracking-widest transition-all duration-300 ${currentLevel.color}`}
 				>
 					{currentLevel.label}
 				</span>
@@ -88,9 +88,9 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 
 			{/* Live Security Parameter Diagnostic Checklist */}
 			<div className="border-t border-white/5 pt-3">
-				<ul className="space-y-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wide">
+				<ul className="space-y-1.5 text-sm md:text-base sm:text-xs font-bold uppercase tracking-wide">
 					<li
-						className={`flex items-center gap-2 transition-colors duration-300 ${checks.length ? "text-emerald-400" : "text-slate-600"}`}
+						className={`flex items-center text-sm md:text-base gap-2 transition-colors duration-300 ${checks.length ? "text-emerald-400" : "text-slate-600"}`}
 					>
 						{checks.length ? (
 							<ShieldCheck size={12} />
@@ -100,7 +100,7 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 						<span>More than 8 Characters</span>
 					</li>
 					<li
-						className={`flex items-center gap-2 transition-colors duration-300 ${checks.uppercase ? "text-emerald-400" : "text-slate-600"}`}
+						className={`flex items-center text-sm md:text-base gap-2 transition-colors duration-300 ${checks.uppercase ? "text-emerald-400" : "text-slate-600"}`}
 					>
 						{checks.uppercase ? (
 							<ShieldCheck size={12} />
@@ -110,7 +110,7 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 						<span> Must include both uppercase and lowercase letters.</span>
 					</li>
 					<li
-						className={`flex items-center gap-2 transition-colors duration-300 ${checks.number && checks.symbol ? "text-emerald-400" : "text-slate-600"}`}
+						className={`flex items-center text-sm md:text-base gap-2 transition-colors duration-300 ${checks.number && checks.symbol ? "text-emerald-400" : "text-slate-600"}`}
 					>
 						{checks.number && checks.symbol ? (
 							<ShieldCheck size={12} />
