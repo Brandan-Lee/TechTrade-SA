@@ -7,7 +7,7 @@ import MainLayout from "./components/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ScrollToTop from "./components/main/common/ScrollToTop";
 
-// Pages
+// Main Pages
 import Home from "./pages/main/Home";
 import About from "./pages/main/About";
 import Market from "./pages/main/Market";
@@ -24,10 +24,10 @@ import MyOffers from "./pages/main/MyOffers";
 import MyTransactions from "./pages/main/MyTransactions";
 import ViewListing from "./pages/main/ViewListing";
 import ManageOffer from "./pages/main/ManageOffer";
+import WhatsAppTTLPage from "./pages/main/WhatsAppTTLPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
-// NOTE: If you create standalone files for these later, swap these out for real imports!
 const UserRoleManagement = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">👥 User Role Management</h1><p className="text-neutral-400 mt-1 text-sm">Update permissions matrices and staff access levels.</p></div>;
 const TechDatabase = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">💻 Tech Database</h1><p className="text-neutral-400 mt-1 text-sm">Manage hardware specification blueprints and component metadata data nodes.</p></div>;
 const AdminMessages = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">💬 Support Messages</h1><p className="text-neutral-400 mt-1 text-sm">Inbound inquiries, system notifications, and internal escalation chat channels.</p></div>;
@@ -45,212 +45,218 @@ import NotificationModal from "./components/main/Notifications/NotificationModal
 import CounterOfferModal from "./components/main/Notifications/CounterOfferModal";
 import TOSModal from "./components/main/tos/TOSModal";
 import PrivacyModal from "./components/main/privacy/PrivacyModal";
-import WhatsAppTTLPage from "./pages/main/WhatsAppTTLPage";
 
 function App() {
-    // --- UI State ---
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const [isForgotOpen, setIsForgotOpen] = useState(false);
-    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-    const [isOTPOpen, setIsOTPOpen] = useState(false);
-    const [isResetOpen, setIsResetOpen] = useState(false);
-    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-    const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
-    const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
-    const [isDataModalOpen, setIsDataModalOpen] = useState(false);
+	// --- UI State ---
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isLoginOpen, setIsLoginOpen] = useState(false);
+	const [isForgotOpen, setIsForgotOpen] = useState(false);
+	const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+	const [isOTPOpen, setIsOTPOpen] = useState(false);
+	const [isResetOpen, setIsResetOpen] = useState(false);
+	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+	const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
+	const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
+	const [isDataModalOpen, setIsDataModalOpen] = useState(false);
 
-    const isAnyModalOpen = useMemo(() => {
-        return (
-            isMenuOpen ||
-            isLoginOpen ||
-            isRegisterOpen ||
-            isForgotOpen ||
-            isOTPOpen ||
-            isResetOpen ||
-            isNotificationOpen ||
-            isCounterModalOpen ||
-            isTOSModalOpen ||
-            isDataModalOpen
-        );
-    }, [
-        isMenuOpen,
-        isLoginOpen,
-        isRegisterOpen,
-        isForgotOpen,
-        isOTPOpen,
-        isResetOpen,
-        isNotificationOpen,
-        isCounterModalOpen,
-        isTOSModalOpen,
-        isDataModalOpen,
-    ]);
+	// --- Dynamic Authentication State Vectors ---
+	const [authEmail, setAuthEmail] = useState("");
+	const [authPurpose, setAuthPurpose] = useState("login");
 
-    useEffect(() => {
-        document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
-    }, [isAnyModalOpen]);
+	const isAnyModalOpen = useMemo(() => {
+		return (
+			isMenuOpen ||
+			isLoginOpen ||
+			isRegisterOpen ||
+			isForgotOpen ||
+			isOTPOpen ||
+			isResetOpen ||
+			isNotificationOpen ||
+			isCounterModalOpen ||
+			isTOSModalOpen ||
+			isDataModalOpen
+		);
+	}, [
+		isMenuOpen,
+		isLoginOpen,
+		isRegisterOpen,
+		isForgotOpen,
+		isOTPOpen,
+		isResetOpen,
+		isNotificationOpen,
+		isCounterModalOpen,
+		isTOSModalOpen,
+		isDataModalOpen,
+	]);
 
-    // --- Switch Logic (Navigation between Auth States) ---
-    const closeAllModals = () => {
-        setIsLoginOpen(false);
-        setIsRegisterOpen(false);
-        setIsForgotOpen(false);
-        setIsOTPOpen(false);
-        setIsResetOpen(false);
-        setIsNotificationOpen(false);
-        setIsCounterModalOpen(false);
-        setIsTOSModalOpen(false);
-        setIsDataModalOpen(false);
-    };
+	useEffect(() => {
+		document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
+	}, [isAnyModalOpen]);
 
-    const switchToRegister = () => {
-        closeAllModals();
-        setIsRegisterOpen(true);
-    };
+	// --- Switch Logic (Navigation between Auth States) ---
+	const closeAllModals = () => {
+		setIsLoginOpen(false);
+		setIsRegisterOpen(false);
+		setIsForgotOpen(false);
+		setIsOTPOpen(false);
+		setIsResetOpen(false);
+		setIsNotificationOpen(false);
+		setIsCounterModalOpen(false);
+		setIsTOSModalOpen(false);
+		setIsDataModalOpen(false);
+	};
 
-    const switchToLogin = () => {
-        closeAllModals();
-        setIsLoginOpen(true);
-    };
+	const switchToRegister = () => {
+		closeAllModals();
+		setIsRegisterOpen(true);
+	};
 
-    const switchToForgot = () => {
-        closeAllModals();
-        setIsForgotOpen(true);
-    };
+	const switchToLogin = () => {
+		closeAllModals();
+		setIsLoginOpen(true);
+	};
 
-    const switchToOTP = () => {
-        closeAllModals();
-        setIsOTPOpen(true);
-    };
+	const switchToForgot = () => {
+		closeAllModals();
+		setIsForgotOpen(true);
+	};
 
-    const switchToReset = () => {
-        closeAllModals();
-        setIsResetOpen(true);
-    };
+	// FIX: Update parameters to capture payload information bubbles from sub-forms
+	const switchToOTP = (emailValue = "", purposeValue = "login") => {
+		closeAllModals();
+		setAuthEmail(emailValue);
+		setAuthPurpose(purposeValue);
+		setIsOTPOpen(true);
+	};
 
-    return (
-        <BrowserRouter>
-            <ScrollToTop />
+	const switchToReset = () => {
+		closeAllModals();
+		setIsResetOpen(true);
+	};
 
-            <Routes>
-                {/* --- Public App Routes (Wrapped in Global Customer Layout) --- */}
-                <Route
-                    path="/"
-                    element={
-                        <MainLayout
-                            openLogin={() => setIsLoginOpen(true)}
-                            isMenuOpen={isMenuOpen}
-                            setIsMenuOpen={setIsMenuOpen}
-                            openNotifications={() => setIsNotificationOpen(true)}
-                            openTOS={() => setIsTOSModalOpen(true)}
-                            openData={() => setIsDataModalOpen(true)}
-                        />
-                    }
-                >
-                    <Route index element={<Home />} />
-                    <Route path="about" element={<About openLogin={switchToLogin} />} />
-                    <Route path="marketplace" element={<Market />} />
-                    <Route path="sell" element={<SellGear />} />
-                    <Route path="build-doctor" element={<BuildDoctor />} />
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="offers" element={<MyOffers />} />
-                    <Route path="transactions" element={<MyTransactions />} />
-                    <Route path="view-listing" element={<ViewListing />} />
-                    <Route
-                        path="manage-offer"
-                        element={
-                            <ManageOffer
-                                openCounterModal={() => setIsCounterModalOpen(true)}
-                            />
-                        }
-                    />
-                    <Route path="contact-us" element={<ContactUs />} />
-                    <Route path="listing-report" element={<ListingReportPage />} />
-                    <Route path="escrow-tracker" element={<EscrowTrackerPage />} />
-                    <Route path="review" element={<ReviewPage />} />
-                    <Route path="report-user" element={<ReportUser />} />
-                    <Route path="dispute" element={<LaunchDisputePage />} />
-                    <Route path="whatsapp-ttl" element={<WhatsAppTTLPage />} />
-                </Route>
+	return (
+		<BrowserRouter>
+			<ScrollToTop />
 
-                {/* --- Fully Functional Responsive Admin Layout Section --- */}
-                <Route 
-                    path="/admin" 
-                    element={<AdminLayout />}
-                >
-                    {/* Main Dashboard Panel Route */}
-                    <Route index element={<AdminDashboard />} />
+			<Routes>
+				{/* --- Public App Routes (Wrapped in Global Customer Layout) --- */}
+				<Route
+					path="/"
+					element={
+						<MainLayout
+							openLogin={() => setIsLoginOpen(true)}
+							isMenuOpen={isMenuOpen}
+							setIsMenuOpen={setIsMenuOpen}
+							openNotifications={() => setIsNotificationOpen(true)}
+							openTOS={() => setIsTOSModalOpen(true)}
+							openData={() => setIsDataModalOpen(true)}
+						/>
+					}
+				>
+					<Route index element={<Home />} />
+					<Route path="about" element={<About openLogin={switchToLogin} />} />
+					<Route path="marketplace" element={<Market />} />
+					<Route path="sell" element={<SellGear />} />
+					<Route path="build-doctor" element={<BuildDoctor />} />
+					<Route path="profile" element={<Profile />} />
+					<Route path="offers" element={<MyOffers />} />
+					<Route path="transactions" element={<MyTransactions />} />
+					<Route path="view-listing" element={<ViewListing />} />
+					<Route
+						path="manage-offer"
+						element={
+							<ManageOffer
+								openCounterModal={() => setIsCounterModalOpen(true)}
+							/>
+						}
+					/>
+					<Route path="contact-us" element={<ContactUs />} />
+					<Route path="listing-report" element={<ListingReportPage />} />
+					<Route path="escrow-tracker" element={<EscrowTrackerPage />} />
+					<Route path="review" element={<ReviewPage />} />
+					<Route path="report-user" element={<ReportUser />} />
+					<Route path="dispute" element={<LaunchDisputePage />} />
+					<Route path="whatsapp-ttl" element={<WhatsAppTTLPage />} />
+				</Route>
 
-                    {/* Subroutes Mapping directly to your Cyberpunk Sidebar Items */}
-                    <Route path="roles" element={<UserRoleManagement />} />
-                    <Route path="database" element={<TechDatabase />} />
-                    <Route path="messages" element={<AdminMessages />} />
-                    <Route path="reported-users" element={<ReportedUsers />} />
-                    <Route path="reported-listings" element={<ReportedListings />} />
-                    <Route path="nuke" element={<NukeSuite />} />
-                </Route>
-            </Routes>
+				{/* --- Fully Functional Responsive Admin Layout Section --- */}
+				<Route 
+					path="/admin" 
+					element={<AdminLayout />}
+				>
+					<Route index element={<AdminDashboard />} />
+					<Route path="roles" element={<UserRoleManagement />} />
+					<Route path="database" element={<TechDatabase />} />
+					<Route path="messages" element={<AdminMessages />} />
+					<Route path="reported-users" element={<ReportedUsers />} />
+					<Route path="reported-listings" element={<ReportedListings />} />
+					<Route path="nuke" element={<NukeSuite />} />
+				</Route>
+			</Routes>
 
-            {/* Modals sit outside the Routes so it can overlay any page */}
-            <LoginModal
-                isOpen={isLoginOpen}
-                onClose={() => setIsLoginOpen(false)}
-                onSwitchToRegister={switchToRegister}
-                onSwitchToForgot={switchToForgot}
-                onSwitchToOTP={switchToOTP}
-            />
+			<LoginModal
+				isOpen={isLoginOpen}
+				onClose={() => setIsLoginOpen(false)}
+				onSwitchToRegister={switchToRegister}
+				onSwitchToForgot={switchToForgot}
+				onSwitchToOTP={switchToOTP} 
+			/>
 
-            <RegisterModal
-                isOpen={isRegisterOpen}
-                onClose={() => setIsRegisterOpen(false)}
-                onSwitchToOTP={switchToOTP}
-                onSwitchToLogin={switchToLogin}
-                onSwitchToTOS={() => setIsTOSModalOpen(true)}
-            />
+			<RegisterModal
+				isOpen={isRegisterOpen}
+				onClose={() => setIsRegisterOpen(false)}
+				onSwitchToLogin={switchToLogin}
+				onSwitchToTOS={() => setIsTOSModalOpen(true)}
+			/>
 
-            <ForgotModal
-                isOpen={isForgotOpen}
-                onClose={() => setIsForgotOpen(false)}
-                onSwitchToLogin={switchToLogin}
-                onSwitchToOTP={switchToOTP}
-            />
+			<ForgotModal
+				isOpen={isForgotOpen}
+				onClose={() => setIsForgotOpen(false)}
+				onSwitchToLogin={switchToLogin}
+				onSwitchToOTP={(email) => switchToOTP(email, "reset")} 
+			/>
 
-            <OTPModal
-                isOpen={isOTPOpen}
-                onClose={() => setIsOTPOpen(false)}
-                onSwitchToForgot={switchToForgot}
-                onSwitchToReset={switchToReset}
-                onSwitchToLogin={switchToLogin}
-                onSwitchToData={() => setIsDataModalOpen(true)}
-            />
+			<OTPModal
+				isOpen={isOTPOpen}
+				onClose={() => setIsOTPOpen(false)}
+				email={authEmail}       
+				purpose={authPurpose}   
+				onSwitchToForgot={switchToForgot}
+				onSwitchToReset={switchToReset}
+				onSwitchToLogin={switchToLogin}
+				onSwitchToData={() => setIsDataModalOpen(true)}
+				onLoginSuccess={(data) => {
+					console.log("Profile Authorized! Payload Context:", data);
+				}}
+			/>
 
-            <ResetModal
-                isOpen={isResetOpen}
-                onClose={() => setIsResetOpen(false)}
-                onSwitchToLogin={switchToLogin}
-            />
+			<ResetModal
+				isOpen={isResetOpen}
+				onClose={() => setIsResetOpen(false)}
+				onSwitchToLogin={switchToLogin}
+			/>
 
-            <NotificationModal
-                isOpen={isNotificationOpen}
-                onClose={() => setIsNotificationOpen(false)}
-            />
+			<NotificationModal
+				isOpen={isNotificationOpen}
+				onClose={() => setIsNotificationOpen(false)}
+			/>
 
-            <CounterOfferModal
-                isOpen={isCounterModalOpen}
-                onClose={() => setIsCounterModalOpen(false)}
-            />
+			<CounterOfferModal
+				isOpen={isCounterModalOpen}
+				onClose={() => setIsCounterModalOpen(false)}
+			/>
 
-            <TOSModal
-                isOpen={isTOSModalOpen}
-                onClose={() => setIsTOSModalOpen(false)}
-            />
+			<TOSModal
+				isOpen={isTOSModalOpen}
+				onClose={() => setIsTOSModalOpen(false)}
+			/>
 
-            <PrivacyModal
-                isOpen={isDataModalOpen}
-                onClose={() => setIsDataModalOpen(false)}
-            />
-        </BrowserRouter>
-    );
+			<PrivacyModal
+				isOpen={isDataModalOpen}
+				onClose={() => setIsDataModalOpen(false)}
+			/>
+		</BrowserRouter>
+	);
 }
 
 export default App;

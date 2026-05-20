@@ -89,7 +89,7 @@ const LoginModalContent = ({
 				triggerStatus("Authentication successful. Redirecting...", "success");
 
 				setTimeout(() => {
-					onSwitchToOTP(formData.email);
+					onSwitchToOTP(formData.email, "login");
 				}, 2000);
 			} else {
 				triggerStatus(

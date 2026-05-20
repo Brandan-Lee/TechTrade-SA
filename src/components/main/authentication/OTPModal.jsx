@@ -1,23 +1,41 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RefreshCw, KeyRound, Terminal, HelpCircle } from "lucide-react";
+import { RefreshCw, Terminal, HelpCircle } from "lucide-react";
 import AuthModalWrapper from "./AuthModalWrapper";
 import CyberActionButton from "../../ui/CyberActionButton";
 import AuthFooter from "./AuthFooter";
+import CyberAlert from "../../ui/CyberAlert";
 
 export const OTPModal = ({
 	isOpen,
 	onClose,
+	purpose = "login",
+	email = "",
 	onSwitchToReset,
 	onSwitchToLogin,
 	onSwitchToForgot,
 	onSwitchToData,
+	onLoginSuccess,
 }) => {
 	const [otp, setOtp] = useState(["", "", "", ""]);
 	const [timer, setTimer] = useState(60);
 	const [isLoading, setIsLoading] = useState(false);
+	const [alert, setAlert] = useState({
+		show: false,
+		message: "",
+		type: "error",
+	});
+
 	const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
-	// --- Secure Token Countdown Counter Lifecycle ---
+	useEffect(() => {
+		if (isOpen) {
+			setOtp(["", "", "", ""]);
+			setTimer(60);
+			setAlert({ show: false, message: "", type: "error" });
+			setTimeout(() => inputRefs[0].current?.focus(), 100);
+		}
+	}, [isOpen]);
+
 	useEffect(() => {
 		if (!isOpen) return;
 		const interval = setInterval(() => {
@@ -26,14 +44,12 @@ export const OTPModal = ({
 		return () => clearInterval(interval);
 	}, [isOpen]);
 
-	// --- Segmented Field Parsing System ---
 	const handleChange = (index, value) => {
 		if (isNaN(value)) return;
 		const newOtp = [...otp];
 		newOtp[index] = value.substring(value.length - 1);
 		setOtp(newOtp);
 
-		// Advance cursor pipeline to adjacent input track
 		if (value && index < 3) {
 			inputRefs[index + 1].current.focus();
 		}
@@ -47,49 +63,132 @@ export const OTPModal = ({
 
 	const handleVerify = async (e) => {
 		e.preventDefault();
+		setAlert({ show: false, message: "", type: "error" });
+
 		const codeString = otp.join("");
-		if (codeString.length < 4) return;
+		if (codeString.length < 4) {
+			setAlert({
+				show: true,
+				message: "PLEASE ENTER THE FULL 4-DIGIT CODE.",
+				type: "error",
+			});
+			return;
+		}
 
 		setIsLoading(true);
-		try {
-			// Pipeline payload securely to auth matrix
-			// await api.verifyOTP(codeString);
 
-			// Advance view architecture state forward on success
-			onSwitchToReset();
+		try {
+			const endpoint =
+				purpose === "login"
+					? "http://localhost/techtrade_api/authentication/verify_login_otp.php"
+					: "http://localhost/techtrade_api/authentication/verify_reset_otp.php";
+
+			const response = await fetch(endpoint, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email, otp: codeString }),
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.message || "Verification failed.");
+			}
+
+			if (purpose === "login") {
+				setAlert({
+					show: true,
+					message: "LOGIN VERIFIED! SUCCESS.",
+					type: "success",
+				});
+
+				setTimeout(() => {
+					setIsLoading(false);
+					if (onLoginSuccess) onLoginSuccess(data);
+					onClose(); // CLOSES MODAL AUTOMATICALLY
+				}, 2000);
+			} else {
+				setIsLoading(false);
+				onSwitchToReset();
+			}
 		} catch (error) {
-			console.error("TOKEN_DECRYPTION_EXCEPTION:", error);
-		} finally {
+			setAlert({
+				show: true,
+				message: error.message.toUpperCase(),
+				type: "error",
+			});
 			setIsLoading(false);
 		}
 	};
 
-	const handleResend = () => {
-		if (timer > 0) return;
-		// Re-transmit cryptographic stream down link channels
-		setTimer(60);
+	const handleResend = async () => {
+		if (timer > 0 || isLoading) return;
+		setAlert({ show: false, message: "", type: "error" });
+
+		try {
+			const endpoint =
+				"http://localhost/techtrade_api/authentication/resend_otp.php";
+
+			const response = await fetch(endpoint, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email, purpose }),
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.message || "Failed to re-transmit token.");
+			}
+
+			setAlert({
+				show: true,
+				message: "A FRESH VERIFICATION CODE HAS BEEN TRANSMITTED.",
+				type: "success",
+			});
+			setTimer(60);
+		} catch (error) {
+			setAlert({
+				show: true,
+				message: error.message.toUpperCase(),
+				type: "error",
+			});
+		}
 	};
 
 	return (
 		<AuthModalWrapper
 			isOpen={isOpen}
 			onClose={onClose}
-			onBack={onSwitchToForgot}
+			onBack={purpose === "login" ? onSwitchToLogin : onSwitchToForgot}
 		>
 			<div className="space-y-6 sm:space-y-8 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
 				{/* Visual Anchor Terminal Top Header */}
 				<div className="space-y-1.5">
-					<h1 className="text-white text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight leading-none">
-						OTP Verification
+					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+						OTP{" "}
+						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+							Verification
+						</span>
 					</h1>
-					<p className="text-slate-500 text-[11px] sm:text-xs font-medium leading-normal uppercase tracking-wider pt-1">
-						Please enter the 4-digit code sent to your registered email to complete verification.
+					<p className="text-slate-500 sm:text-xs md:text-sm font-medium leading-normal uppercase tracking-wider pt-1">
+						Please enter the 4-digit code sent to{" "}
+						<span className="text-slate-300 font-bold">
+							{email || "your email"}
+						</span>{" "}
+						to complete verification.
 					</p>
 				</div>
 
-				{/* Secure Recovery Gateway Form */}
+				{alert.show && (
+					<CyberAlert
+						type={alert.type}
+						message={alert.message}
+						onClose={() => setAlert({ ...alert, show: false })}
+					/>
+				)}
+
 				<form onSubmit={handleVerify} className="space-y-6 sm:space-y-8">
-					{/* Character Array Input Matrix Fieldset */}
 					<fieldset className="flex justify-center gap-2 sm:gap-4">
 						<legend className="sr-only">Enter 4-digit verification code</legend>
 						{otp.map((digit, index) => (
@@ -110,9 +209,8 @@ export const OTPModal = ({
 						))}
 					</fieldset>
 
-					{/* Cryptographic Key Expiration Monitor Box */}
 					<div className="flex justify-between items-center bg-black/30 p-3 sm:p-4 rounded-lg border border-white/5">
-						<div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+						<div className="sm:text-xs md:text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
 							<Terminal size={12} className="text-fuchsia-500" />
 							<span>Expires in:</span>
 							<span className="text-fuchsia-400 font-black tabular-nums">
@@ -123,8 +221,8 @@ export const OTPModal = ({
 							type="button"
 							disabled={timer > 0 || isLoading}
 							onClick={handleResend}
-							className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 py-1 px-2.5 rounded border transition-all ${
-								timer > 0
+							className={`text-sm md:text-base font-black uppercase tracking-widest flex items-center gap-1.5 py-1 px-2.5 rounded border transition-all ${
+								timer > 0 || isLoading
 									? "text-slate-700 border-transparent cursor-not-allowed"
 									: "text-fuchsia-400 border-fuchsia-500/20 bg-fuchsia-500/[0.02] hover:border-fuchsia-500/50 hover:bg-fuchsia-500/[0.05]"
 							} focus:outline-none focus:ring-1 focus:ring-fuchsia-500`}
@@ -136,16 +234,12 @@ export const OTPModal = ({
 						</button>
 					</div>
 
-					{/* Operational Executable Stack Buttons */}
 					<div className="space-y-4 pt-2 border-t border-white/5">
 						<CyberActionButton
-							label={
-								isLoading ? "" : "VERIFY CODE"
-							}
+							label={isLoading ? "PROCESSING VERIFICATION" : "VERIFY CODE"}
 							type="submit"
 							isLoading={isLoading}
 							className="w-full text-xs sm:text-sm tracking-widest font-black"
-                            onClick={onSwitchToReset}
 						/>
 
 						<AuthFooter
@@ -156,8 +250,7 @@ export const OTPModal = ({
 					</div>
 				</form>
 
-				{/* Sub-node Informational Diagnostic Footer */}
-				<div className="pt-2 flex justify-center items-center gap-1 text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
+				<div className="pt-2 flex justify-center items-center gap-1 sm:text-xs md:text-sm text-slate-600 font-bold uppercase tracking-wide">
 					<HelpCircle size={12} className="text-slate-700" />
 					<span>Wondering how we use this code for verification?</span>
 					<button
