@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:5173"); 
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -35,7 +35,7 @@ if ($user && $user->verifyPassword($password)) {
     if ($user->isSuspended()) {
         http_response_code(403);
         echo json_encode([
-            "status" => "error", 
+            "status" => "error",
             "message" => "Account is suspended until " . $user->getSuspendedUntil() . ". Reason: " . $user->getSuspendedReason()
         ]);
         exit;
@@ -47,7 +47,7 @@ if ($user && $user->verifyPassword($password)) {
     if ($otpManager->sendNewOTP($user->getEmail(), 'login', $user->getId())) {
         http_response_code(200);
         echo json_encode([
-            "status" => "pending_otp", 
+            "status" => "pending_otp",
             "message" => "Verification code sent to your email."
         ]);
     } else {

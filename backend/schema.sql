@@ -78,7 +78,7 @@ CREATE TABLE
     user_id BIGINT UNSIGNED NULL,
     email VARCHAR(255) NOT NULL,
     code_hash VARCHAR(255) NOT NULL,
-    purpose ENUM ('login', 'reset_password') NOT NULL,
+    purpose ENUM ('login', 'reset') NOT NULL,
     expires_at DATETIME NOT NULL,
     verified_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -56,8 +56,24 @@ const LoginModalContent = ({
 		}
 	};
 
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		
+		setAlert({ show: false, message: "", type: "error" });
+		if (errorField === name || errorField === "credentials") {
+			setErrorField("");
+		}
+		
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+	};
+
 	const handleLogin = async (e) => {
 		e.preventDefault();
+		if (isLoading) return; 
+
 		setErrorField("");
 		setAlert({ show: false, message: "", type: "error" });
 
@@ -87,25 +103,25 @@ const LoginModalContent = ({
 
 			if (response.ok) {
 				triggerStatus("Authentication successful. Redirecting...", "success");
-
 				setTimeout(() => {
-					onSwitchToOTP(formData.email, "login");
+					onSwitchToOTP(formData.email.trim(), "login");
 				}, 2000);
 			} else {
+				const fieldTarget = data.field || "credentials";
 				triggerStatus(
 					data.message || "Authentication failed.",
 					"error",
-					"server",
+					fieldTarget,
 				);
+				setIsLoading(false);
 			}
 		} catch (err) {
 			triggerStatus(
 				"Connection to the TechTrade network failed.",
 				"error",
-				"server",
+				"credentials",
 			);
-		} finally {
-			if (alert.type !== "success") setIsLoading(false);
+			setIsLoading(false);
 		}
 	};
 
@@ -128,39 +144,49 @@ const LoginModalContent = ({
 				/>
 			)}
 
-			<form onSubmit={handleLogin} className="space-y-6">
+			<form onSubmit={handleLogin} className="space-y-6" noValidate>
 				<AuthInput
 					key={
-						errorField === "email" ? `shake-email-${shakeTick}` : "normal-email"
+						errorField === "email" || errorField === "credentials"
+							? `shake-email-${shakeTick}`
+							: "normal-email"
 					}
 					label="EMAIL"
 					type="email"
+					name="email" 
 					placeholder="user@network.com"
 					value={formData.email}
-					onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-					error={errorField === "email"}
-					className={errorField === "email" ? "animate-shake" : ""}
+					onChange={handleInputChange}
+					error={errorField === "email" || errorField === "credentials"}
+					className={
+						errorField === "email" || errorField === "credentials"
+							? "animate-shake"
+							: ""
+					}
 					required
 				/>
 
 				<div className="space-y-3">
 					<AuthInput
 						key={
-							errorField === "password"
+							errorField === "password" || errorField === "credentials"
 								? `shake-pass-${shakeTick}`
 								: "normal-pass"
 						}
 						label="PASSWORD"
 						type="password"
+						name="password"
 						isPassword={true}
 						showPassword={showPassword}
 						togglePassword={() => setShowPassword(!showPassword)}
 						value={formData.password}
-						onChange={(e) =>
-							setFormData({ ...formData, password: e.target.value })
+						onChange={handleInputChange}
+						error={errorField === "password" || errorField === "credentials"}
+						className={
+							errorField === "password" || errorField === "credentials"
+								? "animate-shake"
+								: ""
 						}
-						error={errorField === "password"}
-						className={errorField === "password" ? "animate-shake" : ""}
 						required
 					/>
 
@@ -202,6 +228,7 @@ const LoginModalContent = ({
 						New to TechTrade?
 					</span>
 					<button
+						type="button"
 						onClick={onSwitchToRegister}
 						className="group relative px-6 py-2"
 					>

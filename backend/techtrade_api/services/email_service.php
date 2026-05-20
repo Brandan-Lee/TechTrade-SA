@@ -27,7 +27,7 @@ class EmailService {
             $this->mailer->addAddress($toEmail);
             $this->mailer->Subject = 'Verification Code - TechTrade';
             
-            $action = ($purpose === 'reset_password') ? 'reset your password' : 'login to your account';
+            $action = ($purpose === 'reset') ? 'reset your password' : 'login to your account';
             
             $this->mailer->Body = "
                 <div style='font-family: sans-serif; padding: 20px;'>

@@ -1,7 +1,8 @@
 <?php
 header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -19,13 +20,13 @@ require_once __DIR__ . '/../models/validation/hardware_checker.php';
 $db = Database::getConnection();
 
 $inputData = [
-    'firstName' => $_POST['firstName'] ?? '',
-    'lastName' => $_POST['lastName'] ?? '',
-    'email' => $_POST['email'] ?? '',
-    'password' => $_POST['password'] ?? '',
-    'mobile' => $_POST['mobile'] ?? '',
-    'province' => $_POST['province'] ?? '',
-    'regType' => $_POST['regType'] ?? 'buyer',
+    'firstName'  => $_POST['firstName'] ?? '',
+    'lastName'   => $_POST['lastName'] ?? '',
+    'email'      => $_POST['email'] ?? '',
+    'password'   => $_POST['password'] ?? '',
+    'mobile'     => $_POST['mobile'] ?? '',
+    'province'   => $_POST['province'] ?? '',
+    'regType'    => $_POST['regType'] ?? 'buyer',
     'hardwareId' => $_POST['hardwareId'] ?? ''
 ];
 
@@ -63,13 +64,27 @@ if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] === UPLOA
 $crypto = new EncryptionEngine(ENCRYPTION_KEY);
 
 $encryptedFirstName = $crypto->encrypt($inputData['firstName']);
-$encryptedLastName = $crypto->encrypt($inputData['lastName']);
-$encryptedMobile = $crypto->encrypt($inputData['mobile']);
+$encryptedLastName  = $crypto->encrypt($inputData['lastName']);
+$encryptedMobile    = $crypto->encrypt($inputData['mobile']);
 
 $passwordHash = password_hash($inputData['password'], PASSWORD_BCRYPT);
 
+switch ($inputData['regType']) {
+    case 'seller':
+        $roleId = 2;
+        break;
+    case 'both':
+        $roleId = 5;
+        break;
+    case 'buyer':
+    default:
+        $roleId = 1;
+        break;
+}
+
 try {
     $sql = 'INSERT INTO users (
+            role_id,
             first_name, 
             last_name, 
             email, 
@@ -80,11 +95,12 @@ try {
             avatar_url, 
             reg_type,
             tos_accepted_at  
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
 
     $stmt = $db->prepare($sql);
 
     $stmt->execute([
+        $roleId,
         $encryptedFirstName,
         $encryptedLastName,
         $inputData['email'],

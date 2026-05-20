@@ -10,28 +10,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../models/validation/database.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../models/validation/database.php';
 require_once __DIR__ . '/../models/security/otp_manager.php';
+require_once __DIR__ . '/../services/email_service.php';
 
 $db = Database::getConnection();
+
 $input = json_decode(file_get_contents('php://input'), true);
-$email = $input['email'] ?? '';
-$otpCode = $input['otp'] ?? '';
+$email = isset($input['email']) ? trim($input['email']) : '';
+$otpCode = isset($input['otp']) ? trim($input['otp']) : '';
+
+if (empty($email) || empty($otpCode)) {
+    http_response_code(400);
+    echo json_encode([
+        "status" => "error", 
+        "message" => "Missing identification details or token strings.",
+    ]);
+    exit();
+}
 
 $otpManager = new OTPManager($db, new EmailService());
 
 if ($otpManager->verifyOTP($email, 'login', $otpCode)) {
-    session_start();
-    $user = User::findByEmail($db, $email);
-    $_SESSION['user_id'] = $user->getId();
-    $user->updateLastLogin();
+    
+    $userStmt = $db->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
+    $userStmt->execute([$email]);
+    $user = $userStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        http_response_code(404);
+        echo json_encode(["status" => "error", "message" => "Profile link verification dropped."]);
+        exit();
+    }
+
+    // Secure cross-origin session synchronization tracks
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    $_SESSION['user_id'] = $user['id'];
+
+    $updateLog = $db->prepare("UPDATE users SET last_login_at = NOW() WHERE id = ?");
+    $updateLog->execute([$user['id']]);
     
     echo json_encode(["status" => "success", "message" => "Login verified."]);
 } else {
     http_response_code(401);
     echo json_encode(["status" => "error", "message" => "Invalid or expired code."]);
 }
-
-
 ?>

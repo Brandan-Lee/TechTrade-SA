@@ -10,12 +10,9 @@ class OTPManager
         $this->emailService = $emailService;
     }
 
-    /**
-     * Generates, stores, and emails an OTP in one go.
-     */
     public function sendNewOTP(string $email, string $purpose, ?int $userId = null): bool
     {
-        $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $code = (string) random_int(1000, 9999);
         $hash = password_hash($code, PASSWORD_BCRYPT);
         $expiresAt = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
@@ -30,15 +27,33 @@ class OTPManager
 
     public function verifyOTP(string $email, string $purpose, string $submittedCode): bool
     {
-        $stmt = $this->db->prepare("SELECT * FROM otp_verifications WHERE email = ? AND purpose = ? AND verified_at IS NULL AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1");
+        $stmt = $this->db->prepare("SELECT * FROM otp_verifications 
+                                WHERE email = ? 
+                                  AND purpose = ? 
+                                  AND verified_at IS NULL 
+                                ORDER BY created_at DESC LIMIT 1");
+
         $stmt->execute([$email, $purpose]);
         $otp = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($otp && password_verify($submittedCode, $otp['code_hash'])) {
+        if (!$otp) {
+            return false;
+        }
+
+        $expiryTimestamp = strtotime($otp['expires_at']);
+        $currentTimestamp = time();
+
+        if ($currentTimestamp > $expiryTimestamp) {
+            return false;
+        }
+
+        if (password_verify(trim($submittedCode), $otp['code_hash'])) {
             $update = $this->db->prepare("UPDATE otp_verifications SET verified_at = NOW() WHERE id = ?");
             $update->execute([$otp['id']]);
             return true;
         }
+
         return false;
     }
 }
+?>

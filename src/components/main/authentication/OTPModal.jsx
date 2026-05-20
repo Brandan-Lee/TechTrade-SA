@@ -19,6 +19,8 @@ export const OTPModal = ({
 	const [otp, setOtp] = useState(["", "", "", ""]);
 	const [timer, setTimer] = useState(60);
 	const [isLoading, setIsLoading] = useState(false);
+	const [errorField, setErrorField] = useState("");
+	const [shakeTick, setShakeTick] = useState(0);
 	const [alert, setAlert] = useState({
 		show: false,
 		message: "",
@@ -31,6 +33,7 @@ export const OTPModal = ({
 		if (isOpen) {
 			setOtp(["", "", "", ""]);
 			setTimer(60);
+			setErrorField("");
 			setAlert({ show: false, message: "", type: "error" });
 			setTimeout(() => inputRefs[0].current?.focus(), 100);
 		}
@@ -44,8 +47,24 @@ export const OTPModal = ({
 		return () => clearInterval(interval);
 	}, [isOpen]);
 
+	const triggerStatus = (message, type = "error", fieldName = "") => {
+		setAlert({ show: true, message, type });
+
+		if (type === "error" && fieldName) {
+			setErrorField("");
+			setShakeTick((tick) => tick + 1);
+			requestAnimationFrame(() => setErrorField(fieldName));
+		} else {
+			setErrorField("");
+		}
+	};
+
 	const handleChange = (index, value) => {
 		if (isNaN(value)) return;
+
+		setAlert({ show: false, message: "", type: "error" });
+		setErrorField("");
+
 		const newOtp = [...otp];
 		newOtp[index] = value.substring(value.length - 1);
 		setOtp(newOtp);
@@ -57,37 +76,52 @@ export const OTPModal = ({
 
 	const handleKeyDown = (index, e) => {
 		if (e.key === "Backspace" && !otp[index] && index > 0) {
+			setAlert({ show: false, message: "", type: "error" });
+			setErrorField("");
 			inputRefs[index - 1].current.focus();
 		}
 	};
 
 	const handleVerify = async (e) => {
 		e.preventDefault();
+		if (isLoading) return;
+
+		setErrorField("");
 		setAlert({ show: false, message: "", type: "error" });
 
 		const codeString = otp.join("");
 		if (codeString.length < 4) {
-			setAlert({
-				show: true,
-				message: "PLEASE ENTER THE FULL 4-DIGIT CODE.",
-				type: "error",
-			});
+			triggerStatus("PLEASE ENTER THE FULL 4-DIGIT CODE.", "error", "otp");
 			return;
 		}
 
 		setIsLoading(true);
 
 		try {
-			const endpoint =
-				purpose === "login"
-					? "http://localhost/techtrade_api/authentication/verify_login_otp.php"
-					: "http://localhost/techtrade_api/authentication/verify_reset_otp.php";
+			const cleanLoginUrl =
+				"http://localhost/techtrade_api/authentication/verify_login_otp.php";
+			const cleanResetUrl =
+				"http://localhost/techtrade_api/authentication/verify_reset_otp.php";
+
+			const endpoint = purpose === "login" ? cleanLoginUrl : cleanResetUrl;
 
 			const response = await fetch(endpoint, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, otp: codeString }),
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+				},
+				body: JSON.stringify({
+					email: email.trim(),
+					otp: codeString.trim(),
+				}),
 			});
+
+			if (response.status === 404) {
+				throw new Error(
+					"ENDPOINT ROUTE NOT FOUND ON SERVER. VALIDATE .PHP FILENAME MATCHES.",
+				);
+			}
 
 			const data = await response.json();
 
@@ -96,33 +130,30 @@ export const OTPModal = ({
 			}
 
 			if (purpose === "login") {
-				setAlert({
-					show: true,
-					message: "LOGIN VERIFIED! SUCCESS.",
-					type: "success",
-				});
+				triggerStatus("LOGIN VERIFIED!", "success");
 
 				setTimeout(() => {
 					setIsLoading(false);
 					if (onLoginSuccess) onLoginSuccess(data);
-					onClose(); // CLOSES MODAL AUTOMATICALLY
+					onClose();
 				}, 2000);
 			} else {
-				setIsLoading(false);
-				onSwitchToReset();
+				triggerStatus("CODE VERIFIED! Redirecting...", "success");
+
+				setTimeout(() => {
+					setIsLoading(false);
+					onSwitchToReset(email.trim(), codeString.trim());
+				}, 2000);
 			}
 		} catch (error) {
-			setAlert({
-				show: true,
-				message: error.message.toUpperCase(),
-				type: "error",
-			});
+			triggerStatus(error.message.toUpperCase(), "error", "otp");
 			setIsLoading(false);
 		}
 	};
 
 	const handleResend = async () => {
 		if (timer > 0 || isLoading) return;
+		setErrorField("");
 		setAlert({ show: false, message: "", type: "error" });
 
 		try {
@@ -141,18 +172,16 @@ export const OTPModal = ({
 				throw new Error(data.message || "Failed to re-transmit token.");
 			}
 
-			setAlert({
-				show: true,
-				message: "A FRESH VERIFICATION CODE HAS BEEN TRANSMITTED.",
-				type: "success",
-			});
+			setOtp(["", "", "", ""]);
+			setTimeout(() => inputRefs[0].current?.focus(), 50);
+
+			triggerStatus(
+				"A FRESH VERIFICATION CODE HAS BEEN TRANSMITTED.",
+				"success",
+			);
 			setTimer(60);
 		} catch (error) {
-			setAlert({
-				show: true,
-				message: error.message.toUpperCase(),
-				type: "error",
-			});
+			triggerStatus(error.message.toUpperCase(), "error", "otp");
 		}
 	};
 
@@ -163,7 +192,6 @@ export const OTPModal = ({
 			onBack={purpose === "login" ? onSwitchToLogin : onSwitchToForgot}
 		>
 			<div className="space-y-6 sm:space-y-8 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
-				{/* Visual Anchor Terminal Top Header */}
 				<div className="space-y-1.5">
 					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
 						OTP{" "}
@@ -188,8 +216,15 @@ export const OTPModal = ({
 					/>
 				)}
 
-				<form onSubmit={handleVerify} className="space-y-6 sm:space-y-8">
-					<fieldset className="flex justify-center gap-2 sm:gap-4">
+				<form
+					onSubmit={handleVerify}
+					className="space-y-6 sm:space-y-8"
+					noValidate
+				>
+					<fieldset
+						key={errorField === "otp" ? `shake-otp-${shakeTick}` : "normal-otp"}
+						className={`flex justify-center gap-2 sm:gap-4 ${errorField === "otp" ? "animate-shake" : ""}`}
+					>
 						<legend className="sr-only">Enter 4-digit verification code</legend>
 						{otp.map((digit, index) => (
 							<input
@@ -204,7 +239,11 @@ export const OTPModal = ({
 								onChange={(e) => handleChange(index, e.target.value)}
 								onKeyDown={(e) => handleKeyDown(index, e)}
 								disabled={isLoading}
-								className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-center text-xl sm:text-2xl font-black rounded-lg border border-white/10 bg-[#121214] text-white focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 focus:outline-none transition-all placeholder:text-slate-800 disabled:opacity-40"
+								className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-center text-xl sm:text-2xl font-black rounded-lg bg-[#121214] text-white focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 focus:outline-none transition-all placeholder:text-slate-800 disabled:opacity-40 border ${
+									errorField === "otp"
+										? "border-rose-500 bg-rose-500/[0.02]"
+										: "border-white/10"
+								}`}
 							/>
 						))}
 					</fieldset>
@@ -236,7 +275,7 @@ export const OTPModal = ({
 
 					<div className="space-y-4 pt-2 border-t border-white/5">
 						<CyberActionButton
-							label={isLoading ? "PROCESSING VERIFICATION" : "VERIFY CODE"}
+							label={isLoading ? "Processing OTP Code" : "VERIFY CODE"}
 							type="submit"
 							isLoading={isLoading}
 							className="w-full text-xs sm:text-sm tracking-widest font-black"
