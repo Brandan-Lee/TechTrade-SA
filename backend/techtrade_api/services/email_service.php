@@ -34,7 +34,7 @@ class EmailService {
                     <h2>Security Verification</h2>
                     <p>You have requested to <b>{$action}</b>.</p>
                     <h1 style='color: #d946ef; letter-spacing: 5px;'>{$otpCode}</h1>
-                    <p>This code expires in 10 minutes. If you did not request this, please ignore this email.</p>
+                    <p>This code expires in 10 minutes. If you did not request this, please contact support. Your account may have been breached</p>
                 </div>";
             
             return $this->mailer->send();

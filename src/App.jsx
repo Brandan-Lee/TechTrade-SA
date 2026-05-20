@@ -59,8 +59,8 @@ function App() {
 	const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 	const [isDataModalOpen, setIsDataModalOpen] = useState(false);
 
-	// --- Dynamic Authentication State Vectors ---
 	const [authEmail, setAuthEmail] = useState("");
+	const [authOTP, setAuthOTP] = useState("");
 	const [authPurpose, setAuthPurpose] = useState("login");
 
 	const isAnyModalOpen = useMemo(() => {
@@ -93,7 +93,6 @@ function App() {
 		document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
 	}, [isAnyModalOpen]);
 
-	// --- Switch Logic (Navigation between Auth States) ---
 	const closeAllModals = () => {
 		setIsLoginOpen(false);
 		setIsRegisterOpen(false);
@@ -121,7 +120,6 @@ function App() {
 		setIsForgotOpen(true);
 	};
 
-	// FIX: Update parameters to capture payload information bubbles from sub-forms
 	const switchToOTP = (emailValue = "", purposeValue = "login") => {
 		closeAllModals();
 		setAuthEmail(emailValue);
@@ -129,8 +127,10 @@ function App() {
 		setIsOTPOpen(true);
 	};
 
-	const switchToReset = () => {
+	const switchToReset = (emailValue = "", otpValue = "") => {
 		closeAllModals();
+		if (emailValue) setAuthEmail(emailValue);
+		if (otpValue) setAuthOTP(otpValue);
 		setIsResetOpen(true);
 	};
 
@@ -139,7 +139,6 @@ function App() {
 			<ScrollToTop />
 
 			<Routes>
-				{/* --- Public App Routes (Wrapped in Global Customer Layout) --- */}
 				<Route
 					path="/"
 					element={
@@ -233,7 +232,10 @@ function App() {
 			<ResetModal
 				isOpen={isResetOpen}
 				onClose={() => setIsResetOpen(false)}
+				onSwitchToOTP={() => switchToOTP(authEmail, "reset")}
 				onSwitchToLogin={switchToLogin}
+				email={authEmail}
+				otpCode={authOTP}
 			/>
 
 			<NotificationModal

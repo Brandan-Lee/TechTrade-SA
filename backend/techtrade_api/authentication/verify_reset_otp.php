@@ -53,14 +53,6 @@ if ($otpRecord) {
 http_response_code(401);
 echo json_encode([
     "status" => "error",
-    "message" => "Invalid or expired recovery verification code.",
-    "debug_diagnostics" => [
-        "record_found_in_db" => $recordFound,
-        "is_expired" => $isExpired,
-        "password_hash_matched" => $passwordMatches,
-        "server_time" => date('Y-m-d H:i:s'),
-        "db_expiry_time" => $otpRecord ? $otpRecord['expires_at'] : 'N/A',
-        "submitted_otp" => $otpCode
-    ]
+    "message" => "Invalid or expired recovery verification code."
 ]);
 ?>

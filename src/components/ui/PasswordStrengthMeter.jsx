@@ -2,18 +2,19 @@ import React from "react";
 import { ShieldCheck, Terminal, AlertCircle } from "lucide-react";
 
 const PasswordStrengthMeter = ({ password = "" }) => {
-	// 1. Calculate explicit criteria states
+	// Evaluates the exact 5 distinct criteria parameters expected by the PHP backend
 	const checks = {
 		length: password.length >= 8,
 		uppercase: /[A-Z]/.test(password),
+		lowercase: /[a-z]/.test(password), // Fixed: Now validates lowercase letters
 		number: /[0-9]/.test(password),
 		symbol: /[^A-Za-z0-9]/.test(password),
 	};
 
-	// Calculate total validation integrity score (0 to 4)
+	// Calculate total validation integrity score (0 to 5)
 	const strength = Object.values(checks).filter(Boolean).length;
 
-	// Score definitions tailored to a high-contrast cyber tactical HUD
+	// Score definitions mapped across a 5-tier strength layout configuration
 	const config = [
 		{
 			label: "Very Weak",
@@ -35,6 +36,10 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 			label: "Strong",
 			color: "bg-fuchsia-500/20 border border-fuchsia-500 text-fuchsia-400",
 		},
+		{
+			label: "Maximum",
+			color: "bg-fuchsia-500/30 border border-fuchsia-400 text-fuchsia-300",
+		},
 	];
 
 	const currentLevel = config[strength];
@@ -42,34 +47,30 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 	return (
 		<div className="w-full space-y-4 font-mono select-none animate-in fade-in duration-300">
 			{/* Real-time Metric Readout Header Block */}
-			<div
-				className="flex justify-between items-center text-sm md:text-base sm:text-xs font-bold uppercase tracking-wider"
-				aria-live="polite"
-				aria-atomic="true"
-			>
+			<div className="flex justify-between items-center text-sm font-bold uppercase tracking-wider">
 				<div className="text-slate-500 flex items-center gap-1.5">
 					<Terminal size={12} className="text-fuchsia-500" />
-					<span className="text-sm md:text-base"> Password strength: </span>
+					<span>Password strength:</span>
 				</div>
 				<span
-					className={`px-2 py-0.5 rounded text-sm md:text-base font-black tracking-widest transition-all duration-300 ${currentLevel.color}`}
+					className={`px-2 py-0.5 rounded text-xs font-black tracking-widest transition-all duration-300 ${currentLevel.color}`}
 				>
 					{currentLevel.label}
 				</span>
 			</div>
 
-			{/* Segmented 4-Bar Data Channel Grid */}
-			<div className="flex gap-1.5 h-1.5" aria-hidden="true">
-				{[1, 2, 3, 4].map((step) => {
+			{/* Segmented Data Channel Grid (5 bars total) */}
+			<div className="flex gap-1.5 h-1.5">
+				{[1, 2, 3, 4, 5].map((step) => {
 					const isActive = strength >= step;
 					let barColor = "bg-white/5 border border-white/5";
 
 					if (isActive) {
-						if (strength === 1)
+						if (strength <= 2)
 							barColor = "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]";
-						else if (strength === 2)
-							barColor = "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]";
 						else if (strength === 3)
+							barColor = "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]";
+						else if (strength === 4)
 							barColor =
 								"bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]";
 						else
@@ -88,9 +89,9 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 
 			{/* Live Security Parameter Diagnostic Checklist */}
 			<div className="border-t border-white/5 pt-3">
-				<ul className="space-y-1.5 text-sm md:text-base sm:text-xs font-bold uppercase tracking-wide">
+				<ul className="space-y-1.5 text-xs font-bold uppercase tracking-wide">
 					<li
-						className={`flex items-center text-sm md:text-base gap-2 transition-colors duration-300 ${checks.length ? "text-emerald-400" : "text-slate-600"}`}
+						className={`flex items-center gap-2 transition-colors duration-300 ${checks.length ? "text-emerald-400" : "text-slate-600"}`}
 					>
 						{checks.length ? (
 							<ShieldCheck size={12} />
@@ -100,24 +101,34 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 						<span>More than 8 Characters</span>
 					</li>
 					<li
-						className={`flex items-center text-sm md:text-base gap-2 transition-colors duration-300 ${checks.uppercase ? "text-emerald-400" : "text-slate-600"}`}
+						className={`flex items-center gap-2 transition-colors duration-300 ${checks.uppercase && checks.lowercase ? "text-emerald-400" : "text-slate-600"}`}
 					>
-						{checks.uppercase ? (
+						{checks.uppercase && checks.lowercase ? (
 							<ShieldCheck size={12} />
 						) : (
 							<AlertCircle size={12} />
 						)}
-						<span> Must include both uppercase and lowercase letters.</span>
+						<span>Must include both uppercase & lowercase letters</span>
 					</li>
 					<li
-						className={`flex items-center text-sm md:text-base gap-2 transition-colors duration-300 ${checks.number && checks.symbol ? "text-emerald-400" : "text-slate-600"}`}
+						className={`flex items-center gap-2 transition-colors duration-300 ${checks.number ? "text-emerald-400" : "text-slate-600"}`}
 					>
-						{checks.number && checks.symbol ? (
+						{checks.number ? (
 							<ShieldCheck size={12} />
 						) : (
 							<AlertCircle size={12} />
 						)}
-						<span>Must include numbers and symbols</span>
+						<span>Must include numbers</span>
+					</li>
+					<li
+						className={`flex items-center gap-2 transition-colors duration-300 ${checks.symbol ? "text-emerald-400" : "text-slate-600"}`}
+					>
+						{checks.symbol ? (
+							<ShieldCheck size={12} />
+						) : (
+							<AlertCircle size={12} />
+						)}
+						<span>Must include special symbols</span>
 					</li>
 				</ul>
 			</div>
