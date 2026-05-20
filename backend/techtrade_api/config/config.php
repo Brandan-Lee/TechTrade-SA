@@ -22,6 +22,13 @@ define('DATA_RETENTION_YEARS', 7);
 define('SECURE_COOKIES_ONLY', false); //change later for hosting
 define('COOKIE_SAMESITE', 'Lax');
 
+// Email
+define('SMTP_HOST', getEnvVariable('SMTP_HOST', 'smtp.gmail.com'));
+define('SMTP_USER', getEnvVariable('SMTP_USER'));
+define('SMTP_PASS', getEnvVariable('SMTP_PASS'));
+define('FROM_EMAIL', getEnvVariable('FROM_EMAIL'));
+define('FROM_NAME', getEnvVariable('FROM_NAME', 'TechTrade Security'));
+
 function setFrontendCookie(string $name, string $value, int $durationInSeconds = 3600): void
 {
     setcookie($name, $value, [

@@ -79,7 +79,7 @@ try {
             province, 
             avatar_url, 
             reg_type,
-            tos_accepted_at  -- ADDED THIS
+            tos_accepted_at  
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
 
     $stmt = $db->prepare($sql);
@@ -94,7 +94,6 @@ try {
         $inputData['province'],
         $avatarUrl,
         $inputData['regType']
-        // tos_accepted_at is handled by NOW()
     ]);
 
     http_response_code(201);

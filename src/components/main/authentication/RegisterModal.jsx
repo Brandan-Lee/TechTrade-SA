@@ -260,11 +260,12 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 
 	return (
 			<div className="space-y-5 sm:space-y-6 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
-				<div className="space-y-1">
-					<h1 className="text-white text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight leading-none">
-						Create Account
-					</h1>
-				</div>
+				<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+					Create{" "}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+						Account
+					</span>
+				</h1>
 
 				{alert.show && (
 					<CyberAlert

@@ -40,7 +40,7 @@ const LoginModalContent = ({
 	const [alert, setAlert] = useState({
 		show: false,
 		message: "",
-		type: "error", // 'error' or 'success'
+		type: "error",
 	});
 
 	const triggerStatus = (message, type = "error", fieldName = "") => {
@@ -61,7 +61,6 @@ const LoginModalContent = ({
 		setErrorField("");
 		setAlert({ show: false, message: "", type: "error" });
 
-		// Basic Validation
 		if (!formData.email.trim()) {
 			triggerStatus("Email field cannot be empty.", "error", "email");
 			return;
@@ -87,10 +86,8 @@ const LoginModalContent = ({
 			const data = await response.json();
 
 			if (response.ok) {
-				// Show Success Message
 				triggerStatus("Authentication successful. Redirecting...", "success");
 
-				// Wait 2 seconds then navigate
 				setTimeout(() => {
 					onSwitchToOTP(formData.email);
 				}, 2000);
@@ -108,118 +105,113 @@ const LoginModalContent = ({
 				"server",
 			);
 		} finally {
-			// If success, we keep loading true during the 2s timeout
 			if (alert.type !== "success") setIsLoading(false);
 		}
 	};
 
 	return (
-			<div className="space-y-10 py-4">
-				<div className="space-y-2">
-					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
-						User{" "}
-						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-							Login
-						</span>
-					</h1>
-				</div>
+		<div className="space-y-10 py-4">
+			<div className="space-y-2">
+				<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+					User{" "}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+						Login
+					</span>
+				</h1>
+			</div>
 
-				{alert.show && (
-					<CyberAlert
-						type={alert.type}
-						message={alert.message}
-						onClose={() => setAlert({ ...alert, show: false })}
-					/>
-				)}
+			{alert.show && (
+				<CyberAlert
+					type={alert.type}
+					message={alert.message}
+					onClose={() => setAlert({ ...alert, show: false })}
+				/>
+			)}
 
-				<form onSubmit={handleLogin} className="space-y-6">
+			<form onSubmit={handleLogin} className="space-y-6">
+				<AuthInput
+					key={
+						errorField === "email" ? `shake-email-${shakeTick}` : "normal-email"
+					}
+					label="EMAIL"
+					type="email"
+					placeholder="user@network.com"
+					value={formData.email}
+					onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+					error={errorField === "email"}
+					className={errorField === "email" ? "animate-shake" : ""}
+					required
+				/>
+
+				<div className="space-y-3">
 					<AuthInput
 						key={
-							errorField === "email"
-								? `shake-email-${shakeTick}`
-								: "normal-email"
+							errorField === "password"
+								? `shake-pass-${shakeTick}`
+								: "normal-pass"
 						}
-						label="EMAIL"
-						type="email"
-						placeholder="user@network.com"
-						value={formData.email}
+						label="PASSWORD"
+						type="password"
+						isPassword={true}
+						showPassword={showPassword}
+						togglePassword={() => setShowPassword(!showPassword)}
+						value={formData.password}
 						onChange={(e) =>
-							setFormData({ ...formData, email: e.target.value })
+							setFormData({ ...formData, password: e.target.value })
 						}
-						error={errorField === "email"}
-						className={errorField === "email" ? "animate-shake" : ""}
+						error={errorField === "password"}
+						className={errorField === "password" ? "animate-shake" : ""}
 						required
 					/>
 
-					<div className="space-y-3">
-						<AuthInput
-							key={
-								errorField === "password"
-									? `shake-pass-${shakeTick}`
-									: "normal-pass"
-							}
-							label="PASSWORD"
-							type="password"
-							isPassword={true}
-							showPassword={showPassword}
-							togglePassword={() => setShowPassword(!showPassword)}
-							value={formData.password}
-							onChange={(e) =>
-								setFormData({ ...formData, password: e.target.value })
-							}
-							error={errorField === "password"}
-							className={errorField === "password" ? "animate-shake" : ""}
-							required
-						/>
-
-						<div className="flex justify-between items-center">
-							<label className="flex items-center gap-2 cursor-pointer group">
-								<input
-									type="checkbox"
-									className="accent-fuchsia-500 bg-slate-800 border-slate-600 rounded"
-									checked={formData.rememberMe}
-									onChange={(e) =>
-										setFormData({ ...formData, rememberMe: e.target.checked })
-									}
-								/>
-								<span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-fuchsia-400 transition-colors">
-									Remember Me
-								</span>
-							</label>
-
-							<button
-								type="button"
-								onClick={onSwitchToForgot}
-								className="text-slate-500 text-[10px] font-black uppercase tracking-widest hover:text-fuchsia-400 transition-all flex items-center gap-2"
-							>
-								<Lock size={10} /> Lost Access?
-							</button>
-						</div>
-					</div>
-
-					<CyberActionButton
-						label={isLoading ? "SUBMITTING LOGIN" : "LOGIN"}
-						type="submit"
-						isLoading={isLoading}
-					/>
-				</form>
-
-				<div className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
-					<div className="flex flex-col items-center gap-2">
-						<span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">
-							New to TechTrade?
-						</span>
-						<button
-							onClick={onSwitchToRegister}
-							className="group relative px-6 py-2"
-						>
-							<span className="relative z-10 text-violet-400 font-black uppercase text-xs tracking-[0.3em] group-hover:text-fuchsia-400 transition-colors">
-								REGISTER NOW
+					<div className="flex justify-between items-center">
+						<label className="flex items-center gap-2 cursor-pointer group">
+							<input
+								type="checkbox"
+								className="accent-fuchsia-500 bg-slate-800 border-slate-600 rounded"
+								checked={formData.rememberMe}
+								onChange={(e) =>
+									setFormData({ ...formData, rememberMe: e.target.checked })
+								}
+							/>
+							<span className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest group-hover:text-fuchsia-400 transition-colors">
+								Remember Me
 							</span>
+						</label>
+
+						<button
+							type="button"
+							onClick={onSwitchToForgot}
+							className="text-slate-500 text-xs md:text-sm font-black uppercase tracking-widest hover:text-fuchsia-400 transition-all flex items-center gap-2"
+						>
+							<Lock size={10} /> FORGOT PASSWORD?
 						</button>
 					</div>
 				</div>
+
+				<CyberActionButton
+					label={isLoading ? "SUBMITTING LOGIN" : "LOGIN"}
+					type="submit"
+					isLoading={isLoading}
+				/>
+			</form>
+
+			<div className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
+				<div className="flex flex-col items-center gap-2">
+					<span className="text-slate-600 text-sm md:text-base font-black uppercase tracking-widest">
+						New to TechTrade?
+					</span>
+					<button
+						onClick={onSwitchToRegister}
+						className="group relative px-6 py-2"
+					>
+						<span className="relative z-10 text-violet-400 font-black uppercase text-xs md:text-sm tracking-[0.3em] group-hover:text-fuchsia-400 transition-colors">
+							REGISTER NOW
+						</span>
+					</button>
+				</div>
 			</div>
+		</div>
 	);
 };
 
