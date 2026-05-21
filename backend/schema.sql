@@ -94,10 +94,10 @@ CREATE TABLE
 CREATE TABLE
   categories (
     id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    group_label VARCHAR(32) NOT NULL, -- COMPONENTS, COOLING, STORAGE, CHASSIS
-    name VARCHAR(64) NOT NULL, -- GPUs, CPUs, etc.
-    slug VARCHAR(64) NOT NULL, -- gpus, cpus, aios, air-coolers, ...
-    spec_table VARCHAR(32) NULL, -- maps to child table name (NULL if no spec table yet)
+    group_label VARCHAR(32) NOT NULL,
+    name VARCHAR(64) NOT NULL, 
+    slug VARCHAR(64) NOT NULL, 
+    spec_table VARCHAR(32) NULL, 
     sort_order SMALLINT NOT NULL DEFAULT 0,
     PRIMARY KEY (id),
     UNIQUE KEY uq_categories_slug (slug)
@@ -113,7 +113,6 @@ CREATE TABLE
     full_name VARCHAR(255) NOT NULL, -- e.g. "NVIDIA GeForce RTX 3080 Ti FE"
     slug VARCHAR(255) NOT NULL, -- url-safe unique key
     msrp_cents INT UNSIGNED NULL, -- reference MSRP in ZAR cents
-    image_url VARCHAR(512) NULL,
     is_active TINYINT (1) NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -277,6 +276,19 @@ CREATE TABLE
     CONSTRAINT fk_hdds_hardware FOREIGN KEY (hardware_id) REFERENCES hardware (id) ON DELETE CASCADE
   ) ENGINE = InnoDB;
 
+  CREATE TABLE pc_cases (
+    hardware_id BIGINT UNSIGNED NOT NULL,
+    form_factor VARCHAR(64) NULL, -- ATX, mATX, ITX
+    side_panel VARCHAR(64) NULL, -- Tempered Glass, Mesh, Solid
+    max_gpu_length_mm SMALLINT UNSIGNED NULL,
+    max_cooler_height_mm SMALLINT UNSIGNED NULL,
+    drive_bays_3_5 TINYINT UNSIGNED NULL,
+    drive_bays_2_5 TINYINT UNSIGNED NULL,
+    dimensions VARCHAR(128) NULL, -- L x W x H
+    PRIMARY KEY (hardware_id),
+    CONSTRAINT fk_pc_cases_hardware FOREIGN KEY (hardware_id) REFERENCES hardware(id) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
 -- -----------------------------------------------------------------------------
 -- 3. LISTINGS (marketplace)
 -- -----------------------------------------------------------------------------
@@ -297,7 +309,7 @@ CREATE TABLE
       'OFFERED',
       'PENDING',
       'COMMITED',
-      'SOLD',
+      'SOLD'
     ) NOT NULL DEFAULT 'AVAILABLE',
     is_featured TINYINT (1) NOT NULL DEFAULT 0,
     view_count INT UNSIGNED NOT NULL DEFAULT 0,

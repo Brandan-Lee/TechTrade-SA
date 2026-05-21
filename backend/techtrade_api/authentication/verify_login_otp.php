@@ -81,9 +81,9 @@ try {
             setcookie('remember_me', $cookieValue, [
                 'expires' => time() + $duration,
                 'path' => '/',
-                'secure' => false, 
-                'httponly' => true,      
-                'samesite' => 'Lax'
+                'secure' => false,
+                'httponly' => true,
+                'samesite' => 'None',
             ]);
         }
 

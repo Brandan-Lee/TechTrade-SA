@@ -35,7 +35,7 @@ export default function NavBar({
 			icon: <UserCircle size={18} />,
 			path: "/profile",
 		},
-		...(user?.roleId !== "2"
+		...(user?.roleId !== "1"
 			? [{ label: "View Offers", icon: <File size={18} />, path: "/offers" }]
 			: []),
 		{

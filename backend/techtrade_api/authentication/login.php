@@ -15,50 +15,74 @@ require_once __DIR__ . '/../models/validation/database.php';
 require_once __DIR__ . '/../models/authentication/user.php';
 require_once __DIR__ . '/../models/security/otp_manager.php';
 require_once __DIR__ . '/../services/email_service.php';
+require_once __DIR__ . '/../helpers/session_manager.php';
 
-$db = Database::getConnection();
-$input = json_decode(file_get_contents('php://input'), true);
-
-$email = $input['email'] ?? '';
-$password = $input['password'] ?? '';
-$rememberMe = isset($input['rememberMe']) ? (bool) $input['rememberMe'] : false;
-
-$user = User::findByEmail($db, $email);
-
-if ($user && $user->verifyPassword($password)) {
-
-    if ($user->isBanned()) {
-        http_response_code(403);
-        echo json_encode(["status" => "error", "message" => "Access denied: Account is permanently banned."]);
-        exit;
+try {
+    $db = Database::getConnection();
+    if (!$db) {
+        throw new Exception("Database engine connection dropped.");
     }
 
-    if ($user->isSuspended()) {
-        http_response_code(403);
-        echo json_encode([
-            "status" => "error",
-            "message" => "Account is suspended until " . $user->getSuspendedUntil() . ". Reason: " . $user->getSuspendedReason()
-        ]);
-        exit;
+    SessionManager::init($db);
+
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    $email = isset($input['email']) ? trim(strtolower($input['email'])) : '';
+    $password = $input['password'] ?? '';
+    $rememberMe = isset($input['rememberMe']) ? (bool) $input['rememberMe'] : false;
+
+    if (empty($email) || empty($password)) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Missing credentials."]);
+        exit();
     }
 
-    $emailService = new EmailService();
-    $otpManager = new OTPManager($db, $emailService);
+    $user = User::findByEmail($db, $email);
 
-    if ($otpManager->sendNewOTP($user->getEmail(), 'login', $user->getId())) {
-        http_response_code(200);
-        echo json_encode([
-            "status" => "pending_otp",
-            "message" => "Verification code sent to your email.",
-            "rememberMe" => $rememberMe
-        ]);
+    if ($user && $user->verifyPassword($password)) {
+
+        if ($user->isBanned()) {
+            http_response_code(403);
+            echo json_encode(["status" => "error", "message" => "Access denied: Account is permanently banned."]);
+            exit();
+        }
+
+        if ($user->isSuspended()) {
+            http_response_code(403);
+            echo json_encode([
+                "status" => "error",
+                "message" => "Account is suspended until " . $user->getSuspendedUntil() . ". Reason: " . $user->getSuspendedReason()
+            ]);
+            exit();
+        }
+
+        $emailService = new EmailService();
+        $otpManager = new OTPManager($db, $emailService);
+
+        if ($otpManager->sendNewOTP($user->getEmail(), 'login', $user->getId())) {
+            http_response_code(200);
+            echo json_encode([
+                "status" => "pending_otp",
+                "message" => "Verification code sent to your email.",
+                "rememberMe" => $rememberMe
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["status" => "error", "message" => "Failed to send verification code."]);
+        }
+
     } else {
-        http_response_code(500);
-        echo json_encode(["status" => "error", "message" => "Failed to send verification code."]);
+        http_response_code(401);
+        echo json_encode(["status" => "error", "message" => "Invalid credentials."]);
     }
 
-} else {
-    http_response_code(401);
-    echo json_encode(["status" => "error", "message" => "Invalid credentials."]);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        "status" => "error",
+        "message" => "Internal Server Error during credentials verification handshake.",
+        "debug" => $e->getMessage()
+    ]);
+    exit();
 }
 ?>
