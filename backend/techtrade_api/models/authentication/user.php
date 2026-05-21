@@ -103,14 +103,25 @@ class User
     {
         return $this->id;
     }
+    public function getRoleId(): int
+    {
+        return $this->roleId;
+    }
     public function getEmail(): string
     {
         return $this->email;
     }
     public function getFullName(): string
     {
+        if ($this->crypto) {
+            $decryptedFirst = $this->crypto->decrypt($this->firstName) ?? 'Decryption Error';
+            $decryptedLast = $this->crypto->decrypt($this->lastName) ?? 'Decryption Error';
+            return $decryptedFirst . ' ' . $decryptedLast;
+        }
+        
         return $this->firstName . ' ' . $this->lastName;
     }
+    
     public function getProvince(): string
     {
         return $this->province;

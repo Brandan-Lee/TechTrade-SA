@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Lock } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthModalWrapper from "./AuthModalWrapper";
 import AuthInput from "../../ui/AuthInput";
 import CyberActionButton from "../../ui/CyberActionButton";
@@ -12,20 +13,46 @@ const LoginModal = ({
 	onSwitchToForgot,
 	onSwitchToRegister,
 	onSwitchToOTP,
-}) => (
-	<AuthModalWrapper isOpen={isOpen} onClose={onClose} onBack={onClose}>
-		<LoginModalContent
-			onSwitchToForgot={onSwitchToForgot}
-			onSwitchToRegister={onSwitchToRegister}
-			onSwitchToOTP={onSwitchToOTP}
-		/>
-	</AuthModalWrapper>
-);
+}) => {
+	const location = useLocation();
+	const navigate = useNavigate();
+
+	// 🚀 FIX: Track whether this specific open instance came from the admin panel using local state
+	const [isFromAdmin, setIsFromAdmin] = useState(false);
+
+	useEffect(() => {
+		if (isOpen) {
+			// 1. Check if the router currently contains the admin redirect instruction flag
+			if (location.state?.fromAdmin === true) {
+				setIsFromAdmin(true);
+
+				// 2. Clear the browser history state immediately after saving it locally.
+				// This stops it from sticking around if the user refreshes or closes the modal.
+				navigate(".", { replace: true, state: {} });
+			}
+		} else {
+			// Reset the local state back to false when the modal closes completely
+			setIsFromAdmin(false);
+		}
+	}, [isOpen, location.state, navigate]);
+
+	return (
+		<AuthModalWrapper isOpen={isOpen} onClose={onClose} onBack={onClose}>
+			<LoginModalContent
+				onSwitchToForgot={onSwitchToForgot}
+				onSwitchToRegister={onSwitchToRegister}
+				onSwitchToOTP={onSwitchToOTP}
+				isFromAdmin={isFromAdmin}
+			/>
+		</AuthModalWrapper>
+	);
+};
 
 const LoginModalContent = ({
 	onSwitchToForgot,
 	onSwitchToRegister,
 	onSwitchToOTP,
+	isFromAdmin,
 }) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [formData, setFormData] = useState({
@@ -58,12 +85,12 @@ const LoginModalContent = ({
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
-		
+
 		setAlert({ show: false, message: "", type: "error" });
 		if (errorField === name || errorField === "credentials") {
 			setErrorField("");
 		}
-		
+
 		setFormData((prev) => ({
 			...prev,
 			[name]: value,
@@ -72,7 +99,7 @@ const LoginModalContent = ({
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
-		if (isLoading) return; 
+		if (isLoading) return;
 
 		setErrorField("");
 		setAlert({ show: false, message: "", type: "error" });
@@ -104,7 +131,7 @@ const LoginModalContent = ({
 			if (response.ok) {
 				triggerStatus("Authentication successful. Redirecting...", "success");
 				setTimeout(() => {
-					onSwitchToOTP(formData.email.trim(), "login");
+					onSwitchToOTP(formData.email.trim(), isFromAdmin ? "admin" : "login");
 				}, 2000);
 			} else {
 				const fieldTarget = data.field || "credentials";
@@ -129,7 +156,7 @@ const LoginModalContent = ({
 		<div className="space-y-10 py-4">
 			<div className="space-y-2">
 				<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
-					User{" "}
+					{isFromAdmin ? "Staff" : "User"}{" "}
 					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 						Login
 					</span>
@@ -153,7 +180,7 @@ const LoginModalContent = ({
 					}
 					label="EMAIL"
 					type="email"
-					name="email" 
+					name="email"
 					placeholder="user@network.com"
 					value={formData.email}
 					onChange={handleInputChange}
@@ -190,29 +217,31 @@ const LoginModalContent = ({
 						required
 					/>
 
-					<div className="flex justify-between items-center">
-						<label className="flex items-center gap-2 cursor-pointer group">
-							<input
-								type="checkbox"
-								className="accent-fuchsia-500 bg-slate-800 border-slate-600 rounded"
-								checked={formData.rememberMe}
-								onChange={(e) =>
-									setFormData({ ...formData, rememberMe: e.target.checked })
-								}
-							/>
-							<span className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest group-hover:text-fuchsia-400 transition-colors">
-								Remember Me
-							</span>
-						</label>
+					{!isFromAdmin && (
+						<div className="flex justify-between items-center">
+							<label className="flex items-center gap-2 cursor-pointer group">
+								<input
+									type="checkbox"
+									className="accent-fuchsia-500 bg-slate-800 border-slate-600 rounded"
+									checked={formData.rememberMe}
+									onChange={(e) =>
+										setFormData({ ...formData, rememberMe: e.target.checked })
+									}
+								/>
+								<span className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest group-hover:text-fuchsia-400 transition-colors">
+									Remember Me
+								</span>
+							</label>
 
-						<button
-							type="button"
-							onClick={onSwitchToForgot}
-							className="text-slate-500 text-xs md:text-sm font-black uppercase tracking-widest hover:text-fuchsia-400 transition-all flex items-center gap-2"
-						>
-							<Lock size={10} /> FORGOT PASSWORD?
-						</button>
-					</div>
+							<button
+								type="button"
+								onClick={onSwitchToForgot}
+								className="text-slate-500 text-xs md:text-sm font-black uppercase tracking-widest hover:text-fuchsia-400 transition-all flex items-center gap-2"
+							>
+								<Lock size={10} /> FORGOT PASSWORD?
+							</button>
+						</div>
+					)}
 				</div>
 
 				<CyberActionButton
@@ -222,22 +251,24 @@ const LoginModalContent = ({
 				/>
 			</form>
 
-			<div className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
-				<div className="flex flex-col items-center gap-2">
-					<span className="text-slate-600 text-sm md:text-base font-black uppercase tracking-widest">
-						New to TechTrade?
-					</span>
-					<button
-						type="button"
-						onClick={onSwitchToRegister}
-						className="group relative px-6 py-2"
-					>
-						<span className="relative z-10 text-violet-400 font-black uppercase text-xs md:text-sm tracking-[0.3em] group-hover:text-fuchsia-400 transition-colors">
-							REGISTER NOW
+			{!isFromAdmin && (
+				<div className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
+					<div className="flex flex-col items-center gap-2">
+						<span className="text-slate-600 text-sm md:text-base font-black uppercase tracking-widest">
+							New to TechTrade?
 						</span>
-					</button>
+						<button
+							type="button"
+							onClick={onSwitchToRegister}
+							className="group relative px-6 py-2"
+						>
+							<span className="relative z-10 text-violet-400 font-black uppercase text-xs md:text-sm tracking-[0.3em] group-hover:text-fuchsia-400 transition-colors">
+								REGISTER NOW
+							</span>
+						</button>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

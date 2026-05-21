@@ -78,12 +78,12 @@ CREATE TABLE
     user_id BIGINT UNSIGNED NULL,
     email VARCHAR(255) NOT NULL,
     code_hash VARCHAR(255) NOT NULL,
-    purpose ENUM ('login', 'reset') NOT NULL,
+    purpose ENUM('login', 'reset', 'admin') NOT NULL;
     expires_at DATETIME NOT NULL,
     verified_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    KEY idx_otp_email (email)
+    KEY index_otp_email (email)
   ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------------------------------

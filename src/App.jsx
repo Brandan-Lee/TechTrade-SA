@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import {
+	BrowserRouter,
+	Routes,
+	Route,
+	Link,
+	useNavigate,
+} from "react-router-dom";
 import "./App.css";
+
+import { AuthProvider, useAuth } from "./components/AuthContext";
 
 // Layout & Navigation
 import MainLayout from "./components/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ScrollToTop from "./components/main/common/ScrollToTop";
+import AdminInterceptors from "./components/AdminInterceptors";
 
 // Main Pages
 import Home from "./pages/main/Home";
@@ -28,12 +37,60 @@ import WhatsAppTTLPage from "./pages/main/WhatsAppTTLPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
-const UserRoleManagement = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">👥 User Role Management</h1><p className="text-neutral-400 mt-1 text-sm">Update permissions matrices and staff access levels.</p></div>;
-const TechDatabase = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">💻 Tech Database</h1><p className="text-neutral-400 mt-1 text-sm">Manage hardware specification blueprints and component metadata data nodes.</p></div>;
-const AdminMessages = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">💬 Support Messages</h1><p className="text-neutral-400 mt-1 text-sm">Inbound inquiries, system notifications, and internal escalation chat channels.</p></div>;
-const ReportedUsers = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">🚫 Reported Users Queue</h1><p className="text-neutral-400 mt-1 text-sm">Review profile safety flags, malicious user conduct reports, and bans.</p></div>;
-const ReportedListings = () => <div className="text-neutral-100"><h1 className="text-2xl font-bold">⚠️ Reported Listings Queue</h1><p className="text-neutral-400 mt-1 text-sm">Investigate counterfeit claims, broken pricing specs, or forbidden hardware sales.</p></div>;
-const NukeSuite = () => <div className="p-6 bg-error/10 border border-error/20 rounded-2xl text-error"><h1 className="text-2xl font-black uppercase tracking-wider">☢️ High Command Nuke Suite</h1><p className="text-neutral-300 mt-2 text-sm font-medium">Warning: Global instance purges, system blacklists, and server emergency lockdown overrides live here.</p></div>;
+const UserRoleManagement = () => (
+	<div className="text-neutral-100">
+		<h1 className="text-2xl font-bold">👥 User Role Management</h1>
+		<p className="text-neutral-400 mt-1 text-sm">
+			Update permissions matrices and staff access levels.
+		</p>
+	</div>
+);
+const TechDatabase = () => (
+	<div className="text-neutral-100">
+		<h1 className="text-2xl font-bold">💻 Tech Database</h1>
+		<p className="text-neutral-400 mt-1 text-sm">
+			Manage hardware specification blueprints and component metadata data
+			nodes.
+		</p>
+	</div>
+);
+const AdminMessages = () => (
+	<div className="text-neutral-100">
+		<h1 className="text-2xl font-bold">💬 Support Messages</h1>
+		<p className="text-neutral-400 mt-1 text-sm">
+			Inbound inquiries, system notifications, and internal escalation chat
+			channels.
+		</p>
+	</div>
+);
+const ReportedUsers = () => (
+	<div className="text-neutral-100">
+		<h1 className="text-2xl font-bold">🚫 Reported Users Queue</h1>
+		<p className="text-neutral-400 mt-1 text-sm">
+			Review profile safety flags, malicious user conduct reports, and bans.
+		</p>
+	</div>
+);
+const ReportedListings = () => (
+	<div className="text-neutral-100">
+		<h1 className="text-2xl font-bold">⚠️ Reported Listings Queue</h1>
+		<p className="text-neutral-400 mt-1 text-sm">
+			Investigate counterfeit claims, broken pricing specs, or forbidden
+			hardware sales.
+		</p>
+	</div>
+);
+const NukeSuite = () => (
+	<div className="p-6 bg-error/10 border border-error/20 rounded-2xl text-error">
+		<h1 className="text-2xl font-black uppercase tracking-wider">
+			☢️ High Command Nuke Suite
+		</h1>
+		<p className="text-neutral-300 mt-2 text-sm font-medium">
+			Warning: Global instance purges, system blacklists, and server emergency
+			lockdown overrides live here.
+		</p>
+	</div>
+);
 
 // Auth Modals
 import LoginModal from "./components/main/authentication/LoginModal";
@@ -47,6 +104,10 @@ import TOSModal from "./components/main/tos/TOSModal";
 import PrivacyModal from "./components/main/privacy/PrivacyModal";
 
 function App() {
+	const navigate = useNavigate();
+
+	const { loginContext, isLoading } = useAuth();
+
 	// --- UI State ---
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -134,8 +195,19 @@ function App() {
 		setIsResetOpen(true);
 	};
 
+	if (isLoading) {
+		return (
+			<div className="w-screen h-screen flex flex-col items-center justify-center bg-[#0c0c0e] font-mono gap-4">
+				<div className="w-12 h-12 border-2 border-fuchsia-500 border-t-transparent rounded-full animate-spin"></div>
+				<p className="text-slate-500 text-xs font-bold uppercase tracking-widest animate-pulse">
+					Initializing Security Session...
+				</p>
+			</div>
+		);
+	}
+
 	return (
-		<BrowserRouter>
+		<>
 			<ScrollToTop />
 
 			<Routes>
@@ -178,18 +250,18 @@ function App() {
 					<Route path="whatsapp-ttl" element={<WhatsAppTTLPage />} />
 				</Route>
 
-				{/* --- Fully Functional Responsive Admin Layout Section --- */}
-				<Route 
-					path="/admin" 
-					element={<AdminLayout />}
+				<Route
+					element={<AdminInterceptors openLogin={() => setIsLoginOpen(true)} />}
 				>
-					<Route index element={<AdminDashboard />} />
-					<Route path="roles" element={<UserRoleManagement />} />
-					<Route path="database" element={<TechDatabase />} />
-					<Route path="messages" element={<AdminMessages />} />
-					<Route path="reported-users" element={<ReportedUsers />} />
-					<Route path="reported-listings" element={<ReportedListings />} />
-					<Route path="nuke" element={<NukeSuite />} />
+					<Route path="/admin" element={<AdminLayout />}>
+						<Route index element={<AdminDashboard />} />
+						<Route path="roles" element={<UserRoleManagement />} />
+						<Route path="database" element={<TechDatabase />} />
+						<Route path="messages" element={<AdminMessages />} />
+						<Route path="reported-users" element={<ReportedUsers />} />
+						<Route path="reported-listings" element={<ReportedListings />} />
+						<Route path="nuke" element={<NukeSuite />} />
+					</Route>
 				</Route>
 			</Routes>
 
@@ -198,7 +270,7 @@ function App() {
 				onClose={() => setIsLoginOpen(false)}
 				onSwitchToRegister={switchToRegister}
 				onSwitchToForgot={switchToForgot}
-				onSwitchToOTP={switchToOTP} 
+				onSwitchToOTP={switchToOTP}
 			/>
 
 			<RegisterModal
@@ -212,20 +284,43 @@ function App() {
 				isOpen={isForgotOpen}
 				onClose={() => setIsForgotOpen(false)}
 				onSwitchToLogin={switchToLogin}
-				onSwitchToOTP={(email) => switchToOTP(email, "reset")} 
+				onSwitchToOTP={(email) => switchToOTP(email, "reset")}
 			/>
 
 			<OTPModal
 				isOpen={isOTPOpen}
-				onClose={() => setIsOTPOpen(false)}
-				email={authEmail}       
-				purpose={authPurpose}   
+				onClose={() => {
+					setIsOTPOpen(false);
+					navigate(".", { replace: true, state: {} });
+				}}
+				email={authEmail}
+				purpose={authPurpose}
 				onSwitchToForgot={switchToForgot}
 				onSwitchToReset={switchToReset}
 				onSwitchToLogin={switchToLogin}
 				onSwitchToData={() => setIsDataModalOpen(true)}
-				onLoginSuccess={(data) => {
-					console.log("Profile Authorized! Payload Context:", data);
+				onLoginSuccess={(data, isStaffAttempt) => {
+					console.log("Profile Authorized!", data);
+
+					if (data.user) {
+						loginContext(data.user);
+						localStorage.setItem("user_role", data.user.roleId);
+					}
+
+					closeAllModals();
+
+					const userRole = data.user ? String(data.user.roleId) : "";
+					const ADMIN_ROLES = ["3", "4"];
+					const isActuallyAdmin = ADMIN_ROLES.includes(userRole);
+
+					if (isStaffAttempt && isActuallyAdmin) {
+						navigate("/admin", {
+							replace: true,
+							state: { authenticated: true },
+						});
+					} else {
+						navigate("/", { replace: true, state: {} });
+					}
 				}}
 			/>
 
@@ -257,8 +352,16 @@ function App() {
 				isOpen={isDataModalOpen}
 				onClose={() => setIsDataModalOpen(false)}
 			/>
-		</BrowserRouter>
+		</>
 	);
 }
 
-export default App;
+export default function RootAppWrapper() {
+	return (
+		<BrowserRouter>
+			<AuthProvider>
+				<App />
+			</AuthProvider>
+		</BrowserRouter>
+	);
+}

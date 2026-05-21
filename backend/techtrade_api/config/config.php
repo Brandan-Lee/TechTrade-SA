@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Africa/Johannesburg');
 
 // Password Policy
 define('MIN_PASSWORD_LENGTH', 8);

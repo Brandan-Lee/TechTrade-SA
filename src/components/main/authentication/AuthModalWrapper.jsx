@@ -69,10 +69,7 @@ const AuthModalWrapper = ({
 	return (
 		<AuthModalScrollContext.Provider value={scrollToTop}>
 			<div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-				<div
-					className="absolute inset-0 bg-[#050505]/90 backdrop-blur-md"
-					onClick={onClose}
-				/>
+				<div className="absolute inset-0 bg-[#050505]/90 backdrop-blur-md" />
 
 				<div className="relative flex w-full max-w-6xl h-[700px] bg-[#0a0a0c] rounded-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,1)] overflow-hidden animate-in zoom-in-95 duration-300">
 					{SCANLINE_OVERLAY}
@@ -80,23 +77,23 @@ const AuthModalWrapper = ({
 					<div className="hidden lg:flex lg:flex-grow w-[40%] relative bg-black border-r border-fuchsia-500/30 flex-col items-stretch overflow-hidden">
 						<div className="absolute -left-20 -top-20 w-64 h-64 bg-fuchsia-600/20 blur-[100px]" />
 						<AuthHeader />
-
-						<div className="mt-auto p-8 border-t border-white/5 bg-white/[0.02]">
-							<div className="flex items-center gap-3 text-fuchsia-500/50">
-								<ShieldAlert size={14} />
-								<span className="text-[9px] font-black uppercase tracking-[0.4em]">
-									Secure Connection Established
-								</span>
-							</div>
-						</div>
 					</div>
 
 					<div className="flex-grow h-full bg-[#0a0a0c] relative flex flex-col">
 						<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-fuchsia-500/40 to-transparent" />
 
+						{showBackButton && (
+							<button
+								onClick={onBack || onClose}
+								className="absolute top-8 left-8 z-20 text-fuchsia-500 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] bg-fuchsia-500/10 px-3 py-1.5 rounded-md border border-fuchsia-500/20 hover:bg-fuchsia-500/20 active:scale-95 transition-all cursor-pointer"
+							>
+								<ArrowLeft className="w-3 h-3" /> Back
+							</button>
+						)}
+
 						<button
 							onClick={onClose}
-							className="absolute top-8 right-8 z-20 text-slate-500 hover:text-fuchsia-400 hover:rotate-90 transition-all duration-300 p-2"
+							className="absolute top-8 right-8 z-20 text-slate-500 hover:text-fuchsia-400 hover:rotate-90 transition-all duration-300 p-2 cursor-pointer"
 							aria-label="Close Authentication Interface"
 						>
 							<X size={24} />
@@ -106,7 +103,7 @@ const AuthModalWrapper = ({
 							ref={scrollContainerRef}
 							className="flex-grow overflow-y-auto flex flex-col custom-scrollbar"
 						>
-							<div className="max-w-md mx-auto p-12 w-full animate-in fade-in slide-in-from-right-4 duration-700">
+							<div className="max-w-md mx-auto px-12 pb-12 pt-24 w-full animate-in fade-in slide-in-from-right-4 duration-700">
 								{children}
 							</div>
 						</div>
