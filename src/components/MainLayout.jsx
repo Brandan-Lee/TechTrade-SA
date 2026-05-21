@@ -1,19 +1,33 @@
 import React, { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import NavBar from "./main/common/NavBar";
 import MenuDrawer from "./main/common/MenuDrawer";
 import ScrollToTop from "./main/common/ScrollToTop";
 import WelcomeBanner from "./main/common/WelcomeBanner";
-import FilterBar from "./main/common/FilterBar";
 import Footer from "./main/common/Footer";
 
-// Destructure the new props from App.jsx
-export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openNotifications, openTOS, openData }) {
+export default function MainLayout({
+	openLogin,
+	isMenuOpen,
+	setIsMenuOpen,
+	openNotifications,
+	openTOS,
+	openData,
+}) {
+	const { isLoading } = useAuth();
 	const location = useLocation();
+
+	if (isLoading) {
+		return (
+			<div className="min-h-screen bg-[#090614] flex items-center justify-center text-white">
+				Initializing Session...
+			</div>
+		);
+	}
 
 	const closeMenu = () => setIsMenuOpen(false);
 
-	// Scroll to top when route changes
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [location]);
@@ -23,14 +37,12 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openN
 			className="flex flex-col min-h-screen bg-neutral-50"
 			data-theme="techtrade"
 		>
-			{/* Mobile Menu Drawer */}
 			<MenuDrawer
 				isOpen={isMenuOpen}
 				closeMenu={closeMenu}
 				onSwitchToLogin={openLogin}
 			/>
 
-			{/* Constant Top Components */}
 			<header className="w-full bg-gradient-to-r from-violet-800 via-purple-600 to-violet-800">
 				<NavBar
 					toggleMenu={() => setIsMenuOpen(true)}
@@ -41,13 +53,11 @@ export default function MainLayout({ openLogin, isMenuOpen, setIsMenuOpen, openN
 
 			<WelcomeBanner />
 
-			{/* Dynamic Page Content */}
 			<main className="flex-grow bg-[#090614]">
 				<ScrollToTop />
 				<Outlet />
 			</main>
 
-			{/* Constant Footer Component */}
 			<Footer
 				onLoginClick={openLogin}
 				onTOSClick={openTOS}

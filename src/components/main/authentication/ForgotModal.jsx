@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Terminal, Cpu } from "lucide-react";
 import AuthModalWrapper from "./AuthModalWrapper";
+import { apiFetch } from "../../../lib/api";
 import AuthInput from "../../ui/AuthInput";
 import CyberActionButton from "../../ui/CyberActionButton";
 import AuthFooter from "./AuthFooter";
@@ -59,14 +60,11 @@ export const ForgotModal = ({
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(
-				"http://localhost/techtrade_api/authentication/forgot_password.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email: email.trim() }),
-				},
-			);
+			const response = await apiFetch("/authentication/forgot_password.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email: email.trim() }),
+			});
 
 			const data = await response.json();
 

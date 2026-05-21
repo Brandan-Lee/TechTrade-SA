@@ -14,6 +14,7 @@ import PasswordStrengthMeter from "../../ui/PasswordStrengthMeter";
 import AuthFooter from "./AuthFooter";
 import CyberAlert from "../../ui/CyberAlert";
 import { useAuthModalScroll } from "./AuthModalScrollContext";
+import { apiFetch } from "../../../lib/api";
 
 const saPhoneRegex = /^(?:\+27|0)[6-8][0-9]{8}$/;
 
@@ -200,13 +201,10 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 				payload.append("profilePhoto", formData.profilePhoto);
 			}
 
-			const response = await fetch(
-				"http://localhost/techtrade_api/authentication/register.php",
-				{
-					method: "POST",
-					body: payload,
-				},
-			);
+			const response = await apiFetch("/authentication/register.php", {
+				method: "POST",
+				body: payload,
+			});
 
 			const data = await response.json();
 

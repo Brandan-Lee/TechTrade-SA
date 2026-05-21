@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import AuthModalWrapper from "./AuthModalWrapper";
+import { apiFetch } from "../../../lib/api";
 import AuthInput from "../../ui/AuthInput";
 import CyberActionButton from "../../ui/CyberActionButton";
 import PasswordStrengthMeter from "../../ui/PasswordStrengthMeter";
@@ -105,18 +106,15 @@ export const ResetModal = ({
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(
-				"http://localhost/techtrade_api/authentication/reset_password.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						email: email.trim(),
-						otp: otpCode.trim(),
-						password: formData.password,
-					}),
-				},
-			);
+			const response = await apiFetch("/authentication/reset_password.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: email.trim(),
+					otp: otpCode.trim(),
+					password: formData.password,
+				}),
+			});
 
 			const data = await response.json();
 

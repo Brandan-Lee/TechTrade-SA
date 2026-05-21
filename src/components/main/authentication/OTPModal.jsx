@@ -5,6 +5,7 @@ import AuthModalWrapper from "./AuthModalWrapper";
 import CyberActionButton from "../../ui/CyberActionButton";
 import AuthFooter from "./AuthFooter";
 import CyberAlert from "../../ui/CyberAlert";
+import { apiFetch } from "../../../lib/api";
 
 export const OTPModal = ({
 	isOpen,
@@ -89,36 +90,46 @@ export const OTPModal = ({
 
 		setIsLoading(true);
 
+		const isResetFlow = purpose === "reset";
+
 		try {
-			const response = await fetch(
-				"http://localhost/techtrade_api/authentication/verify_login_otp.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						email: email.trim(),
-						otp: codeString.trim(),
-						purpose: purpose === "admin" ? "login" : purpose,
-						rememberMe: true
-					}),
-				},
-			);
+			const response = isResetFlow
+				? await apiFetch("/authentication/verify_reset_otp.php", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							email: email.trim(),
+							otp: codeString.trim(),
+						}),
+					})
+				: await apiFetch("/authentication/verify_login_otp.php", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							email: email.trim(),
+							otp: codeString.trim(),
+							purpose: purpose === "admin" ? "login" : purpose,
+							rememberMe: true,
+						}),
+					});
 
 			const data = await response.json();
-			if (!response.ok) throw new Error(data.message || "Verification failed.");
+			if (!response.ok || data.status === "error") {
+				throw new Error(data.message || "Verification failed.");
+			}
 
-			if (purpose === "login" || purpose === "admin") {
+			if (isResetFlow) {
+				triggerStatus("CODE VERIFIED!", "success");
+				setTimeout(() => {
+					setIsLoading(false);
+					onSwitchToReset(email.trim(), codeString.trim());
+				}, 2000);
+			} else if (purpose === "login" || purpose === "admin") {
 				triggerStatus("LOGIN VERIFIED!", "success");
 				setTimeout(() => {
 					setIsLoading(false);
 					onClose();
 					if (onLoginSuccess) onLoginSuccess(data, isFromAdmin);
-				}, 2000);
-			} else {
-				triggerStatus("CODE VERIFIED!", "success");
-				setTimeout(() => {
-					setIsLoading(false);
-					onSwitchToReset(email.trim(), codeString.trim());
 				}, 2000);
 			}
 		} catch (error) {
@@ -130,17 +141,14 @@ export const OTPModal = ({
 	const handleResend = async () => {
 		if (timer > 0 || isLoading) return;
 		try {
-			const response = await fetch(
-				"http://localhost/techtrade_api/authentication/resend_otp.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						email,
-						purpose: purpose === "admin" ? "login" : purpose,
-					}),
-				},
-			);
+			const response = await apiFetch("/authentication/resend_otp.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email,
+					purpose: purpose === "admin" ? "login" : purpose,
+				}),
+			});
 			if (!response.ok) throw new Error("Failed to resend.");
 			setOtp(["", "", "", ""]);
 			setTimer(60);

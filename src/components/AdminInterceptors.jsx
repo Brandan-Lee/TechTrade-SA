@@ -1,39 +1,30 @@
 import React, { useEffect } from "react";
-import { Navigate, useLocation, Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+
+const ADMIN_ROLE_IDS = ["3", "4"];
 
 const AdminInterceptors = ({ openLogin }) => {
-	const location = useLocation();
+	const { user, isLoading } = useAuth();
+	const navigate = useNavigate();
 
-	const isVerified = location.state?.authenticated === true;
-	const userRole = localStorage.getItem("user_role") || location.state?.role;
-
-	const ADMIN_ROLES = ["admin", "moderator", "4", "3"];
-	const hasAdminPrivileges = ADMIN_ROLES.includes(String(userRole));
+	const isAdminUser =
+		user && ADMIN_ROLE_IDS.includes(String(user.roleId));
 
 	useEffect(() => {
-		if (!isVerified) {
+		if (isLoading) return;
+
+		if (!isAdminUser) {
 			openLogin();
+			navigate("/", { replace: true, state: { fromAdmin: true } });
 		}
-	}, [openLogin, isVerified]);
+	}, [isLoading, isAdminUser, openLogin, navigate]);
 
-	if (isVerified && !hasAdminPrivileges) {
-		console.warn("Access Denied: Insufficient security clearance privileges.");
-		return (
-			<Navigate
-				to="/"
-				replace
-				state={{ message: "Unauthorized access attempt." }}
-			/>
-		);
+	if (isLoading || !isAdminUser) {
+		return null;
 	}
 
-	if (isVerified && hasAdminPrivileges) {
-		return <Outlet />;
-	}
-
-	window.history.replaceState({}, document.title);
-
-	return <Navigate to="/" replace state={{ fromAdmin: true }} />;
+	return <Outlet />;
 };
 
 export default AdminInterceptors;

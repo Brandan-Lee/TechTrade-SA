@@ -1,11 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import {
-	BrowserRouter,
-	Routes,
-	Route,
-	Link,
-	useNavigate,
-} from "react-router-dom";
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 
 import { AuthProvider, useAuth } from "./components/AuthContext";
@@ -40,55 +34,31 @@ import AdminDashboard from "./pages/admin/Dashboard";
 const UserRoleManagement = () => (
 	<div className="text-neutral-100">
 		<h1 className="text-2xl font-bold">👥 User Role Management</h1>
-		<p className="text-neutral-400 mt-1 text-sm">
-			Update permissions matrices and staff access levels.
-		</p>
 	</div>
 );
 const TechDatabase = () => (
 	<div className="text-neutral-100">
 		<h1 className="text-2xl font-bold">💻 Tech Database</h1>
-		<p className="text-neutral-400 mt-1 text-sm">
-			Manage hardware specification blueprints and component metadata data
-			nodes.
-		</p>
 	</div>
 );
 const AdminMessages = () => (
 	<div className="text-neutral-100">
 		<h1 className="text-2xl font-bold">💬 Support Messages</h1>
-		<p className="text-neutral-400 mt-1 text-sm">
-			Inbound inquiries, system notifications, and internal escalation chat
-			channels.
-		</p>
 	</div>
 );
 const ReportedUsers = () => (
 	<div className="text-neutral-100">
 		<h1 className="text-2xl font-bold">🚫 Reported Users Queue</h1>
-		<p className="text-neutral-400 mt-1 text-sm">
-			Review profile safety flags, malicious user conduct reports, and bans.
-		</p>
 	</div>
 );
 const ReportedListings = () => (
 	<div className="text-neutral-100">
 		<h1 className="text-2xl font-bold">⚠️ Reported Listings Queue</h1>
-		<p className="text-neutral-400 mt-1 text-sm">
-			Investigate counterfeit claims, broken pricing specs, or forbidden
-			hardware sales.
-		</p>
 	</div>
 );
 const NukeSuite = () => (
 	<div className="p-6 bg-error/10 border border-error/20 rounded-2xl text-error">
-		<h1 className="text-2xl font-black uppercase tracking-wider">
-			☢️ High Command Nuke Suite
-		</h1>
-		<p className="text-neutral-300 mt-2 text-sm font-medium">
-			Warning: Global instance purges, system blacklists, and server emergency
-			lockdown overrides live here.
-		</p>
+		<h1 className="text-2xl font-black">☢️ High Command Nuke Suite</h1>
 	</div>
 );
 
@@ -105,10 +75,9 @@ import PrivacyModal from "./components/main/privacy/PrivacyModal";
 
 function App() {
 	const navigate = useNavigate();
+	// 🚀 FIXED: Added 'user' to the hook destructuring
+	const { loginContext, isLoading, user } = useAuth();
 
-	const { loginContext, isLoading } = useAuth();
-
-	// --- UI State ---
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
 	const [isForgotOpen, setIsForgotOpen] = useState(false);
@@ -123,36 +92,6 @@ function App() {
 	const [authEmail, setAuthEmail] = useState("");
 	const [authOTP, setAuthOTP] = useState("");
 	const [authPurpose, setAuthPurpose] = useState("login");
-
-	const isAnyModalOpen = useMemo(() => {
-		return (
-			isMenuOpen ||
-			isLoginOpen ||
-			isRegisterOpen ||
-			isForgotOpen ||
-			isOTPOpen ||
-			isResetOpen ||
-			isNotificationOpen ||
-			isCounterModalOpen ||
-			isTOSModalOpen ||
-			isDataModalOpen
-		);
-	}, [
-		isMenuOpen,
-		isLoginOpen,
-		isRegisterOpen,
-		isForgotOpen,
-		isOTPOpen,
-		isResetOpen,
-		isNotificationOpen,
-		isCounterModalOpen,
-		isTOSModalOpen,
-		isDataModalOpen,
-	]);
-
-	useEffect(() => {
-		document.body.style.overflow = isAnyModalOpen ? "hidden" : "unset";
-	}, [isAnyModalOpen]);
 
 	const closeAllModals = () => {
 		setIsLoginOpen(false);
@@ -170,24 +109,20 @@ function App() {
 		closeAllModals();
 		setIsRegisterOpen(true);
 	};
-
 	const switchToLogin = () => {
 		closeAllModals();
 		setIsLoginOpen(true);
 	};
-
 	const switchToForgot = () => {
 		closeAllModals();
 		setIsForgotOpen(true);
 	};
-
 	const switchToOTP = (emailValue = "", purposeValue = "login") => {
 		closeAllModals();
 		setAuthEmail(emailValue);
 		setAuthPurpose(purposeValue);
 		setIsOTPOpen(true);
 	};
-
 	const switchToReset = (emailValue = "", otpValue = "") => {
 		closeAllModals();
 		if (emailValue) setAuthEmail(emailValue);
@@ -209,7 +144,6 @@ function App() {
 	return (
 		<>
 			<ScrollToTop />
-
 			<Routes>
 				<Route
 					path="/"
@@ -251,9 +185,12 @@ function App() {
 				</Route>
 
 				<Route
-					element={<AdminInterceptors openLogin={() => setIsLoginOpen(true)} />}
+					path="/admin"
+					element={
+						<AdminInterceptors openLogin={() => setIsLoginOpen(true)} />
+					}
 				>
-					<Route path="/admin" element={<AdminLayout />}>
+					<Route element={<AdminLayout />}>
 						<Route index element={<AdminDashboard />} />
 						<Route path="roles" element={<UserRoleManagement />} />
 						<Route path="database" element={<TechDatabase />} />
@@ -272,14 +209,12 @@ function App() {
 				onSwitchToForgot={switchToForgot}
 				onSwitchToOTP={switchToOTP}
 			/>
-
 			<RegisterModal
 				isOpen={isRegisterOpen}
 				onClose={() => setIsRegisterOpen(false)}
 				onSwitchToLogin={switchToLogin}
 				onSwitchToTOS={() => setIsTOSModalOpen(true)}
 			/>
-
 			<ForgotModal
 				isOpen={isForgotOpen}
 				onClose={() => setIsForgotOpen(false)}
@@ -291,7 +226,7 @@ function App() {
 				isOpen={isOTPOpen}
 				onClose={() => {
 					setIsOTPOpen(false);
-					navigate(".", { replace: true, state: {} });
+					navigate(".", { replace: true });
 				}}
 				email={authEmail}
 				purpose={authPurpose}
@@ -299,31 +234,13 @@ function App() {
 				onSwitchToReset={switchToReset}
 				onSwitchToLogin={switchToLogin}
 				onSwitchToData={() => setIsDataModalOpen(true)}
-				onLoginSuccess={(data, isStaffAttempt) => {
-					console.log("Profile Authorized!", data);
-
-					if (data.user) {
-						loginContext(data.user);
-						localStorage.setItem("user_role", data.user.roleId);
-					}
-
+				onLoginSuccess={(data) => {
+					loginContext(data.user);
 					closeAllModals();
-
-					const userRole = data.user ? String(data.user.roleId) : "";
-					const ADMIN_ROLES = ["3", "4"];
-					const isActuallyAdmin = ADMIN_ROLES.includes(userRole);
-
-					if (isStaffAttempt && isActuallyAdmin) {
-						navigate("/admin", {
-							replace: true,
-							state: { authenticated: true },
-						});
-					} else {
-						navigate("/", { replace: true, state: {} });
-					}
+					const isAdmin = ["3", "4"].includes(String(data.user.roleId));
+					navigate(isAdmin ? "/admin" : "/", { replace: true });
 				}}
 			/>
-
 			<ResetModal
 				isOpen={isResetOpen}
 				onClose={() => setIsResetOpen(false)}
@@ -332,22 +249,18 @@ function App() {
 				email={authEmail}
 				otpCode={authOTP}
 			/>
-
 			<NotificationModal
 				isOpen={isNotificationOpen}
 				onClose={() => setIsNotificationOpen(false)}
 			/>
-
 			<CounterOfferModal
 				isOpen={isCounterModalOpen}
 				onClose={() => setIsCounterModalOpen(false)}
 			/>
-
 			<TOSModal
 				isOpen={isTOSModalOpen}
 				onClose={() => setIsTOSModalOpen(false)}
 			/>
-
 			<PrivacyModal
 				isOpen={isDataModalOpen}
 				onClose={() => setIsDataModalOpen(false)}

@@ -24,7 +24,7 @@ export default function SearchBar({ className }) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleSearch}
-                placeholder="Query hardware arrays (RTX 4090, Ryzen 9...)"
+                placeholder="Enter hardware component name (RTX 4090, Ryzen 9...)"
                 aria-label="Search platform hardware listings"
                 className="w-full h-full pl-11 sm:pl-12 pr-20 bg-[#0d0915] border border-purple-500/20 focus:border-fuchsia-500/80 rounded-lg text-white placeholder-slate-600 outline-none transition-all duration-200 text-xs sm:text-sm font-medium tracking-wide shadow-md shadow-black/50 selection:bg-fuchsia-500/30"
             />

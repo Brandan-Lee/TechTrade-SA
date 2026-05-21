@@ -6,6 +6,7 @@ import AuthInput from "../../ui/AuthInput";
 import CyberActionButton from "../../ui/CyberActionButton";
 import CyberAlert from "../../ui/CyberAlert";
 import { useAuthModalScroll } from "./AuthModalScrollContext";
+import { apiFetch } from "../../../lib/api";
 
 const LoginModal = ({
 	isOpen,
@@ -17,21 +18,15 @@ const LoginModal = ({
 	const location = useLocation();
 	const navigate = useNavigate();
 
-	// 🚀 FIX: Track whether this specific open instance came from the admin panel using local state
 	const [isFromAdmin, setIsFromAdmin] = useState(false);
 
 	useEffect(() => {
 		if (isOpen) {
-			// 1. Check if the router currently contains the admin redirect instruction flag
 			if (location.state?.fromAdmin === true) {
 				setIsFromAdmin(true);
-
-				// 2. Clear the browser history state immediately after saving it locally.
-				// This stops it from sticking around if the user refreshes or closes the modal.
 				navigate(".", { replace: true, state: {} });
 			}
 		} else {
-			// Reset the local state back to false when the modal closes completely
 			setIsFromAdmin(false);
 		}
 	}, [isOpen, location.state, navigate]);
@@ -116,15 +111,11 @@ const LoginModalContent = ({
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(
-				"http://localhost/techtrade_api/authentication/login.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(formData),
-					credentials: "include",
-				},
-			);
+			const response = await apiFetch("/authentication/login.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(formData),
+			});
 
 			const data = await response.json();
 
