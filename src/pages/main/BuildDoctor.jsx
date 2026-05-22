@@ -1,76 +1,650 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import ComponentCard from "../../components/main/build-doctor/ComponentCard";
-import { Cpu, Monitor, Zap, Activity } from "lucide-react";
+import {
+	Cpu,
+	Monitor,
+	Zap,
+	Search,
+	ShieldCheck,
+	Trash2,
+	Loader2,
+} from "lucide-react";
+import { useAuth } from "../../components/AuthContext";
 import CyberActionButton from "../../components/ui/CyberActionButton";
+import { apiFetch } from "../../lib/api";
+import CyberAlert from "../../components/ui/CyberAlert";
+
+const API_CATEGORY_NAMES = {
+	CPU: "CPUs",
+	GPU: "GPUs",
+	PSU: "PSUs",
+};
+
+function RenderModule({
+	title,
+	icon: Icon,
+	category,
+	value,
+	specLines,
+	dropdown,
+	onValueChange,
+	onSearch,
+	onSelectComponent,
+	onCloseDropdown,
+	onFocusCategory,
+	error,
+	shakeTick,
+}) {
+	const isOpen = dropdown.category === category && dropdown.list.length > 0;
+
+	return (
+		<div
+			key={
+				error
+					? `shake-${category.toLowerCase()}-${shakeTick}`
+					: `normal-${category.toLowerCase()}`
+			}
+			className={`w-full bg-[#0c0c0e]/90 backdrop-blur-md rounded-2xl p-6 border ${
+				error
+					? "border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+					: "border-white/10"
+			} ${error ? "animate-shake" : ""}`}
+		>
+			<div className="flex flex-col gap-6">
+				<div className="flex flex-col gap-4 w-full">
+					<div className="flex items-center gap-3">
+						<div className="w-9 h-9 bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-lg flex items-center justify-center text-fuchsia-400">
+							<Icon size={18} />
+						</div>
+						<h3 className="text-white font-black uppercase tracking-wider">
+							{title}
+						</h3>
+					</div>
+
+					<div className="relative">
+						<div className="flex gap-2">
+							<input
+								value={value || ""}
+								onChange={(e) => onValueChange(e.target.value)}
+								onFocus={() => onFocusCategory(category)}
+								className={`w-full h-12 px-4 bg-black border ${
+									error
+										? "border-red-500/30 focus:ring-red-500"
+										: "border-white/10 focus:ring-fuchsia-500"
+								} rounded-xl text-xs outline-none focus:ring-1`}
+								placeholder={`Search ${title}...`}
+							/>
+							<button
+								type="button"
+								onClick={() => onSearch(value)}
+								className="p-3 bg-fuchsia-600 rounded-xl shrink-0 text-white"
+							>
+								<Search size={18} />
+							</button>
+						</div>
+
+						{isOpen && (
+							<>
+								<div
+									className="fixed inset-0 z-[80]"
+									aria-hidden
+									onClick={onCloseDropdown}
+								/>
+								<div className="absolute top-[calc(100%+8px)] left-0 w-full z-[85] animate-in fade-in slide-in-from-top-2 duration-150">
+									<div className="bg-[#09090b] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] border border-fuchsia-500/30 p-2 max-h-[250px] overflow-y-auto">
+										{dropdown.list.map((item) => (
+											<button
+												key={item.id}
+												type="button"
+												onMouseDown={(e) => e.preventDefault()}
+												onClick={() => onSelectComponent(item)}
+												className="w-full p-3 text-left hover:bg-fuchsia-600/20 text-xs text-slate-300 hover:text-white rounded-lg border-b border-white/5 last:border-0"
+											>
+												{item.full_name}
+											</button>
+										))}
+									</div>
+								</div>
+							</>
+						)}
+					</div>
+				</div>
+				<div className="w-full bg-black/50 border border-fuchsia-500/10 rounded-xl p-4 min-h-[120px]">
+					<div className="flex items-center gap-2 mb-3">
+						<ShieldCheck size={14} className="text-fuchsia-500" />
+						<span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+							Verified Specs
+						</span>
+					</div>
+					<div className="space-y-1">
+						{specLines.map((line, i) => (
+							<div
+								key={i}
+								className="text-[10px] text-fuchsia-400/90 font-mono py-1 border-b border-white/[0.03] last:border-0"
+							>
+								{line}
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
 
 export default function BuildDoctor() {
-    const [build, setBuild] = useState({
-        cpu: "",
-        gpu: "",
-        psu: "",
-    });
+	const { user, isLoading: authLoading } = useAuth();
+	const containerRef = useRef(null);
 
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="min-h-screen bg-[#050505] text-slate-300 relative overflow-x-hidden"
-        >
-            {/* Background Digital Grid */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800b_1px,transparent_1px),linear-gradient(to_bottom,#8080800b_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-            <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none" />
+	const [editingBuildId, setEditingBuildId] = useState(null);
+	const [buildName, setBuildName] = useState("");
+	const [isDataFetching, setIsDataFetching] = useState(false);
 
-            {/* HEADER INTERFACE */}
-            <header className="w-full max-w-[1440px] mx-auto px-6 md:px-12 pt-12 pb-6 relative z-10">
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
-                        Build <span className="text-fuchsia-500">Doctor</span>
-                    </h1>
-                    <div className="h-[2px] w-16 bg-gradient-to-r from-fuchsia-500 to-transparent mt-4" />
-                </div>
-            </header>
+	const [formData, setFormData] = useState({
+		cpu: { name: "", id: null },
+		gpu: { name: "", id: null },
+		psu: { name: "", id: null },
+	});
 
-            {/* MAIN DIAGNOSTIC CONTAINER */}
-            <main className="w-full max-w-3xl mx-auto px-6 pb-24 relative z-10">
-                <div className="flex flex-col gap-5">
-                    
-                    <ComponentCard
-                        title="CPU (Processor)"
-                        icon={Cpu}
-                        placeholder="E.G., AMD RYZEN 5 3600"
-                        value={build.cpu}
-                        onChange={(e) => setBuild({ ...build, cpu: e.target.value })}
-                    />
-                    
-                    <ComponentCard
-                        title="GPU (Graphics Card)"
-                        icon={Monitor}
-                        placeholder="E.G., NVIDIA RTX 3060 TI"
-                        value={build.gpu}
-                        onChange={(e) => setBuild({ ...build, gpu: e.target.value })}
-                    />
-                    
-                    <ComponentCard
-                        title="PSU (Power Supply)"
-                        icon={Zap}
-                        placeholder="E.G., EVGA SUPERNOVA 750W"
-                        value={build.psu}
-                        onChange={(e) => setBuild({ ...build, psu: e.target.value })}
-                    />
+	const [dropdown, setDropdown] = useState({ category: null, list: [] });
+	const [specs, setSpecs] = useState({
+		cpu: ["Please search for your CPU to add its build specs"],
+		gpu: ["Please search for your GPU to add its build specs"],
+		psu: ["Please search for your PSU to add its build specs"],
+	});
 
-                    {/* ACTION PANEL */}
-                    <div className="mt-8 pt-6 border-t border-white/5 flex flex-col items-center gap-4">
-                        <div className="w-full max-w-sm">
-                            <CyberActionButton
-                                label="SAVE MY BUILD"
-                                className="w-full py-5 text-sm uppercase tracking-widest font-black"
-                            />
-                        </div>
-                    </div>
+	const [errorField, setErrorField] = useState("");
+	const [shakeTick, setShakeTick] = useState(0);
+	const [alert, setAlert] = useState({
+		show: false,
+		message: "",
+		type: "error",
+	});
 
-                </div>
-            </main>
-        </motion.div>
-    );
+	const triggerStatus = (message, type = "error", fieldName = "") => {
+		if (containerRef.current) {
+			containerRef.current.scrollIntoView({ behavior: "smooth" });
+		}
+		setAlert({ show: true, message, type });
+
+		if (type === "error" && fieldName) {
+			setErrorField("");
+			setShakeTick((tick) => tick + 1);
+			requestAnimationFrame(() => setErrorField(fieldName));
+		} else {
+			setErrorField("");
+		}
+	};
+
+	const closeDropdown = () => setDropdown({ category: null, list: [] });
+
+	useEffect(() => {
+		const fetchUserBuild = async () => {
+			if (!user) return;
+			setIsDataFetching(true);
+			try {
+				const response = await apiFetch(
+					"/hardware_intelligence/get_user_build.php",
+					{
+						method: "GET",
+						headers: { Accept: "application/json" },
+					},
+				);
+
+				if (response.ok) {
+					const data = await response.json();
+					if (data && data.id) {
+						setEditingBuildId(data.id);
+						setBuildName(data.name || "Untitled Build");
+						setFormData({
+							cpu: { name: data.cpu_display_name || "", id: data.cpu_id },
+							gpu: { name: data.gpu_display_name || "", id: data.gpu_id },
+							psu: { name: data.psu_display_name || "", id: data.psu_id },
+						});
+						setSpecs({
+							cpu: data.cpu_specs || ["Verified specs could not be loaded."],
+							gpu: data.gpu_specs || ["Verified specs could not be loaded."],
+							psu: data.psu_specs || ["Verified specs could not be loaded."],
+						});
+					}
+				}
+			} catch (err) {
+				console.error("Failed to fetch current user configuration:", err);
+			} finally {
+				setIsDataFetching(false);
+			}
+		};
+
+		if (!authLoading) {
+			fetchUserBuild();
+		}
+	}, [user, authLoading]);
+
+	const titleForCategory = (category) => {
+		switch (category) {
+			case "CPU":
+				return "CPUs";
+			case "GPU":
+				return "GPUs";
+			case "PSU":
+				return "PSUs";
+			default:
+				return "components";
+		}
+	};
+
+	const handleSearch = async (category, query) => {
+		const q = (query ?? "").trim();
+		const apiCategory = API_CATEGORY_NAMES[category];
+
+		if (!q) {
+			triggerStatus(
+				"Enter a search term before searching.",
+				"error",
+				category.toLowerCase(),
+			);
+			return;
+		}
+
+		if (!apiCategory) {
+			triggerStatus("Unknown hardware category.", "error");
+			return;
+		}
+
+		setAlert((prev) => ({ ...prev, show: false }));
+
+		try {
+			const response = await apiFetch("/hardware_intelligence/search.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ q, category: apiCategory }),
+			});
+			const data = await response.json();
+
+			if (!response.ok || data?.error) {
+				triggerStatus(
+					data?.error || "Search failed. Try again.",
+					"error",
+					category.toLowerCase(),
+				);
+				return;
+			}
+
+			const list = Array.isArray(data) ? data : [];
+
+			if (list.length === 0) {
+				triggerStatus(
+					`No matching ${titleForCategory(category)} found in the catalog.`,
+					"error",
+					category.toLowerCase(),
+				);
+				return;
+			}
+
+			setDropdown({ category, list });
+		} catch (err) {
+			console.error("Search failed", err);
+			triggerStatus(
+				"Connection to the catalog failed.",
+				"error",
+				category.toLowerCase(),
+			);
+		}
+	};
+
+	const selectComponent = (component, category) => {
+		const dbSpecs = component.specs || {};
+		const catKey = category.toLowerCase();
+
+		const specLines = [
+			`MANUFACTURER: ${component.brand.toUpperCase()}`,
+			`MODEL VARIANT: ${component.model.toUpperCase()}`,
+		];
+
+		switch (category.toUpperCase()) {
+			case "GPU":
+				if (dbSpecs.chipset)
+					specLines.push(`CHIPSET CORE ARCHITECTURE: ${dbSpecs.chipset}`);
+				if (dbSpecs.vram_gb)
+					specLines.push(
+						`VRAM MEMORY: ${parseFloat(dbSpecs.vram_gb)} GB ${dbSpecs.vram_type || ""}`,
+					);
+				if (dbSpecs.boost_clock_mhz)
+					specLines.push(
+						`CLOCK PROFILES: ${dbSpecs.core_clock_mhz || "—"} MHz BASE / ${dbSpecs.boost_clock_mhz} MHz BOOST`,
+					);
+				if (dbSpecs.pcie_version)
+					specLines.push(`BUS INTERFACE REVISION: ${dbSpecs.pcie_version}`);
+				if (dbSpecs.power_connectors)
+					specLines.push(
+						`REQUIRED INPUT POWER RAILS: ${dbSpecs.power_connectors}`,
+					);
+				if (dbSpecs.tdp_watts)
+					specLines.push(`THERMAL DESIGN POWER (TDP): ${dbSpecs.tdp_watts}W`);
+				if (dbSpecs.outputs)
+					specLines.push(
+						`DISPLAY CONNECTIVITY DISPLAYPORTS/HDMI: ${dbSpecs.outputs}`,
+					);
+				if (dbSpecs.length_mm)
+					specLines.push(
+						`PHYSICAL CLEARANCE METRICS: ${dbSpecs.length_mm}mm LENGTH / ${dbSpecs.slot_width || "—"} SLOT WIDTH`,
+					);
+				break;
+			case "CPU":
+				if (dbSpecs.socket)
+					specLines.push(`MOTHERBOARD SOCKET INTERFACE: ${dbSpecs.socket}`);
+				if (dbSpecs.architecture)
+					specLines.push(`MICROARCHITECTURE REVISION: ${dbSpecs.architecture}`);
+				if (dbSpecs.cores)
+					specLines.push(
+						`COMPUTE MATRIX: ${dbSpecs.cores} PHYSICAL CORES / ${dbSpecs.threads || dbSpecs.cores * 2} LOGICAL THREADS`,
+					);
+				if (dbSpecs.boost_clock_ghz)
+					specLines.push(
+						`OPERATING CLOCK FREQUENCY: ${parseFloat(dbSpecs.base_clock_ghz) || "—"} GHz BASE / ${parseFloat(dbSpecs.boost_clock_ghz)} GHz BOOST`,
+					);
+				if (dbSpecs.tdp_watts)
+					specLines.push(
+						`THERMAL PROFILE PACKAGE POWER: ${dbSpecs.tdp_watts}W`,
+					);
+				if (dbSpecs.integrated_graphics)
+					specLines.push(
+						`INTEGRATED DISPLAY PROCESSOR: ${dbSpecs.integrated_graphics}`,
+					);
+				specLines.push(
+					`OVERCLOCK MATRIX CAPABILITY: ${dbSpecs.unlocked ? "UNLOCKED (MANUFACTURER MULTIPLIER ACTIVE)" : "LOCKED ARCHITECTURE"}`,
+				);
+				break;
+			case "PSU":
+				if (dbSpecs.wattage)
+					specLines.push(
+						`TOTAL POWER OUTPUT CEILING: ${dbSpecs.wattage} WATTS`,
+					);
+				if (dbSpecs.efficiency_rating)
+					specLines.push(
+						`EFFICIENCY MATRIX VALUATION: 80 PLUS ${dbSpecs.efficiency_rating.replace("80+", "").trim()}`,
+					);
+				if (dbSpecs.modular_type)
+					specLines.push(
+						`STRUCTURAL CABLE ROUTING MECHANISM: ${dbSpecs.modular_type.replace("_", " ").toUpperCase()}`,
+					);
+				if (dbSpecs.form_factor)
+					specLines.push(`PHYSICAL PSU SCALE PROFILE: ${dbSpecs.form_factor}`);
+				if (dbSpecs.pcie_connectors || dbSpecs.sata_connectors)
+					specLines.push(
+						`POWER EXTENSION HEADER BULK: ${dbSpecs.pcie_connectors || 0}x PCIe INTERFACES / ${dbSpecs.sata_connectors || 0}x SATA LINKS`,
+					);
+				break;
+			default:
+				specLines.push("HARDWARE ARCHITECTURE SIGNATURE RECOGNIZED");
+				break;
+		}
+
+		setSpecs((prev) => ({ ...prev, [catKey]: specLines }));
+		setFormData((prev) => ({
+			...prev,
+			[catKey]: { name: component.full_name, id: component.id },
+		}));
+		closeDropdown();
+		if (errorField === catKey) {
+			setErrorField("");
+		}
+	};
+
+	const updateField = (category, value) => {
+		const catKey = category.toLowerCase();
+		setAlert({ show: false, message: "", type: "error" });
+		if (errorField === catKey) {
+			setErrorField("");
+		}
+		setFormData((prev) => ({
+			...prev,
+			[catKey]: { name: value, id: null },
+		}));
+	};
+
+	const handleFocusCategory = (category) => {
+		setDropdown((prev) =>
+			prev.category && prev.category !== category
+				? { category: null, list: [] }
+				: prev,
+		);
+	};
+
+	const handleSaveOrUpdateBuild = async () => {
+		setAlert({ show: false, message: "", type: "error" });
+		setErrorField("");
+
+		if (!formData.cpu.id && !formData.gpu.id && !formData.psu.id) {
+			triggerStatus(
+				"Build must contain at least one component",
+				"error",
+				"cpu",
+			);
+			return;
+		}
+
+		let activeName = buildName;
+		if (!activeName || activeName.trim() === "") {
+			const requestedName = prompt(
+				"Enter a name for your custom hardware snapshot:",
+				"My Custom Configuration",
+			);
+			if (!requestedName || requestedName.trim() === "") {
+				triggerStatus("A configuration label name is mandatory.", "error");
+				return;
+			}
+			activeName = requestedName.trim();
+			setBuildName(activeName);
+		}
+
+		const targetEndpoint = editingBuildId
+			? "/hardware_intelligence/update_user_build.php"
+			: "/hardware_intelligence/save_user_build.php";
+
+		try {
+			const response = await apiFetch(targetEndpoint, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					build_id: editingBuildId,
+					name: activeName,
+					cpu_id: formData.cpu.id,
+					gpu_id: formData.gpu.id,
+					psu_id: formData.psu.id,
+					cpu_display_name: formData.cpu.name,
+					gpu_display_name: formData.gpu.name,
+					psu_display_name: formData.psu.name,
+					cpu_specs: specs.cpu,
+					gpu_specs: specs.gpu,
+					psu_specs: specs.psu,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (response.ok && (data.success || data.build_id)) {
+				triggerStatus(
+					editingBuildId
+						? "Hardware modification revision applied!"
+						: "Your Custom Build has been added successfully",
+					"success",
+				);
+				if (!editingBuildId && data.build_id) {
+					setEditingBuildId(data.build_id);
+				}
+			} else {
+				throw new Error(
+					data.error || "There was a problem processing your hardware metrics.",
+				);
+			}
+		} catch (err) {
+			triggerStatus(
+				err.message || "Failed to finalize build changes.",
+				"error",
+			);
+		}
+	};
+
+	const handleDeleteBuild = async () => {
+		if (!editingBuildId) return;
+
+		setAlert({ show: false, message: "", type: "error" });
+		setErrorField("");
+
+		const confirmed = window.confirm(
+			`Are you absolutely sure you want to delete "${buildName || "this configuration"}"?`,
+		);
+		if (!confirmed) return;
+
+		try {
+			const response = await apiFetch(
+				"hardware_intelligence/delete_user_build.php",
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ build_id: editingBuildId }),
+				},
+			);
+
+			const data = await response.json();
+
+			if (response.ok && data.success) {
+				triggerStatus(
+					"The User build has been removed from the system",
+					"success",
+				);
+				setEditingBuildId(null);
+				setBuildName("");
+				setFormData({
+					cpu: { name: "", id: null },
+					gpu: { name: "", id: null },
+					psu: { name: "", id: null },
+				});
+				setSpecs({
+					cpu: ["Please search for your CPU to add its build specs"],
+					gpu: ["Please search for your GPU to add its build specs"],
+					psu: ["Please search for your PSU to add its build specs"],
+				});
+			} else {
+				throw new Error(data.error || "Failed to execute delete transaction.");
+			}
+		} catch (err) {
+			triggerStatus(err.message, "error");
+		}
+	};
+
+	if (authLoading || isDataFetching) {
+		return (
+			<div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center gap-3 text-slate-400 font-mono text-xs uppercase tracking-widest">
+				<Loader2 className="animate-spin text-fuchsia-500" size={24} />
+				Syncing Terminal Core...
+			</div>
+		);
+	}
+
+	if (!user) {
+		return (
+			<div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6">
+				<CyberAlert
+					type="error"
+					message="Access Denied. Please authenticate to initialize the Build Doctor terminal interface."
+				/>
+			</div>
+		);
+	}
+
+	return (
+		<motion.div
+			ref={containerRef}
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			className="min-h-screen bg-[#050505] text-slate-300 p-6 scroll-mt-6"
+		>
+			<header className="max-w-3xl mx-auto py-12">
+				<h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
+					Build{" "}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+						Doctor
+					</span>
+				</h1>
+			</header>
+			<main className="max-w-3xl mx-auto space-y-5">
+				{alert.show && (
+					<div className="mb-6">
+						<CyberAlert
+							type={alert.type}
+							message={alert.message}
+							onClose={() => setAlert({ ...alert, show: false })}
+						/>
+					</div>
+				)}
+
+				<RenderModule
+					title="CPU"
+					icon={Cpu}
+					category="CPU"
+					value={formData.cpu?.name || ""}
+					specLines={specs.cpu}
+					dropdown={dropdown}
+					onValueChange={(value) => updateField("CPU", value)}
+					onSearch={(query) => handleSearch("CPU", query)}
+					onSelectComponent={(item) => selectComponent(item, "CPU")}
+					onCloseDropdown={closeDropdown}
+					onFocusCategory={handleFocusCategory}
+					error={errorField === "cpu"}
+					shakeTick={shakeTick}
+				/>
+				<RenderModule
+					title="GPU"
+					icon={Monitor}
+					category="GPU"
+					value={formData.gpu?.name || ""}
+					specLines={specs.gpu}
+					dropdown={dropdown}
+					onValueChange={(value) => updateField("GPU", value)}
+					onSearch={(query) => handleSearch("GPU", query)}
+					onSelectComponent={(item) => selectComponent(item, "GPU")}
+					onCloseDropdown={closeDropdown}
+					onFocusCategory={handleFocusCategory}
+					error={errorField === "gpu"}
+					shakeTick={shakeTick}
+				/>
+				<RenderModule
+					title="PSU"
+					icon={Zap}
+					category="PSU"
+					value={formData.psu?.name || ""}
+					specLines={specs.psu}
+					dropdown={dropdown}
+					onValueChange={(value) => updateField("PSU", value)}
+					onSearch={(query) => handleSearch("PSU", query)}
+					onSelectComponent={(item) => selectComponent(item, "PSU")}
+					onCloseDropdown={closeDropdown}
+					onFocusCategory={handleFocusCategory}
+					error={errorField === "psu"}
+					shakeTick={shakeTick}
+				/>
+
+				<div className="flex flex-col md:flex-row gap-4 w-full pt-4">
+					<CyberActionButton
+						label={editingBuildId ? "UPDATE MY BUILD" : "SAVE MY BUILD"}
+						onClick={handleSaveOrUpdateBuild}
+						className="flex-1 py-5 text-sm uppercase font-black"
+					/>
+
+					{editingBuildId && (
+						<button
+							type="button"
+							onClick={handleDeleteBuild}
+							className="md:w-1/4 h-[62px] border border-red-500/30 bg-red-950/10 hover:bg-red-600/20 text-red-400 hover:text-red-200 transition-all rounded-xl text-xs uppercase font-black tracking-wider flex items-center justify-center gap-2"
+						>
+							<Trash2 size={16} />
+							Delete Build
+						</button>
+					)}
+				</div>
+			</main>
+		</motion.div>
+	);
 }

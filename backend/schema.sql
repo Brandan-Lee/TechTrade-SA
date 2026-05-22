@@ -676,20 +676,28 @@ CREATE TABLE
 -- -----------------------------------------------------------------------------
 -- 11. BUILD DOCTOR (saved compatibility checks)
 -- -----------------------------------------------------------------------------
-CREATE TABLE
-  user_builds (
+CREATE TABLE user_builds (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(128) NULL,
-    cpu_text VARCHAR(255) NOT NULL,
-    gpu_text VARCHAR(255) NOT NULL,
-    psu_text VARCHAR(255) NOT NULL,
-    result_json JSON NULL, -- bottleneck / wattage analysis output
+    cpu_id BIGINT UNSIGNED,
+    gpu_id BIGINT UNSIGNED,
+    psu_id BIGINT UNSIGNED,
+    cpu_display_name VARCHAR(255),
+    gpu_display_name VARCHAR(255),
+    psu_display_name VARCHAR(255),
+    result_json JSON NULL,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL DEFAULT NULL,
     PRIMARY KEY (id),
-    KEY idx_user_builds_user (user_id),
-    CONSTRAINT fk_user_builds_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-  ) ENGINE = InnoDB;
+    INDEX idx_user_active (user_id, is_deleted),
+    CONSTRAINT fk_user_builds_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_build_cpu FOREIGN KEY (cpu_id) REFERENCES hardware(id) ON DELETE SET NULL,
+    CONSTRAINT fk_build_gpu FOREIGN KEY (gpu_id) REFERENCES hardware(id) ON DELETE SET NULL,
+    CONSTRAINT fk_build_psu FOREIGN KEY (psu_id) REFERENCES hardware(id) ON DELETE SET NULL
+) ENGINE = InnoDB;
 
 -- -----------------------------------------------------------------------------
 -- 12. SUPPORT & ADMIN

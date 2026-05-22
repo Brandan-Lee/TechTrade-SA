@@ -116,7 +116,7 @@ try {
         $files = $_FILES['images'];
         $fileCount = count($files['name']);
 
-        $uploadDir = __DIR__ . "/../../public/uploads/listings/";
+        $uploadDir = __DIR__ . "../uploads/listings/";
 
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0755, true)) {

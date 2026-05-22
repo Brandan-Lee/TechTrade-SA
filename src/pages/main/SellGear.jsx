@@ -47,7 +47,6 @@ export default function SellGear() {
 
 	const [suggestions, setSuggestions] = useState([]);
 
-	// Gallery States
 	const [slots, setSlots] = useState([null, null, null, null, null, null]);
 	const [currentActiveSlot, setCurrentActiveSlot] = useState(null);
 	const fileInputRef = useRef(null);
@@ -64,7 +63,6 @@ export default function SellGear() {
 
 	const conditions = ["New", "Like New", "Good", "Fair"];
 
-	// Unified feedback trigger method reflecting the core auth design
 	const triggerStatus = (message, type = "error", fieldName = "") => {
 		window.scrollTo({ top: 0, behavior: "smooth" });
 		setAlert({ show: true, message, type });
@@ -78,7 +76,6 @@ export default function SellGear() {
 		}
 	};
 
-	// Clean fields errors upon typing values
 	const clearFieldError = (fieldName) => {
 		setAlert({ show: false, message: "", type: "error" });
 		if (errorField === fieldName) {
@@ -86,7 +83,6 @@ export default function SellGear() {
 		}
 	};
 
-	// Search logic tied into the UI
 	const handleSearch = async () => {
 		if (!formData.category) {
 			triggerStatus(
@@ -439,12 +435,10 @@ export default function SellGear() {
 		setSuggestions([]);
 	};
 
-	// Form Submission Logic
 	const handlePublishListing = async (e) => {
 		if (e) e.preventDefault();
 		setErrorField("");
 
-		// Field Boundary Validations tracking back specific field parameters
 		if (!formData.category) {
 			triggerStatus(
 				"Please select an active hardware category.",
@@ -478,7 +472,6 @@ export default function SellGear() {
 			return;
 		}
 
-		// Ensure primary image exists inside Array Slot [0]
 		if (!slots[0]) {
 			triggerStatus(
 				"Primary Image Slot [1] requires an asset file attachment.",
@@ -652,7 +645,7 @@ export default function SellGear() {
 									className={`form-control w-full relative ${errorField === "category" ? "animate-shake" : ""}`}
 								>
 									<label
-										className={`label text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-3 block transition-colors ${errorField === "category" ? "text-red-500" : "text-slate-400"}`}
+										className={`label text-sm md:text-xs font-black uppercase tracking-[0.3em] mb-3 block transition-colors ${errorField === "category" ? "text-red-500" : "text-slate-400"}`}
 									>
 										Select Category
 									</label>
@@ -690,7 +683,7 @@ export default function SellGear() {
 															className="flex flex-col gap-0.5 mb-3 last:mb-0"
 														>
 															<div className="flex items-center gap-2 px-3 py-1 mb-1">
-																<span className="text-[10px] font-mono font-black text-fuchsia-500/60 uppercase tracking-widest">
+																<span className="text-xs md:text-sm font-mono font-black text-fuchsia-500/60 uppercase tracking-widest">
 																	{group.label}
 																</span>
 																<div className="flex-1 h-[1px] bg-fuchsia-500/10" />
@@ -731,7 +724,7 @@ export default function SellGear() {
 									className={`form-control w-full relative ${errorField === "name" ? "animate-shake" : ""}`}
 								>
 									<label
-										className={`label text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-3 block transition-colors ${errorField === "name" ? "text-red-500" : "text-slate-400"}`}
+										className={`label text-sm md:text-xs font-black uppercase tracking-[0.3em] mb-3 block transition-colors ${errorField === "name" ? "text-red-500" : "text-slate-400"}`}
 									>
 										Enter Component Name
 									</label>
@@ -766,7 +759,6 @@ export default function SellGear() {
 										</button>
 									</div>
 
-									{/* SUGGESTIONS INTERFACE MODULE */}
 									{suggestions.length > 0 && (
 										<>
 											<div
@@ -776,7 +768,7 @@ export default function SellGear() {
 											<div className="absolute top-[105%] left-0 w-full z-[85] animate-in fade-in slide-in-from-top-2 duration-150">
 												<div className="bg-[#09090b] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] border border-fuchsia-500/30 p-2 max-h-[250px] overflow-y-auto custom-scrollbar">
 													<div className="px-3 py-1 mb-1 flex items-center gap-2">
-														<span className="text-[9px] font-mono font-black text-fuchsia-500/60 uppercase tracking-widest">
+														<span className="text-xs md:text-sm font-mono font-black text-fuchsia-500/60 uppercase tracking-widest">
 															Matching Catalog Items ({suggestions.length})
 														</span>
 														<div className="flex-1 h-[1px] bg-fuchsia-500/10" />
@@ -791,12 +783,6 @@ export default function SellGear() {
 															<span className="text-xs md:text-sm font-semibold tracking-wide">
 																{item.full_name}
 															</span>
-															{item.msrp_cents && (
-																<span className="text-[10px] font-mono text-slate-500 group-hover/item:text-fuchsia-200 mt-0.5">
-																	Ref MSRP: R{" "}
-																	{(item.msrp_cents / 100).toFixed(2)}
-																</span>
-															)}
 														</button>
 													))}
 												</div>
@@ -815,7 +801,7 @@ export default function SellGear() {
 									className={`form-control w-full ${errorField === "price" ? "animate-shake" : ""}`}
 								>
 									<label
-										className={`label text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-3 block transition-colors ${errorField === "price" ? "text-red-500" : "text-slate-400"}`}
+										className={`label text-sm md:text-xs font-black uppercase tracking-[0.3em] mb-3 block transition-colors ${errorField === "price" ? "text-red-500" : "text-slate-400"}`}
 									>
 										Enter your asking price:
 									</label>
@@ -854,7 +840,7 @@ export default function SellGear() {
 												<div className="mt-0.5 shrink-0 w-4 h-4 rounded border border-fuchsia-500/30 bg-fuchsia-500/5 flex items-center justify-center">
 													<Check className="w-2.5 h-2.5 text-fuchsia-400 stroke-[3]" />
 												</div>
-												<p className="text-slate-400 font-mono text-[10px] md:text-xs leading-normal tracking-tight">
+												<p className="text-slate-400 font-mono text-sm md:text-xs leading-normal tracking-tight">
 													{spec.toUpperCase()}
 												</p>
 											</div>
@@ -882,7 +868,7 @@ export default function SellGear() {
 									className={`form-control ${errorField === "condition" ? "animate-shake" : ""}`}
 								>
 									<label
-										className={`label text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-4 flex justify-between transition-colors ${errorField === "condition" ? "text-red-500" : "text-slate-400"}`}
+										className={`label text-sm md:text-xs font-black uppercase tracking-[0.3em] mb-4 flex justify-between transition-colors ${errorField === "condition" ? "text-red-500" : "text-slate-400"}`}
 									>
 										<span>Component Condition</span>
 										{formData.condition && (
@@ -902,7 +888,7 @@ export default function SellGear() {
 														setFormData({ ...formData, condition: c });
 														clearFieldError("condition");
 													}}
-													className={`relative h-12 md:h-14 rounded-lg font-bold uppercase tracking-wider text-[11px] md:text-sm transition-all duration-300 border overflow-hidden
+													className={`relative h-12 md:h-14 rounded-lg font-bold uppercase tracking-wider text-xs md:text-sm transition-all duration-300 border overflow-hidden
 														${
 															isSelected
 																? "bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.2)]"
@@ -922,12 +908,12 @@ export default function SellGear() {
 								</div>
 
 								<div className="form-control">
-									<label className="label text-slate-400 text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-4">
+									<label className="label text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.3em] mb-4">
 										<span>Description</span>
 									</label>
 									<div className="relative group">
 										<textarea
-											className="w-full h-40 md:h-52 bg-black border border-white/10 text-slate-200 p-5 md:p-6 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/30 text-sm md:text-base font-medium leading-relaxed rounded-xl transition-all placeholder:text-slate-700 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+											className="w-full h-40 md:h-52 bg-black border border-white/10 text-slate-200 p-5 md:p-6 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/30 text-sm md:text-base font-medium leading-relaxed rounded-xl transition-all placeholder:text-slate-700 placeholder:uppercase placeholder:text-sm md:placeholder-text-base placeholder:tracking-widest"
 											placeholder="Input usage history, overclocking details, included accessories..."
 											value={formData.description}
 											onChange={(e) =>
@@ -968,7 +954,7 @@ export default function SellGear() {
 										className={`w-1.5 h-1.5 rounded-full animate-pulse ${errorField === "images" ? "bg-red-500" : "bg-fuchsia-500"}`}
 									/>
 									<p
-										className={`text-[10px] md:text-xs font-mono uppercase tracking-widest ${errorField === "images" ? "text-red-400" : "text-slate-400"}`}
+										className={`text-xs md:text-sm font-mono uppercase tracking-widest ${errorField === "images" ? "text-red-400" : "text-slate-400"}`}
 									>
 										{errorField === "images"
 											? "Primary asset file required below"
@@ -1016,7 +1002,7 @@ export default function SellGear() {
 													<Trash2 size={14} />
 												</button>
 												{index === 0 && (
-													<span className="absolute bottom-2 left-2 px-2 py-0.5 bg-fuchsia-600 text-white text-[8px] font-black uppercase tracking-tighter rounded">
+													<span className="absolute bottom-2 left-2 px-2 py-0.5 bg-fuchsia-600 text-white text-xs md:text-sm font-black uppercase tracking-tighter rounded">
 														Primary Image
 													</span>
 												)}
@@ -1037,13 +1023,13 @@ export default function SellGear() {
 												</div>
 												<div className="text-center">
 													<span
-														className={`block text-[10px] md:text-xs font-mono ${errorField === "images" && index === 0 ? "text-red-500/70 group-hover:text-red-400" : "text-slate-700 group-hover:text-slate-400"}`}
+														className={`block text-xs md:text-sm font-mono ${errorField === "images" && index === 0 ? "text-red-500/70 group-hover:text-red-400" : "text-slate-700 group-hover:text-slate-400"}`}
 													>
 														SLOT {index + 1}
 													</span>
 													{index === 0 && (
 														<span
-															className={`text-[8px] font-bold uppercase tracking-tighter ${errorField === "images" ? "text-red-500 animate-pulse" : "text-fuchsia-500/60"}`}
+															className={`text-xs md:text-sm font-bold uppercase tracking-tighter ${errorField === "images" ? "text-red-500 animate-pulse" : "text-fuchsia-500/60"}`}
 														>
 															Required
 														</span>
@@ -1072,7 +1058,7 @@ export default function SellGear() {
 									className={`shrink-0 mt-0.5 ${errorField === "images" ? "text-red-500" : "text-fuchsia-500"}`}
 									size={14}
 								/>
-								<p className="text-[10px] md:text-[11px] leading-relaxed text-slate-400 font-medium">
+								<p className="text-xs md:text-sm leading-relaxed text-slate-400 font-medium">
 									Ensure hardware is visible under{" "}
 									<span className="text-slate-200 uppercase tracking-tighter">
 										Clear_Light_Conditions
@@ -1110,7 +1096,7 @@ export default function SellGear() {
 									className={`form-control ${errorField === "condition" ? "animate-shake" : ""}`}
 								>
 									<label
-										className={`label text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-4 flex justify-between transition-colors ${errorField === "condition" ? "text-red-500" : "text-slate-400"}`}
+										className={`label text-xs md:text-sm font-black uppercase tracking-[0.3em] mb-4 flex justify-between transition-colors ${errorField === "condition" ? "text-red-500" : "text-slate-400"}`}
 									>
 										<span>Component Condition</span>
 										{formData.condition && (
@@ -1130,7 +1116,7 @@ export default function SellGear() {
 														setFormData({ ...formData, condition: c });
 														clearFieldError("condition");
 													}}
-													className={`relative h-12 md:h-14 rounded-lg font-bold uppercase tracking-wider text-[11px] md:text-sm transition-all duration-300 border overflow-hidden
+													className={`relative h-12 md:h-14 rounded-lg font-bold uppercase tracking-wider text-xs md:text-sm transition-all duration-300 border overflow-hidden
 														${
 															isSelected
 																? "bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.2)]"
@@ -1150,12 +1136,12 @@ export default function SellGear() {
 								</div>
 
 								<div className="form-control">
-									<label className="label text-slate-400 text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-4">
+									<label className="label text-slate-400 text-xs md:text-sm font-black uppercase tracking-[0.3em] mb-4">
 										<span>Description</span>
 									</label>
 									<div className="relative group">
 										<textarea
-											className="w-full h-40 md:h-52 bg-black border border-white/10 text-slate-200 p-5 md:p-6 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/30 text-sm md:text-base font-medium leading-relaxed rounded-xl transition-all placeholder:text-slate-700 placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+											className="w-full h-40 md:h-52 bg-black border border-white/10 text-slate-200 p-5 md:p-6 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/30 text-sm md:text-base font-medium leading-relaxed rounded-xl transition-all placeholder:text-slate-700 placeholder:uppercase placeholder:text-sm placeholder:tracking-widest"
 											placeholder="Input usage history, overclocking details, included accessories..."
 											value={formData.description}
 											onChange={(e) =>
@@ -1191,7 +1177,7 @@ export default function SellGear() {
 										className="text-emerald-500 shrink-0 mt-0.5"
 										size={16}
 									/>
-									<p className="text-slate-400 text-[11px] md:text-xs leading-relaxed">
+									<p className="text-slate-400 text-xs md:text-sm leading-relaxed">
 										Listing undergoes{" "}
 										<span className="text-emerald-400">
 											verification protocols
@@ -1199,9 +1185,6 @@ export default function SellGear() {
 										. Funds secured via TechTrade Escrow.
 									</p>
 								</div>
-								<p className="text-[10px] text-slate-500 font-mono text-center uppercase tracking-tighter">
-									Status: Encrypted_Session_Active
-								</p>
 							</div>
 						</div>
 					</div>
