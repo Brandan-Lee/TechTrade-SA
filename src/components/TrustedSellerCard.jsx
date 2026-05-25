@@ -1,6 +1,7 @@
 import React from "react";
 import { Star, CheckCircle, Shield, Zap, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { mediaUrl } from "../lib/api";
 
 export default function TrustedSellerCard({
 	name,
@@ -8,7 +9,6 @@ export default function TrustedSellerCard({
 	rating,
 	reviews,
 	sales,
-	specialty,
 	image,
 	isMaster,
 }) {
@@ -16,7 +16,7 @@ export default function TrustedSellerCard({
 
 	const handleViewShop = (e) => {
 		e.stopPropagation();
-		navigate(`/profile`);
+		navigate(`/profile/:userId?`);
 	};
 
 	return (
@@ -41,7 +41,7 @@ export default function TrustedSellerCard({
 							className={`absolute -inset-1 rounded-full blur-[2px] opacity-40 group-hover:opacity-100 transition-opacity ${isMaster ? "bg-fuchsia-500" : "bg-violet-500"}`}
 						></div>
 						<img
-							src={image}
+							src={mediaUrl(image)}
 							alt={name}
 							className={`relative w-16 h-16 rounded-full border-2 object-cover ${isMaster ? "border-fuchsia-500" : "border-violet-500"}`}
 						/>
@@ -65,7 +65,7 @@ export default function TrustedSellerCard({
 								<Shield size={10} className="text-violet-400" />
 							)}
 							<span
-								className={`text-[10px] font-black uppercase tracking-widest ${isMaster ? "text-fuchsia-400" : "text-violet-400"}`}
+								className={`text-xs md:text-sm font-black uppercase tracking-widest ${isMaster ? "text-fuchsia-400" : "text-violet-400"}`}
 							>
 								{tier}
 							</span>
@@ -78,24 +78,24 @@ export default function TrustedSellerCard({
 					<div className="bg-white/5 p-3 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
 						<div className="flex items-center gap-1.5 mb-1">
 							<Star className="w-3.5 h-3.5 text-fuchsia-400 fill-fuchsia-400" />
-							<span className="text-slate-100 text-sm font-black italic">
+							<span className="text-slate-100 text-xs md:text-sm font-black italic">
 								{rating}
 							</span>
 						</div>
-						<p className="text-slate-500 text-[10px] font-bold uppercase tracking-tighter">
-							{reviews} Logs
+						<p className="text-slate-500 text-xs md:text-sm font-bold uppercase tracking-tighter">
+							{reviews} Reviews
 						</p>
 					</div>
 
 					<div className="bg-white/5 p-3 rounded-xl border border-white/5 group-hover:border-white/10 transition-colors">
 						<div className="flex items-center gap-1.5 mb-1">
 							<TrendingUp className="w-3.5 h-3.5 text-violet-400" />
-							<span className="text-slate-100 text-sm font-black italic">
+							<span className="text-slate-100 text-xs md:text-sm font-black italic">
 								{sales}
 							</span>
 						</div>
-						<p className="text-slate-500 text-[10px] font-bold uppercase tracking-tighter">
-							Transfers
+						<p className="text-slate-500 text-xs md:text-sm font-bold uppercase tracking-tighter">
+							Successful Trades
 						</p>
 					</div>
 				</div>
@@ -104,7 +104,7 @@ export default function TrustedSellerCard({
 				<button
 					onClick={handleViewShop}
 					className={`
-                        mt-2 w-full py-3 rounded-xl font-black text-xs tracking-[0.2em] uppercase transition-all duration-300
+                        mt-2 w-full py-3 rounded-xl font-black text-xs md:text-sm tracking-[0.2em] uppercase transition-all duration-300
                         border-2 flex items-center justify-center gap-2
                         ${
 													isMaster

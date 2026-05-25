@@ -10,8 +10,17 @@ define('REQUIRE_SYMBOL', true);
 define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'webp']);
 define('MAX_IMAGE_SIZE', 2 * 1024 * 1024);
 
-// Valid South African Provinces
-define('SOUTH_AFRICAN_PROVINCES', ['GP', 'EC', 'FS', 'KZN', 'LIM', 'MPU', 'NW', 'NC', 'WC']);
+define('SOUTH_AFRICAN_PROVINCES', [
+    'Gauteng',
+    'Eastern Cape',
+    'Free State',
+    'KwaZulu-Natal',
+    'Limpopo',
+    'Mpumalanga',
+    'North West',
+    'Northern Cape',
+    'Western Cape'
+]);
 
 // Penalty and Data Retention Rules ---
 define('SUSPENSION_STRIKE_THRESHOLD', 3);
@@ -71,5 +80,42 @@ if (empty($rawBase64Key)) {
 }
 
 define('ENCRYPTION_KEY', base64_decode($rawBase64Key));
+
+define('API_ROOT', dirname(__DIR__));
+define('UPLOADS_DIR', API_ROOT . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR);
+
+function uploadsDiskPath(string $subfolder): string
+{
+    $dir = UPLOADS_DIR . trim($subfolder, '/\\') . DIRECTORY_SEPARATOR;
+
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+
+    return $dir;
+}
+
+function publicMediaUrl(?string $storedPath): ?string
+{
+    if ($storedPath === null || trim($storedPath) === '') {
+        return null;
+    }
+
+    $storedPath = trim($storedPath);
+
+    if (preg_match('#^https?://#i', $storedPath)) {
+        return $storedPath;
+    }
+
+    $path = ltrim(str_replace('\\', '/', $storedPath), '/');
+
+    if (str_starts_with($path, 'techtrade_api/')) {
+        $path = substr($path, strlen('techtrade_api/'));
+    }
+
+    $base = rtrim(getEnvVariable('PUBLIC_API_BASE', 'http://localhost/techtrade_api'), '/');
+
+    return $base . '/' . $path;
+}
 
 ?>

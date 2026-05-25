@@ -444,31 +444,31 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 								>
 									Select Province
 								</option>
-								<option value="GP" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Gauteng" className="bg-[#0c0c0e] text-slate-300">
 									Gauteng [GP]
 								</option>
-								<option value="EC" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Eastern Cape" className="bg-[#0c0c0e] text-slate-300">
 									Eastern Cape [EC]
 								</option>
-								<option value="FS" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Free State" className="bg-[#0c0c0e] text-slate-300">
 									Free State [FS]
 								</option>
-								<option value="KZN" className="bg-[#0c0c0e] text-slate-300">
+								<option value="KwaZulu-Natal" className="bg-[#0c0c0e] text-slate-300">
 									KwaZulu-Natal [KZN]
 								</option>
-								<option value="LIM" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Limpopo" className="bg-[#0c0c0e] text-slate-300">
 									Limpopo [LIM]
 								</option>
-								<option value="MPU" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Mpumalanga" className="bg-[#0c0c0e] text-slate-300">
 									Mpumalanga [MPU]
 								</option>
-								<option value="NW" className="bg-[#0c0c0e] text-slate-300">
+								<option value="North West" className="bg-[#0c0c0e] text-slate-300">
 									North West [NW]
 								</option>
-								<option value="NC" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Northern Cape" className="bg-[#0c0c0e] text-slate-300">
 									Northern Cape [NC]
 								</option>
-								<option value="WC" className="bg-[#0c0c0e] text-slate-300">
+								<option value="Western Cape" className="bg-[#0c0c0e] text-slate-300">
 									Western Cape [WC]
 								</option>
 							</select>

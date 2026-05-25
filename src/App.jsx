@@ -163,7 +163,7 @@ function App() {
 					<Route path="marketplace" element={<Market />} />
 					<Route path="sell" element={<SellGear />} />
 					<Route path="build-doctor" element={<BuildDoctor />} />
-					<Route path="profile" element={<Profile />} />
+					<Route path="profile/:userId?" element={<Profile />} />
 					<Route path="offers" element={<MyOffers />} />
 					<Route path="transactions" element={<MyTransactions />} />
 					<Route path="view-listing" element={<ViewListing />} />

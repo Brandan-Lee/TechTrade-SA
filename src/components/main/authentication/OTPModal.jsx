@@ -89,7 +89,6 @@ export const OTPModal = ({
 		}
 
 		setIsLoading(true);
-
 		const isResetFlow = purpose === "reset";
 
 		try {
@@ -158,6 +157,8 @@ export const OTPModal = ({
 		}
 	};
 
+	const isResendDisabled = timer > 0 || isLoading;
+
 	return (
 		<AuthModalWrapper
 			isOpen={isOpen}
@@ -201,7 +202,7 @@ export const OTPModal = ({
 								onChange={(e) => handleChange(index, e.target.value)}
 								onKeyDown={(e) => handleKeyDown(index, e)}
 								disabled={isLoading}
-								className="w-16 h-16 text-center text-2xl font-black rounded-lg bg-[#121214] border border-white/10 text-white focus:border-fuchsia-500 focus:outline-none"
+								className="w-16 h-16 text-center text-2xl font-black rounded-lg bg-[#121214] border border-white/10 text-white focus:border-fuchsia-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
 							/>
 						))}
 					</fieldset>
@@ -215,9 +216,13 @@ export const OTPModal = ({
 						</span>
 						<button
 							type="button"
-							disabled={timer > 0 || isLoading}
+							disabled={isResendDisabled}
 							onClick={handleResend}
-							className="text-fuchsia-400 font-black uppercase tracking-widest hover:text-fuchsia-300"
+							className={`font-black uppercase tracking-widest transition-all ${
+								isResendDisabled
+									? "text-slate-600 cursor-not-allowed opacity-40 pointer-events-none"
+									: "text-fuchsia-400 hover:text-fuchsia-300 cursor-pointer"
+							}`}
 						>
 							RESEND
 						</button>

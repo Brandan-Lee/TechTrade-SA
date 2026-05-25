@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { X, Terminal, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../AuthContext";
 
 export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 	const location = useLocation();
+	const { user } = useAuth();
 
-	// Prevent background scrolling when navigation layer dashboard overlay is active
 	useEffect(() => {
 		if (isOpen) {
 			document.body.style.overflow = "hidden";
@@ -17,14 +18,17 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 		};
 	}, [isOpen]);
 
+	const showSellGear = user && user.roleId !== null && String(user.roleId) !== "0" && String(user.roleId) !== "1";
+
 	const menuItems = [
 		{ name: "HOME", label: "Home", path: "/" },
 		{ name: "ABOUT", label: "About Us", path: "/about" },
 		{ name: "MARKET", label: "Main Marketplace", path: "/marketplace" },
-		{ name: "Sell Your Gear", label: "Sell Your Gear", path: "/sell" },
+		...(showSellGear
+			? [{ name: "Sell Your Gear", label: "Sell Your Gear", path: "/sell" }]
+			: []),
 		{ name: "Build Doctor", label: "Build Doctor", path: "/build-doctor" },
 		{ name: "divider", path: null },
-		{ name: "My Transactions", label: "My Transactions", path: "/transactions" },
 		{ name: "Contact Us", label: "Contact Us", path: "/contact" },
 		{
 			name: "Login/Register",
@@ -36,7 +40,6 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 
 	return (
 		<>
-			{/* Blurry Interface Terminal Backdrop Veil Dimmer */}
 			<div
 				className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 
                 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
@@ -44,7 +47,6 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 				aria-hidden="true"
 			/>
 
-			{/* STRUCTURAL INTERFACE NAVIGATION DIALOG DRAW PANEL */}
 			<aside
 				aria-modal="true"
 				role="dialog"
@@ -53,7 +55,6 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 					isOpen ? "translate-x-0" : "-translate-x-full"
 				}`}
 			>
-				{/* Decorative Internal Technical Detail Accent */}
 				<div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-fuchsia-500/0 via-fuchsia-500/20 to-fuchsia-500/0" />
 
 				<div className="flex flex-col h-full p-5 sm:p-6 gap-8">
@@ -62,7 +63,7 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 						<div className="flex items-center gap-2">
 							<Terminal size={14} className="text-fuchsia-500 animate-pulse" />
 							<h2 className="text-white text-xs font-black uppercase tracking-[0.25em]">
-								NAVIGATION
+								SITE NAVIGATION
 							</h2>
 						</div>
 						<button
@@ -74,7 +75,6 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 						</button>
 					</div>
 
-					{/* INTERFACE ACCESS SYSTEM LINK TREE */}
 					<nav className="flex flex-col gap-1.5 w-full items-start">
 						{menuItems.map((item, index) => {
 							if (item.name === "divider") {
@@ -90,7 +90,6 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 							const isActive = location.pathname === item.path;
 							const Element = item.isModal ? "button" : Link;
 
-							// Interactive parameters config binding
 							const elementProps = item.isModal
 								? {
 										onClick: () => {
@@ -116,12 +115,10 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
                                         focus-visible:ring-1 focus-visible:ring-fuchsia-500 focus-visible:bg-fuchsia-500/5
                                     `}
 								>
-									{/* Action Route Pointer Tag Decor */}
 									{isActive && (
 										<div className="absolute left-0 top-2 bottom-2 w-[3px] bg-fuchsia-500 rounded-r" />
 									)}
 
-									{/* Visual Clean Name String Block */}
 									<div className="flex items-center justify-between w-full">
 										<span className="text-xs sm:text-sm font-bold tracking-wide transition-transform group-hover:translate-x-0.5">
 											{item.label}

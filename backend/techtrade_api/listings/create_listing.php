@@ -116,13 +116,7 @@ try {
         $files = $_FILES['images'];
         $fileCount = count($files['name']);
 
-        $uploadDir = __DIR__ . "../uploads/listings/";
-
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0755, true)) {
-                throw new Exception("Server Error: Asset upload repository target directory creation failed.");
-            }
-        }
+        $uploadDir = uploadsDiskPath('listings');
 
         $sqlImages = "INSERT INTO listing_images (listing_id, url, sort_order, is_primary) VALUES (?, ?, ?, ?)";
         $stmtImg = $db->prepare($sqlImages);
@@ -143,7 +137,7 @@ try {
                 if (move_uploaded_file($files['tmp_name'][$i], $destinationPath)) {
                     $isPrimary = intval($_POST["image_meta_{$i}_is_primary"] ?? ($i === 0 ? 1 : 0));
                     $sortOrder = intval($_POST["image_meta_{$i}_sort_order"] ?? $i);
-                    $publicUrl = "/uploads/listings/" . $uniqueFilename;
+                    $publicUrl = 'uploads/listings/' . $uniqueFilename;
 
                     $stmtImg->execute([$newListingId, $publicUrl, $sortOrder, $isPrimary]);
                 } else {

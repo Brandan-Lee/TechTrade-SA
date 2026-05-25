@@ -56,10 +56,7 @@ try {
             exit();
         }
 
-        SessionManager::init($db);
-
-        $_SESSION['user_id'] = $userModel->getId();
-        $_SESSION['user_role'] = $userModel->getRoleId();
+        SessionManager::login($db, (int) $userModel->getId(), (int) $userModel->getRoleId());
 
         $userModel->updateLastLogin();
 
@@ -83,7 +80,7 @@ try {
                 'path' => '/',
                 'secure' => false,
                 'httponly' => true,
-                'samesite' => 'None',
+                'samesite' => 'Lax',
             ]);
         }
 

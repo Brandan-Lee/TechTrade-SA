@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { apiFetch } from "../lib/api";
+import { apiFetch, setSessionExpiredHandler } from "../lib/api";
 
 const AuthContext = createContext(null);
 const USER_STORAGE_KEY = "techtrade_user";
@@ -53,6 +53,15 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		checkAuthStatus();
 	}, [checkAuthStatus]);
+
+	useEffect(() => {
+		setSessionExpiredHandler(() => {
+			setUser(null);
+			writeStoredUser(null);
+			localStorage.removeItem("user_role");
+		});
+		return () => setSessionExpiredHandler(null);
+	}, []);
 
 	const loginContext = (userData) => {
 		setUser(userData);

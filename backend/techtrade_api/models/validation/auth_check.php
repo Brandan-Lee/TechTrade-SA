@@ -41,7 +41,7 @@ try {
                         "fullName" => $user->getFullName(),
                         "regType" => $user->getRegType(),
                         "roleId" => $roleId,
-                        "location_province" => $user->getProvince() 
+                        "province" => $user->getProvince() 
                     ]
                 ]);
                 exit;

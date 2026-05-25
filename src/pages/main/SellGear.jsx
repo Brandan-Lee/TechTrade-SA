@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CyberAlert from "../../components/ui/CyberAlert";
 import { apiFetch } from "../../lib/api";
+import { useAuth } from "../../components/AuthContext";
 import CyberActionButton from "../../components/ui/CyberActionButton";
 import {
 	ShieldCheck,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 
 export default function SellGear() {
+	const { user, refreshAuth } = useAuth();
 	const [formData, setFormData] = useState({
 		category: "",
 		name: "",
@@ -131,6 +133,7 @@ export default function SellGear() {
 	};
 
 	const selectComponent = (component) => {
+		const dbSpecs = component.specs || {};
 		setFormData({
 			...formData,
 			name: component.full_name,
@@ -481,6 +484,14 @@ export default function SellGear() {
 			return;
 		}
 
+		if (!user) {
+			triggerStatus(
+				"Your session has expired. Please log in again before listing gear.",
+				"error",
+			);
+			return;
+		}
+
 		setIsLoading(true);
 		setAlert({ show: false, message: "", type: "error" });
 
@@ -547,6 +558,11 @@ export default function SellGear() {
 					"Compatibility matrix generated for tri-vector builds",
 					"Market velocity analysis applied for pricing intelligence",
 				]);
+			} else if (response.status === 401) {
+				await refreshAuth();
+				throw new Error(
+					"Your session has expired. Please log in again, then retry your listing.",
+				);
 			} else {
 				throw new Error(
 					data.error || "Remote database rejected transmission parameters.",

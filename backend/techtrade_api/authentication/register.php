@@ -52,7 +52,7 @@ if ($hardwareChecker->isBanned($inputData['hardwareId'])) {
 $avatarUrl = null;
 if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] === UPLOAD_ERR_OK) {
     try {
-        $uploader = new AvatarUploader('../uploads/avatars/');
+        $uploader = new AvatarUploader();
         $avatarUrl = $uploader->upload($_FILES['profilePhoto']);
     } catch (Exception $e) {
         http_response_code(400);

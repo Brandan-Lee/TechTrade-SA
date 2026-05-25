@@ -29,13 +29,15 @@ export default function NavBar({
         alert("You have been successfully logged out.");
     }
 
+	const showSellGearViewOffers = user && user.roleId !== null && String(user.roleId) !== "0" && String(user.roleId) !== "1";
+
 	const menuItems = [
 		{
 			label: "Manage Profile",
 			icon: <UserCircle size={18} />,
 			path: "/profile",
 		},
-		...(user?.roleId !== "1"
+		...(showSellGearViewOffers
 			? [{ label: "View Offers", icon: <File size={18} />, path: "/offers" }]
 			: []),
 		{
@@ -54,7 +56,9 @@ export default function NavBar({
 
 	const navLinks = [
 		{ name: "Marketplace", path: "/marketplace" },
-		{ name: "Sell Gear", path: "/sell" },
+		...(showSellGearViewOffers 
+			? [{ name: "Sell Gear", path: "/sell" }] 
+			: []),
 		{ name: "Build Doctor", path: "/build-doctor" },
 		{ name: "About", path: "/about" },
 		{ name: "Support", path: "/contact-us" },

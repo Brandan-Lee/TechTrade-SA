@@ -3,6 +3,7 @@ import { MapPin, User, Zap, Award, Package, Clock } from "lucide-react";
 import CyberActionButton from "./ui/CyberActionButton";
 import { useNavigate } from "react-router-dom";
 import AlternateButton from "./ui/AlternateButton";
+import { mediaUrl } from "../lib/api";
 
 export default function ListingCard({
 	title,
@@ -47,7 +48,7 @@ export default function ListingCard({
 			{/* Image Header Area */}
 			<div className="relative h-56 w-full overflow-hidden bg-black">
 				<img
-					src={image}
+					src={mediaUrl(image)}
 					alt={title}
 					className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
 				/>
@@ -55,16 +56,16 @@ export default function ListingCard({
 				{/* Featured Ribbon - Top Left */}
 				{isFeatured && (
 					<div className="absolute top-0 left-0 z-20">
-						<div className="bg-fuchsia-600 text-white text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 flex items-center gap-1 shadow-lg shadow-fuchsia-500/20 rounded-br-xl border-r border-b border-fuchsia-400">
+						<div className="bg-fuchsia-600 text-white text-xs md:text-sm font-black uppercase tracking-[0.2em] px-3 py-1 flex items-center gap-1 shadow-lg shadow-fuchsia-500/20 rounded-br-xl border-r border-b border-fuchsia-400">
 							<Zap size={10} className="fill-current" />
-							Elite Listing
+							Featured Listing
 						</div>
 					</div>
 				)}
 
 				{/* Condition Badge - Top Right */}
 				<div className="absolute top-3 right-3 z-20">
-					<div className="bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded text-slate-300 text-[10px] font-bold uppercase tracking-widest">
+					<div className="bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded text-slate-300 text-xs md:text-sm font-bold uppercase tracking-widest">
 						{condition}
 					</div>
 				</div>
@@ -76,7 +77,7 @@ export default function ListingCard({
 				<div className="absolute bottom-3 left-3 flex items-center gap-2">
 					<div
 						className={`
-                        px-3 py-1 rounded-md border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 backdrop-blur-sm
+                        px-3 py-1 rounded-md border text-xs md:text-sm font-black uppercase tracking-widest flex items-center gap-2 backdrop-blur-sm
                         ${statusStyles[status] || statusStyles["Available Now"]}
                     `}
 					>
@@ -105,13 +106,13 @@ export default function ListingCard({
 						<div className="w-6 h-6 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center">
 							<User size={12} className="text-violet-400" />
 						</div>
-						<span className="text-[11px] font-bold text-slate-400 group-hover/seller:text-white transition-colors">
+						<span className="text-xs md:text-sm font-bold text-slate-400 group-hover/seller:text-white transition-colors">
 							{seller}
 						</span>
 					</div>
 					<div className="flex items-center gap-2 text-slate-500">
 						<MapPin size={12} className="text-fuchsia-500" />
-						<span className="text-[11px] font-bold uppercase tracking-tighter">
+						<span className="text-xs md:text-sm font-bold uppercase tracking-tighter">
 							{location}
 						</span>
 					</div>
@@ -123,11 +124,11 @@ export default function ListingCard({
 						<span className="text-white text-3xl font-black italic tracking-tighter">
 							{price}
 						</span>
-						<span className="text-fuchsia-500/50 text-[10px] font-black uppercase tracking-widest">
+						<span className="text-fuchsia-500/50 text-xs md:text-sm font-black uppercase tracking-widest">
 							ZAR / SECURE
 						</span>
 					</div>
-					<p className="text-slate-600 text-[10px] font-bold uppercase tracking-widest mt-1">
+					<p className="text-slate-600 text-xs md:text-sm font-bold uppercase tracking-widest mt-1">
 						Or Best Offer
 					</p>
 				</div>

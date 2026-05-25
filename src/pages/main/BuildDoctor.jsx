@@ -8,6 +8,7 @@ import {
 	ShieldCheck,
 	Trash2,
 	Loader2,
+	Layers,
 } from "lucide-react";
 import { useAuth } from "../../components/AuthContext";
 import CyberActionButton from "../../components/ui/CyberActionButton";
@@ -71,7 +72,7 @@ function RenderModule({
 									error
 										? "border-red-500/30 focus:ring-red-500"
 										: "border-white/10 focus:ring-fuchsia-500"
-								} rounded-xl text-xs outline-none focus:ring-1`}
+								} rounded-xl text-xs md:text-sm outline-none focus:ring-1`}
 								placeholder={`Search ${title}...`}
 							/>
 							<button
@@ -98,7 +99,7 @@ function RenderModule({
 												type="button"
 												onMouseDown={(e) => e.preventDefault()}
 												onClick={() => onSelectComponent(item)}
-												className="w-full p-3 text-left hover:bg-fuchsia-600/20 text-xs text-slate-300 hover:text-white rounded-lg border-b border-white/5 last:border-0"
+												className="w-full p-3 text-left hover:bg-fuchsia-600/20 text-xs text md:text-sm -slate-300 hover:text-white rounded-lg border-b border-white/5 last:border-0"
 											>
 												{item.full_name}
 											</button>
@@ -112,7 +113,7 @@ function RenderModule({
 				<div className="w-full bg-black/50 border border-fuchsia-500/10 rounded-xl p-4 min-h-[120px]">
 					<div className="flex items-center gap-2 mb-3">
 						<ShieldCheck size={14} className="text-fuchsia-500" />
-						<span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+						<span className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-400">
 							Verified Specs
 						</span>
 					</div>
@@ -120,7 +121,7 @@ function RenderModule({
 						{specLines.map((line, i) => (
 							<div
 								key={i}
-								className="text-[10px] text-fuchsia-400/90 font-mono py-1 border-b border-white/[0.03] last:border-0"
+								className="text-xs md:text-sm text-fuchsia-400/90 font-mono py-1 border-b border-white/[0.03] last:border-0"
 							>
 								{line}
 							</div>
@@ -415,6 +416,14 @@ export default function BuildDoctor() {
 		setAlert({ show: false, message: "", type: "error" });
 		setErrorField("");
 
+		if (!user) {
+			triggerStatus(
+				"Please log in or create an account to save custom configurations.",
+				"error",
+			);
+			return;
+		}
+
 		if (!formData.cpu.id && !formData.gpu.id && !formData.psu.id) {
 			triggerStatus(
 				"Build must contain at least one component",
@@ -538,18 +547,7 @@ export default function BuildDoctor() {
 		return (
 			<div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center gap-3 text-slate-400 font-mono text-xs uppercase tracking-widest">
 				<Loader2 className="animate-spin text-fuchsia-500" size={24} />
-				Syncing Terminal Core...
-			</div>
-		);
-	}
-
-	if (!user) {
-		return (
-			<div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6">
-				<CyberAlert
-					type="error"
-					message="Access Denied. Please authenticate to initialize the Build Doctor terminal interface."
-				/>
+				Retrieving user build
 			</div>
 		);
 	}
@@ -561,14 +559,30 @@ export default function BuildDoctor() {
 			animate={{ opacity: 1 }}
 			className="min-h-screen bg-[#050505] text-slate-300 p-6 scroll-mt-6"
 		>
-			<header className="max-w-3xl mx-auto py-12">
-				<h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
-					Build{" "}
-					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-						Doctor
-					</span>
-				</h1>
+			<header className="max-w-3xl mx-auto py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+				<div>
+					<h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
+						Build{" "}
+						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+							Doctor
+						</span>
+					</h1>
+				</div>
+
+				{/* Users Current Build Name Banner Display */}
+				<div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/5 rounded-xl self-start sm:self-center">
+					<Layers size={14} className="text-fuchsia-400" />
+					<div className="flex flex-col">
+						<span className="text xs md:text-sm text-slate-500 uppercase tracking-widest font-bold">
+							Current Profile
+						</span>
+						<span className="text-xs md:text-sm text-slate-200 font-mono font-bold truncate max-w-[180px]">
+							{buildName ? buildName : "Unsaved Configuration"}
+						</span>
+					</div>
+				</div>
 			</header>
+
 			<main className="max-w-3xl mx-auto space-y-5">
 				{alert.show && (
 					<div className="mb-6">

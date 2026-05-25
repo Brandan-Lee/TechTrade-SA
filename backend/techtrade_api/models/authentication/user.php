@@ -6,7 +6,6 @@ class User
 {
     private PDO $db;
     private ?EncryptionEngine $crypto = null;
-
     private int $id;
     private int $roleId;
     private string $email;
@@ -40,6 +39,23 @@ class User
         }
     }
 
+    private function isEncrypted(?string $value): bool
+    {
+        if (empty($value))
+            return false;
+        return (bool) preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value);
+    }
+
+    private function safeDecrypt(?string $payload): string
+    {
+        if (empty($payload))
+            return '';
+        if ($this->crypto && $this->isEncrypted($payload)) {
+            return $this->crypto->decrypt($payload) ?? $payload;
+        }
+        return $payload;
+    }
+
     public static function findById(PDO $db, int $id): ?User
     {
         $stmt = $db->prepare("SELECT * FROM users WHERE id = ? AND is_deleted = 0 LIMIT 1");
@@ -64,8 +80,6 @@ class User
         return $user;
     }
 
-    // --- Security Methods ---
-
     public function verifyPassword(string $password): bool
     {
         return password_verify($password, $this->passwordHash);
@@ -81,7 +95,7 @@ class User
         $this->lastName = $row['last_name'];
         $this->encryptedMobile = $row['mobile'] ?? '';
         $this->hardwareId = $row['hardware_id'] ?? null;
-        $this->province = $row['province'];
+        $this->province = $row['province']; // Stores "Gauteng", "Western Cape", etc.
         $this->avatarUrl = $row['avatar_url'];
         $this->regType = $row['reg_type'];
         $this->trustScore = (float) $row['trust_score'];
@@ -111,21 +125,26 @@ class User
     {
         return $this->email;
     }
+
     public function getFullName(): string
     {
-        if ($this->crypto) {
-            $decryptedFirst = $this->crypto->decrypt($this->firstName) ?? 'Decryption Error';
-            $decryptedLast = $this->crypto->decrypt($this->lastName) ?? 'Decryption Error';
-            return $decryptedFirst . ' ' . $decryptedLast;
-        }
-        
-        return $this->firstName . ' ' . $this->lastName;
+        $first = $this->safeDecrypt($this->firstName);
+        $last = $this->safeDecrypt($this->lastName);
+        return trim($first . ' ' . $last);
     }
-    
+
+    // NATIVE RETURN: Pulls full string data straight out of structural storage
     public function getProvince(): string
     {
         return $this->province;
     }
+
+    // NATIVE RETURN: Kept for legacy backwards compatibility alignment, returns full string
+    public function getRawProvinceCode(): string
+    {
+        return $this->province;
+    }
+
     public function getAvatarUrl(): ?string
     {
         return $this->avatarUrl;
@@ -169,10 +188,7 @@ class User
 
     public function getMobile(): string
     {
-        if (!empty($this->encryptedMobile) && $this->crypto) {
-            return $this->crypto->decrypt($this->encryptedMobile) ?? 'Decryption Error';
-        }
-        return '';
+        return $this->safeDecrypt($this->encryptedMobile);
     }
 
     public function addStrike(int $count = 1, string $reason = ''): bool
@@ -181,17 +197,17 @@ class User
         $params = [$this->strikeCount];
         $sql = "UPDATE users SET strike_count = ?";
 
-        if ($this->hasBeenSuspended && $this->strikeCount >= BAN_STRIKE_THRESHOLD) {
+        if ($this->hasBeenSuspended && $this->strikeCount >= 3) {
             $this->isBanned = true;
             $this->banReason = empty($reason) ? 'Permanent Hardware Ban' : $reason;
             $sql .= ", is_banned = 1, banned_at = NOW(), ban_reason = ?";
             $params[] = $this->banReason;
-        } else if ($this->strikeCount == SUSPENSION_STRIKE_THRESHOLD) {
+        } else if ($this->strikeCount == 2) {
             $this->isSuspended = true;
             $this->hasBeenSuspended = true;
             $this->suspendedReason = empty($reason) ? 'Automatic system suspension' : $reason;
             $sql .= ", is_suspended = 1, has_been_suspended = 1, suspended_at = NOW(), suspended_until = DATE_ADD(NOW(), INTERVAL ? DAY), suspended_reason = ?";
-            $params[] = SUSPENSION_DURATION_DAYS;
+            $params[] = 7;
             $params[] = $this->suspendedReason;
         }
 
@@ -204,7 +220,7 @@ class User
 
     public function suspend(string $reason, ?int $customDays = null): bool
     {
-        $days = $customDays ?? SUSPENSION_DURATION_DAYS;
+        $days = $customDays ?? 7;
         $sql = "UPDATE users SET is_suspended = 1, has_been_suspended = 1, suspended_at = NOW(), suspended_until = DATE_ADD(NOW(), INTERVAL ? DAY), suspended_reason = ? WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$days, $reason, $this->id]);
@@ -224,3 +240,4 @@ class User
         return $stmt->execute([$this->id]);
     }
 }
+?>

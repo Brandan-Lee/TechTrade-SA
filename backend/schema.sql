@@ -435,8 +435,7 @@ CREATE TABLE
 --     UI: WhatsAppTTLPage (user policy), MyTransactions “Open TTL Bridge”,
 --         TOSModal 24h bridge, notifications.type = 'bridge'
 -- -----------------------------------------------------------------------------
-CREATE TABLE
-  whatsapp_bridges (
+CREATE TABLE whatsapp_bridges (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     transaction_id BIGINT UNSIGNED NOT NULL,
     buyer_id BIGINT UNSIGNED NOT NULL,
@@ -465,14 +464,14 @@ CREATE TABLE
     CONSTRAINT fk_whatsapp_bridges_buyer FOREIGN KEY (buyer_id) REFERENCES users (id),
     CONSTRAINT fk_whatsapp_bridges_seller FOREIGN KEY (seller_id) REFERENCES users (id),
     CONSTRAINT fk_whatsapp_bridges_revoked_by FOREIGN KEY (revoked_by_id) REFERENCES users (id),
+    
+    -- FIXED CHECK CONSTRAINT LOGIC
     CONSTRAINT chk_whatsapp_bridges_custom_days CHECK (
-      ttl_preset <> 'custom'
-      OR (
-        ttl_custom_days IS NOT NULL
-        AND ttl_custom_days BETWEEN 1 AND 365
-      )
+        (ttl_preset != 'custom') 
+        OR 
+        (ttl_preset = 'custom' AND ttl_custom_days IS NOT NULL AND ttl_custom_days BETWEEN 1 AND 365)
     )
-  ) ENGINE = InnoDB;
+) ENGINE = InnoDB;
 
 CREATE TABLE
   transaction_events (
@@ -571,24 +570,28 @@ CREATE TABLE
 -- -----------------------------------------------------------------------------
 -- 8. REVIEWS
 -- -----------------------------------------------------------------------------
-CREATE TABLE
-  reviews (
+CREATE TABLE reviews (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     transaction_id BIGINT UNSIGNED NOT NULL,
     reviewer_id BIGINT UNSIGNED NOT NULL,
     reviewee_id BIGINT UNSIGNED NOT NULL,
-    rating TINYINT UNSIGNED NOT NULL, -- 1–5
+    
+    -- PLACED DIRECTLY AS A COLUMN-LEVEL INLINE CONSTRAINT
+    rating TINYINT UNSIGNED NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    
     comment TEXT NOT NULL,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at DATETIME NULL DEFAULT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_reviews_transaction_reviewer (transaction_id, reviewer_id),
     KEY idx_reviews_reviewee (reviewee_id),
-    CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5),
+    KEY idx_reviews_is_deleted (is_deleted),
     CONSTRAINT fk_reviews_transaction FOREIGN KEY (transaction_id) REFERENCES transactions (id),
     CONSTRAINT fk_reviews_reviewer FOREIGN KEY (reviewer_id) REFERENCES users (id),
     CONSTRAINT fk_reviews_reviewee FOREIGN KEY (reviewee_id) REFERENCES users (id)
-  ) ENGINE = InnoDB;
+) ENGINE = InnoDB;
 
 -- -----------------------------------------------------------------------------
 -- 9. REPORTS (users & listings) — admin queues

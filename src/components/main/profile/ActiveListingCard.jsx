@@ -2,6 +2,8 @@ import React from "react";
 import { Eye, Terminal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { mediaUrl } from "../../../lib/api";
+
 const ActiveListingCard = ({ title, price, condition, time, views, image }) => {
 	const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ const ActiveListingCard = ({ title, price, condition, time, views, image }) => {
 			{/* Component Image Uplink Shell */}
 			<div className="relative w-20 h-20 md:w-24 md:h-24 shrink-0 bg-black rounded-lg border border-white/5 overflow-hidden group">
 				<img
-					src={image || "https://placehold.co/200"} // Fallback handler included
+					src={image ? mediaUrl(image) : "https://placehold.co/200"}
 					alt={`Hardware image for ${title}`}
 					className="w-full h-full object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-500"
 				/>
