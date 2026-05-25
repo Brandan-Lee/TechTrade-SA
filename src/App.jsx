@@ -166,7 +166,7 @@ function App() {
 					<Route path="profile/:userId?" element={<Profile />} />
 					<Route path="offers" element={<MyOffers />} />
 					<Route path="transactions" element={<MyTransactions />} />
-					<Route path="view-listing" element={<ViewListing />} />
+					<Route path="view-listing/:id" element={<ViewListing />} />
 					<Route
 						path="manage-offer"
 						element={

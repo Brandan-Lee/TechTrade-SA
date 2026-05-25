@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import CyberAlert from "../../components/ui/CyberAlert";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, mediaUrl } from "../../lib/api";
 import { useAuth } from "../../components/AuthContext";
 import CyberActionButton from "../../components/ui/CyberActionButton";
 import {
@@ -17,8 +18,26 @@ import {
 	ShieldAlert,
 } from "lucide-react";
 
+const normalizeCondition = (grade) => {
+	if (!grade) return "";
+	const map = {
+		NEW: "New",
+		"LIKE NEW": "Like New",
+		GOOD: "Good",
+		FAIR: "Fair",
+	};
+	const upper = grade.toUpperCase();
+	return map[upper] || grade;
+};
+
 export default function SellGear() {
 	const { user, refreshAuth } = useAuth();
+	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
+	const listingId = searchParams.get("listingId");
+	const isEditMode = Boolean(listingId);
+
+	const [loadingListing, setLoadingListing] = useState(isEditMode);
 	const [formData, setFormData] = useState({
 		category: "",
 		name: "",
@@ -84,6 +103,81 @@ export default function SellGear() {
 			setErrorField("");
 		}
 	};
+
+	useEffect(() => {
+		if (!listingId) return;
+
+		const loadListingForEdit = async () => {
+			setLoadingListing(true);
+			setAlert({ show: false, message: "", type: "error" });
+
+			try {
+				const response = await apiFetch(
+					`/listings/get_listing.php?id=${encodeURIComponent(listingId)}`,
+				);
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Could not load listing for editing.");
+				}
+
+				const listing = data.listing;
+				if (user && String(user.id) !== String(listing.seller_id)) {
+					throw new Error("You can only edit your own listings.");
+				}
+
+				const categoryLabel =
+					listing.category_name || listing.category_slug || "";
+
+				setFormData({
+					category: categoryLabel,
+					name: listing.title || "",
+					hardware_id: listing.hardware_id
+						? String(listing.hardware_id)
+						: "",
+					condition: normalizeCondition(listing.condition_grade),
+					description: listing.description || "",
+					price: listing.price_cents
+						? String(listing.price_cents / 100)
+						: "",
+					images: [],
+				});
+
+				if (listing.specs?.length > 0) {
+					setSpecs(
+						listing.specs.map((s) =>
+							s.label && s.value
+								? `${s.label}: ${s.value}`
+								: s.value || s.label,
+						),
+					);
+				}
+
+				const paths = listing.image_paths || [];
+				const previews = listing.images || [];
+				const newSlots = [null, null, null, null, null, null];
+				paths.forEach((path, index) => {
+					if (index < newSlots.length) {
+						newSlots[index] = {
+							file: null,
+							preview: previews[index] || mediaUrl(path),
+							existingUrl: path,
+						};
+					}
+				});
+				setSlots(newSlots);
+			} catch (err) {
+				triggerStatus(
+					err.message || "Failed to load listing data.",
+					"error",
+				);
+			} finally {
+				setLoadingListing(false);
+			}
+		};
+
+		loadListingForEdit();
+	}, [listingId, user]);
 
 	const handleSearch = async () => {
 		if (!formData.category) {
@@ -442,7 +536,7 @@ export default function SellGear() {
 		if (e) e.preventDefault();
 		setErrorField("");
 
-		if (!formData.category) {
+		if (!isEditMode && !formData.category) {
 			triggerStatus(
 				"Please select an active hardware category.",
 				"error",
@@ -450,7 +544,7 @@ export default function SellGear() {
 			);
 			return;
 		}
-		if (!formData.name.trim()) {
+		if (!isEditMode && !formData.name.trim()) {
 			triggerStatus(
 				"Component field cannot be left blank.",
 				"error",
@@ -475,7 +569,18 @@ export default function SellGear() {
 			return;
 		}
 
-		if (!slots[0]) {
+		if (isEditMode && !formData.description.trim()) {
+			triggerStatus(
+				"Please provide a description for your listing.",
+				"error",
+				"description",
+			);
+			return;
+		}
+
+		const hasPrimaryImage =
+			slots[0] && (slots[0].file || slots[0].existingUrl);
+		if (!hasPrimaryImage) {
 			triggerStatus(
 				"Primary Image Slot [1] requires an asset file attachment.",
 				"error",
@@ -497,28 +602,39 @@ export default function SellGear() {
 
 		try {
 			const payload = new FormData();
-			const generatedTitle = `${formData.name}`;
 			const rawPriceInCents = Math.round(parseFloat(formData.price) * 100);
 
-			payload.append("title", generatedTitle);
-			payload.append(
-				"description",
-				formData.description || `Authentic ${formData.name} hardware listing.`,
-			);
-			payload.append("condition_grade", formData.condition);
-			payload.append("price_cents", rawPriceInCents.toString());
-			payload.append("category_slug", formData.category);
+			if (isEditMode) {
+				payload.append("listing_id", listingId);
+				payload.append("description", formData.description);
+				payload.append("condition_grade", formData.condition);
+				payload.append("price_cents", rawPriceInCents.toString());
+			} else {
+				const generatedTitle = `${formData.name}`;
+				payload.append("title", generatedTitle);
+				payload.append(
+					"description",
+					formData.description ||
+						`Authentic ${formData.name} hardware listing.`,
+				);
+				payload.append("condition_grade", formData.condition);
+				payload.append("price_cents", rawPriceInCents.toString());
+				payload.append("category_slug", formData.category);
 
-			if (formData.hardware_id) {
-				payload.append("hardware_id", formData.hardware_id);
-			}
+				if (formData.hardware_id) {
+					payload.append("hardware_id", formData.hardware_id);
+				}
 
-			if (specs && specs.length > 0) {
-				payload.append("verified_specs", JSON.stringify(specs));
+				if (specs && specs.length > 0) {
+					payload.append("verified_specs", JSON.stringify(specs));
+				}
 			}
 
 			slots.forEach((slot, index) => {
-				if (slot && slot.file) {
+				if (slot?.existingUrl) {
+					payload.append("existing_images[]", slot.existingUrl);
+				}
+				if (slot?.file) {
 					payload.append("images[]", slot.file);
 					payload.append(
 						`image_meta_${index}_is_primary`,
@@ -528,7 +644,11 @@ export default function SellGear() {
 				}
 			});
 
-			const response = await apiFetch("/listings/create_listing.php", {
+			const endpoint = isEditMode
+				? "/listings/update_listing.php"
+				: "/listings/create_listing.php";
+
+			const response = await apiFetch(endpoint, {
 				method: "POST",
 				body: payload,
 			});
@@ -536,28 +656,38 @@ export default function SellGear() {
 			const data = await response.json();
 
 			if (response.ok) {
-				triggerStatus(
-					`Listing successfully added to the marketplace. ID Ref: #${data.listing_id || "SUCCESS"}`,
-					"success",
-				);
+				if (isEditMode) {
+					triggerStatus(
+						`Listing #${data.listing_id || listingId} updated successfully.`,
+						"success",
+					);
+					setTimeout(() => {
+						navigate(`/view-listing/${data.listing_id || listingId}`);
+					}, 1200);
+				} else {
+					triggerStatus(
+						`Listing successfully added to the marketplace. ID Ref: #${data.listing_id || "SUCCESS"}`,
+						"success",
+					);
 
-				setFormData({
-					category: "",
-					name: "",
-					hardware_id: "",
-					condition: "",
-					description: "",
-					price: "",
-					images: [],
-				});
-				setSlots([null, null, null, null, null, null]);
-				setSpecs([
-					"Component architecture verified via image recognition",
-					"Serial number cross-referenced with manufacturer database",
-					"Performance benchmarks auto-populated from global registry",
-					"Compatibility matrix generated for tri-vector builds",
-					"Market velocity analysis applied for pricing intelligence",
-				]);
+					setFormData({
+						category: "",
+						name: "",
+						hardware_id: "",
+						condition: "",
+						description: "",
+						price: "",
+						images: [],
+					});
+					setSlots([null, null, null, null, null, null]);
+					setSpecs([
+						"Component architecture verified via image recognition",
+						"Serial number cross-referenced with manufacturer database",
+						"Performance benchmarks auto-populated from global registry",
+						"Compatibility matrix generated for tri-vector builds",
+						"Market velocity analysis applied for pricing intelligence",
+					]);
+				}
 			} else if (response.status === 401) {
 				await refreshAuth();
 				throw new Error(
@@ -596,7 +726,9 @@ export default function SellGear() {
 	const removeImage = (index, e) => {
 		e.stopPropagation();
 		if (slots[index]) {
-			URL.revokeObjectURL(slots[index].preview);
+			if (slots[index].file) {
+				URL.revokeObjectURL(slots[index].preview);
+			}
 			setSlots((prev) => {
 				const next = [...prev];
 				next[index] = null;
@@ -604,6 +736,14 @@ export default function SellGear() {
 			});
 		}
 	};
+
+	if (loadingListing) {
+		return (
+			<div className="w-full min-h-screen bg-[#050505] py-32 flex flex-col items-center justify-center gap-3 text-slate-500 font-mono text-xs uppercase tracking-widest">
+				Loading listing for edit...
+			</div>
+		);
+	}
 
 	return (
 		<motion.div
@@ -619,12 +759,18 @@ export default function SellGear() {
 			<header className="w-full max-w-[1440px] mx-auto px-6 md:px-10 pt-12 pb-8 relative z-10">
 				<div className="flex flex-col gap-2">
 					<h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
-						New{" "}
+						{isEditMode ? "Update " : "New "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 							Listing
 						</span>
 					</h1>
 					<div className="h-1 w-24 bg-gradient-to-r from-fuchsia-600 to-transparent mt-4" />
+					{isEditMode && (
+						<p className="text-slate-500 text-xs font-mono uppercase tracking-widest mt-3 max-w-xl">
+							You can update price, condition, description, and images only.
+							Component details cannot be changed.
+						</p>
+					)}
 				</div>
 			</header>
 
@@ -637,7 +783,7 @@ export default function SellGear() {
 						<section className="bg-[#0c0c0e]/80 backdrop-blur-md rounded-2xl p-6 md:p-10 shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-white/10 w-full relative">
 							<h2 className="text-white text-xl md:text-2xl font-black uppercase tracking-tighter italic mb-8 flex items-center gap-3">
 								<span className="w-2 h-6 bg-fuchsia-500 inline-block" />
-								Add the component
+								{isEditMode ? "Listing details" : "Add the component"}
 							</h2>
 
 							{alert.show && (
@@ -651,6 +797,22 @@ export default function SellGear() {
 							)}
 
 							<div className="space-y-8">
+								{isEditMode && (
+									<div className="rounded-xl border border-white/10 bg-black/40 p-5 space-y-2">
+										<p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+											Component (locked)
+										</p>
+										<p className="text-white font-black uppercase tracking-tight text-lg">
+											{formData.name || "—"}
+										</p>
+										<p className="text-fuchsia-400/80 text-xs font-mono uppercase tracking-wider">
+											{formData.category || "—"}
+										</p>
+									</div>
+								)}
+
+								{!isEditMode && (
+								<>
 								{/* 1. CATEGORY DROPDOWN */}
 								<div
 									key={
@@ -807,7 +969,32 @@ export default function SellGear() {
 									)}
 								</div>
 
-								{/* 3. ASKING PRICE INPUT */}
+								{/* VERIFIED SPECS BOX */}
+								<div className="w-full bg-[#050506] rounded-xl p-5 md:p-6 border border-fuchsia-500/20 relative overflow-hidden">
+									<div className="absolute top-0 right-0 w-2 h-2 bg-fuchsia-500/40 [clip-path:polygon(100%_0,100%_100%,0_0)]" />
+									<div className="flex items-center gap-2.5 mb-5">
+										<ShieldCheck className="w-4 h-4 text-fuchsia-400 shrink-0" />
+										<h3 className="text-white text-xs md:text-sm font-black tracking-widest uppercase">
+											Verified Specifications
+										</h3>
+									</div>
+									<div className="flex flex-col gap-3">
+										{specs.map((spec, idx) => (
+											<div key={idx} className="flex items-start gap-3">
+												<div className="mt-0.5 shrink-0 w-4 h-4 rounded border border-fuchsia-500/30 bg-fuchsia-500/5 flex items-center justify-center">
+													<Check className="w-2.5 h-2.5 text-fuchsia-400 stroke-[3]" />
+												</div>
+												<p className="text-slate-400 font-mono text-sm md:text-xs leading-normal tracking-tight">
+													{spec.toUpperCase()}
+												</p>
+											</div>
+										))}
+									</div>
+								</div>
+								</>
+								)}
+
+								{/* ASKING PRICE — editable in create and update */}
 								<div
 									key={
 										errorField === "price"
@@ -838,29 +1025,6 @@ export default function SellGear() {
 												clearFieldError("price");
 											}}
 										/>
-									</div>
-								</div>
-
-								{/* VERIFIED SPECS BOX */}
-								<div className="w-full bg-[#050506] rounded-xl p-5 md:p-6 border border-fuchsia-500/20 relative overflow-hidden">
-									<div className="absolute top-0 right-0 w-2 h-2 bg-fuchsia-500/40 [clip-path:polygon(100%_0,100%_100%,0_0)]" />
-									<div className="flex items-center gap-2.5 mb-5">
-										<ShieldCheck className="w-4 h-4 text-fuchsia-400 shrink-0" />
-										<h3 className="text-white text-xs md:text-sm font-black tracking-widest uppercase">
-											Verified Specifications
-										</h3>
-									</div>
-									<div className="flex flex-col gap-3">
-										{specs.map((spec, idx) => (
-											<div key={idx} className="flex items-start gap-3">
-												<div className="mt-0.5 shrink-0 w-4 h-4 rounded border border-fuchsia-500/30 bg-fuchsia-500/5 flex items-center justify-center">
-													<Check className="w-2.5 h-2.5 text-fuchsia-400 stroke-[3]" />
-												</div>
-												<p className="text-slate-400 font-mono text-sm md:text-xs leading-normal tracking-tight">
-													{spec.toUpperCase()}
-												</p>
-											</div>
-										))}
 									</div>
 								</div>
 							</div>
@@ -1180,7 +1344,11 @@ export default function SellGear() {
 							<div className="w-full">
 								<CyberActionButton
 									label={
-										isLoading ? "PROPAGATING PARAMS..." : "PUBLISH TO TECHTRADE"
+										isLoading
+											? "PROPAGATING PARAMS..."
+											: isEditMode
+												? "SAVE LISTING CHANGES"
+												: "PUBLISH TO TECHTRADE"
 									}
 									onClick={handlePublishListing}
 									disabled={isLoading}

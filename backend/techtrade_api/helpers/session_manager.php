@@ -2,7 +2,6 @@
 
 class SessionManager
 {
-    /** @var int Session lifetime in seconds (7 days) */
     private const SESSION_LIFETIME = 7 * 24 * 60 * 60;
 
     public static function init(PDO $db): void
@@ -66,5 +65,10 @@ class SessionManager
                 'samesite' => 'Lax',
             ]);
         }
+    }
+
+    public static function getActiveUserId(): ?int
+    {
+        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
     }
 }

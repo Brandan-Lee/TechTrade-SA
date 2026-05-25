@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 
 import { mediaUrl } from "../../../lib/api";
 
-const ActiveListingCard = ({ title, price, condition, time, views, image }) => {
+const ActiveListingCard = ({ id, title, price, condition, time, views, image }) => {
 	const navigate = useNavigate();
 
 	const handleViewListing = () => {
-		navigate(`/view-listing`);
+		if (id != null) {
+			navigate(`/view-listing/${id}`);
+		}
 	};
 
 	const handleKeyDown = (e) => {

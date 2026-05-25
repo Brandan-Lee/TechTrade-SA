@@ -292,8 +292,7 @@ CREATE TABLE
 -- -----------------------------------------------------------------------------
 -- 3. LISTINGS (marketplace)
 -- -----------------------------------------------------------------------------
-CREATE TABLE
-  listings (
+CREATE TABLE listings (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     seller_id BIGINT UNSIGNED NOT NULL,
     category_id SMALLINT UNSIGNED NOT NULL,
@@ -302,7 +301,6 @@ CREATE TABLE
     description TEXT NOT NULL,
     condition_grade ENUM ('New', 'Like New', 'Good', 'Fair') NOT NULL,
     price_cents INT UNSIGNED NOT NULL, -- ZAR stored as cents (850000 = R8,500.00)
-    accepts_offers TINYINT (1) NOT NULL DEFAULT 1, -- “Or Best Offer”
     location_province VARCHAR(64) NULL,
     status ENUM (
       'AVAILABLE',
@@ -311,7 +309,7 @@ CREATE TABLE
       'COMMITED',
       'SOLD'
     ) NOT NULL DEFAULT 'AVAILABLE',
-    is_featured TINYINT (1) NOT NULL DEFAULT 0,
+    is_deleted TINYINT (1) NOT NULL DEFAULT 0, -- Soft delete flag
     view_count INT UNSIGNED NOT NULL DEFAULT 0,
     published_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -323,11 +321,12 @@ CREATE TABLE
     KEY idx_listings_status (status),
     KEY idx_listings_price (price_cents),
     KEY idx_listings_location (location_province),
+    KEY idx_listings_deleted (is_deleted), -- For fast filtering of active listings
     FULLTEXT KEY ft_listings_search (title, description),
     CONSTRAINT fk_listings_seller FOREIGN KEY (seller_id) REFERENCES users (id),
     CONSTRAINT fk_listings_category FOREIGN KEY (category_id) REFERENCES categories (id),
     CONSTRAINT fk_listings_hardware FOREIGN KEY (hardware_id) REFERENCES hardware (id)
-  ) ENGINE = InnoDB;
+) ENGINE = InnoDB;
 
 CREATE TABLE
   listing_images (
@@ -353,6 +352,15 @@ CREATE TABLE
     KEY idx_listing_specs_listing (listing_id),
     CONSTRAINT fk_listing_specs_listing FOREIGN KEY (listing_id) REFERENCES listings (id) ON DELETE CASCADE
   ) ENGINE = InnoDB;
+
+  CREATE TABLE listing_views (
+    listing_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    viewed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (listing_id, user_id),
+    CONSTRAINT fk_views_listing FOREIGN KEY (listing_id) REFERENCES listings (id) ON DELETE CASCADE,
+    CONSTRAINT fk_views_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE = InnoDB;
 
 -- -----------------------------------------------------------------------------
 -- 4. OFFERS & NEGOTIATION

@@ -32,6 +32,10 @@ define('DATA_RETENTION_YEARS', 7);
 define('SECURE_COOKIES_ONLY', false); //change later for hosting
 define('COOKIE_SAMESITE', 'Lax');
 
+// Offer Expiration Configuration ---
+define('OFFER_LIFETIME_HOURS', 48);
+define('OFFER_LIFETIME_SECONDS', OFFER_LIFETIME_HOURS * 60 * 60);
+
 // Email
 define('SMTP_HOST', getEnvVariable('SMTP_HOST', 'smtp.gmail.com'));
 define('SMTP_USER', getEnvVariable('SMTP_USER'));

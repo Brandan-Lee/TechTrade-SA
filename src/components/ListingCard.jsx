@@ -6,6 +6,7 @@ import AlternateButton from "./ui/AlternateButton";
 import { mediaUrl } from "../lib/api";
 
 export default function ListingCard({
+	id,
 	title,
 	price,
 	seller,
@@ -15,11 +16,10 @@ export default function ListingCard({
 	image,
 	isFeatured = false,
 }) {
-	// Cyberpunk Status Theme: High saturation, glowing pulses
 	const statusStyles = {
 		"Available Now": "border-emerald-500/50 text-emerald-400 bg-emerald-500/10",
 		"Offer Received": "border-amber-500/50 text-amber-400 bg-amber-500/10",
-		"Payment Pending":
+		"Pending Transaction":
 			"border-fuchsia-500/50 text-fuchsia-400 bg-fuchsia-500/10",
 	};
 
@@ -27,12 +27,14 @@ export default function ListingCard({
 
 	const handleViewListing = (e) => {
 		e.stopPropagation();
-		navigate(`/view-listing`);
+		if (id != null) {
+			navigate(`/view-listing/${id}`);
+		}
 	};
 
 	const handleViewShop = (e) => {
 		e.stopPropagation();
-		navigate(`/profile`);
+		navigate("/profile");
 	};
 
 	return (

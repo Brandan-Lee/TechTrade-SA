@@ -31,7 +31,6 @@ try {
         throw new Exception("Targeted terminal geo-coordinates missing.");
     }
 
-    // NATIVE MATCHING: Direct string assignment now that data formats align precisely
     $targetProvince = $provinceInput;
 
     $query = "SELECT 
@@ -47,7 +46,7 @@ try {
                 (SELECT li.url FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.is_primary DESC, li.id ASC LIMIT 1) AS primary_image
               FROM listings l
               INNER JOIN users u ON l.seller_id = u.id
-              WHERE l.status = 'AVAILABLE'
+              WHERE l.status IN ('AVAILABLE', 'OFFERED', 'PENDING')
                 AND l.is_deleted = 0
                 AND l.location_province = :province
                 AND u.is_deleted = 0
@@ -77,7 +76,7 @@ try {
         
         $statusLabel = "Available Now";
         if ($item['status'] === 'OFFERED') $statusLabel = "Offer Received";
-        if ($item['status'] === 'PENDING') $statusLabel = "Payment Pending";
+        if ($item['status'] === 'PENDING') $statusLabel = "Pending Transaction";
 
         return [
             "id" => (int) $item['id'],
@@ -85,7 +84,7 @@ try {
             "price" => $formattedPrice,
             "seller" => $sellerName,
             "sellerId" => (int) $item['seller_id'],
-            "location" => !empty($item['location']) ? $item['location'] : 'Unknown', // Returns native text string directly
+            "location" => !empty($item['location']) ? $item['location'] : 'Unknown',
             "status" => $statusLabel,
             "condition" => $item['condition'],
             "image" => !empty($item['primary_image']) ? publicMediaUrl($item['primary_image']) : null
