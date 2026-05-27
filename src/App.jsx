@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import {
+	BrowserRouter,
+	Routes,
+	Route,
+	useNavigate,
+	useLocation,
+} from "react-router-dom";
 import "./App.css";
 
 import { AuthProvider, useAuth } from "./components/AuthContext";
@@ -75,13 +81,14 @@ import PrivacyModal from "./components/main/privacy/PrivacyModal";
 
 function App() {
 	const navigate = useNavigate();
-	// 🚀 FIXED: Added 'user' to the hook destructuring
+	const location = useLocation();
 	const { loginContext, isLoading, user } = useAuth();
 
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
 	const [isForgotOpen, setIsForgotOpen] = useState(false);
 	const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+	const [registerMode, setRegisterMode] = useState("create");
 	const [isOTPOpen, setIsOTPOpen] = useState(false);
 	const [isResetOpen, setIsResetOpen] = useState(false);
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -107,8 +114,34 @@ function App() {
 
 	const switchToRegister = () => {
 		closeAllModals();
+		setRegisterMode("create");
 		setIsRegisterOpen(true);
 	};
+
+	const switchToEditProfile = () => {
+		closeAllModals();
+		setRegisterMode("edit");
+		setIsRegisterOpen(true);
+	};
+
+	const closeRegisterModal = () => {
+		setIsRegisterOpen(false);
+		setRegisterMode("create");
+		if (location.pathname === "/profile/edit") {
+			navigate(user ? `/profile/${user.id}` : "/profile", { replace: true });
+		}
+	};
+
+	useEffect(() => {
+		if (location.pathname !== "/profile/edit") return;
+		if (isLoading) return;
+		if (!user) {
+			navigate("/", { replace: true });
+			return;
+		}
+		switchToEditProfile();
+	}, [location.pathname, user, isLoading]);
+
 	const switchToLogin = () => {
 		closeAllModals();
 		setIsLoginOpen(true);
@@ -163,7 +196,9 @@ function App() {
 					<Route path="marketplace" element={<Market />} />
 					<Route path="sell" element={<SellGear />} />
 					<Route path="build-doctor" element={<BuildDoctor />} />
-					<Route path="profile/:userId?" element={<Profile />} />
+					<Route path="profile/edit" element={<Profile />} />
+					<Route path="profile/:userId" element={<Profile />} />
+					<Route path="profile" element={<Profile />} />
 					<Route path="offers" element={<MyOffers />} />
 					<Route path="transactions" element={<MyTransactions />} />
 					<Route path="view-listing/:id" element={<ViewListing />} />
@@ -176,7 +211,10 @@ function App() {
 						}
 					/>
 					<Route path="contact-us" element={<ContactUs />} />
-					<Route path="listing-report" element={<ListingReportPage />} />
+					<Route
+						path="listing-report/:listingId"
+						element={<ListingReportPage />}
+					/>
 					<Route path="escrow-tracker" element={<EscrowTrackerPage />} />
 					<Route path="review" element={<ReviewPage />} />
 					<Route path="report-user" element={<ReportUser />} />
@@ -186,9 +224,7 @@ function App() {
 
 				<Route
 					path="/admin"
-					element={
-						<AdminInterceptors openLogin={() => setIsLoginOpen(true)} />
-					}
+					element={<AdminInterceptors openLogin={() => setIsLoginOpen(true)} />}
 				>
 					<Route element={<AdminLayout />}>
 						<Route index element={<AdminDashboard />} />
@@ -211,7 +247,8 @@ function App() {
 			/>
 			<RegisterModal
 				isOpen={isRegisterOpen}
-				onClose={() => setIsRegisterOpen(false)}
+				mode={registerMode}
+				onClose={closeRegisterModal}
 				onSwitchToLogin={switchToLogin}
 				onSwitchToTOS={() => setIsTOSModalOpen(true)}
 			/>

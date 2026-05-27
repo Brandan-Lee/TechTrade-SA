@@ -15,16 +15,25 @@ import AuthFooter from "./AuthFooter";
 import CyberAlert from "../../ui/CyberAlert";
 import { useAuthModalScroll } from "./AuthModalScrollContext";
 import { apiFetch } from "../../../lib/api";
+import { useAuth } from "../../AuthContext";
+import { mediaUrl } from "../../../lib/api";
 
 const saPhoneRegex = /^(?:\+27|0)[6-8][0-9]{8}$/;
 
-const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => (
+const RegisterModal = ({
+	isOpen,
+	mode = "create",
+	onClose,
+	onSwitchToLogin,
+	onSwitchToTOS,
+}) => (
 	<AuthModalWrapper
 		isOpen={isOpen}
 		onClose={onClose}
-		onBack={onSwitchToLogin}
+		onBack={mode === "edit" ? onClose : onSwitchToLogin}
 	>
 		<RegisterModalContent
+			mode={mode}
 			onClose={onClose}
 			onSwitchToLogin={onSwitchToLogin}
 			onSwitchToTOS={onSwitchToTOS}
@@ -32,7 +41,13 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onSwitchToTOS }) => (
 	</AuthModalWrapper>
 );
 
-const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
+const RegisterModalContent = ({
+	mode = "create",
+	onClose,
+	onSwitchToLogin,
+	onSwitchToTOS,
+}) => {
+	const { refreshAuth } = useAuth();
 	const [formData, setFormData] = useState({
 		firstName: "",
 		lastName: "",
@@ -60,6 +75,55 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 	const [shakeTick, setShakeTick] = useState(0);
 	const scrollToTop = useAuthModalScroll();
 	const [hardwareId, setHardwareId] = useState("");
+
+	useEffect(() => {
+		if (mode !== "edit") return;
+
+		const fetchUserData = async () => {
+			setIsLoading(true);
+			try {
+				const response = await apiFetch(
+					"/authentication/get_current_user.php",
+					{
+						method: "GET",
+						headers: { Accept: "application/json" },
+					},
+				);
+				const data = await response.json();
+
+				if (response.ok && data.status === "success" && data.user) {
+					setFormData({
+						firstName: data.user.first_name || "",
+						lastName: data.user.last_name || "",
+						email: data.user.email || "",
+						password: "",
+						confirmPassword: "",
+						mobile: data.user.mobile || "",
+						province: data.user.province || "",
+						regType: data.user.reg_type || "buyer",
+						profilePhoto: null,
+						agreedToTerms: true,
+					});
+
+					if (data.user.avatar_url) {
+						setProfileImage(mediaUrl(data.user.avatar_url));
+					}
+				} else {
+					triggerStatus(
+						data.message || "Failed to load profile data.",
+						"error",
+					);
+				}
+			} catch (error) {
+				console.error("Profile data retrieval error:", error);
+				triggerStatus("SYSTEM ERROR: CANNOT RETRIEVE DATA PROFILE.", "error");
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchUserData();
+	}, [mode]);
 
 	useEffect(() => {
 		const generateFingerprint = () => {
@@ -142,14 +206,25 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 			return;
 		}
 
-		if (!formData.password) {
-			triggerStatus("Password field cannot be empty.", "error", "password");
-			return;
-		}
+		if (mode !== "edit") {
+			if (!formData.password) {
+				triggerStatus("Password field cannot be empty.", "error", "password");
+				return;
+			}
 
-		if (formData.password !== formData.confirmPassword) {
-			triggerStatus("Passwords do not match.", "error", "confirmPassword");
-			return;
+			if (formData.password !== formData.confirmPassword) {
+				triggerStatus("Passwords do not match.", "error", "confirmPassword");
+				return;
+			}
+
+			if (calculateStrength(formData.password) < 4) {
+				triggerStatus(
+					"Password is too weak. Please meet all security requirements.",
+					"error",
+					"password",
+				);
+				return;
+			}
 		}
 
 		if (!saPhoneRegex.test(cleanPhone)) {
@@ -175,15 +250,6 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 			return;
 		}
 
-		if (calculateStrength(formData.password) < 4) {
-			triggerStatus(
-				"Password is too weak. Please meet all security requirements.",
-				"error",
-				"password",
-			);
-			return;
-		}
-
 		setIsLoading(true);
 
 		try {
@@ -191,17 +257,25 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 			payload.append("firstName", formData.firstName);
 			payload.append("lastName", formData.lastName);
 			payload.append("email", formData.email);
-			payload.append("password", formData.password);
 			payload.append("mobile", cleanPhone);
 			payload.append("province", formData.province);
 			payload.append("regType", formData.regType);
 			payload.append("hardwareId", hardwareId);
 
+			if (mode !== "edit") {
+				payload.append("password", formData.password);
+			}
+
 			if (formData.profilePhoto) {
 				payload.append("profilePhoto", formData.profilePhoto);
 			}
 
-			const response = await apiFetch("/authentication/register.php", {
+			const targetEndpoint =
+				mode === "edit"
+					? "/authentication/update_profile.php"
+					: "/authentication/register.php";
+
+			const response = await apiFetch(targetEndpoint, {
 				method: "POST",
 				body: payload,
 			});
@@ -218,29 +292,36 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 				);
 			}
 
-			// SUCCESS: Trigger status, then wait 2 seconds
-			triggerStatus(
-				"Registration successful! Redirecting to login...",
-				"success",
-			);
-
-			setTimeout(() => {
-				setFormData({
-					firstName: "",
-					lastName: "",
-					email: "",
-					password: "",
-					confirmPassword: "",
-					mobile: "",
-					province: "",
-					regType: "buyer",
-					profilePhoto: null,
-					agreedToTerms: false,
-				});
-				setProfileImage(null);
-				onSwitchToLogin();
-				setIsLoading(false);
-			}, 2000);
+			if (mode === "edit") {
+				triggerStatus("Profile updated successfully!", "success");
+				await refreshAuth();
+				setTimeout(() => {
+					setIsLoading(false);
+					onClose();
+				}, 1500);
+			} else {
+				triggerStatus(
+					"Registration successful! Redirecting to login...",
+					"success",
+				);
+				setTimeout(() => {
+					setFormData({
+						firstName: "",
+						lastName: "",
+						email: "",
+						password: "",
+						confirmPassword: "",
+						mobile: "",
+						province: "",
+						regType: "buyer",
+						profilePhoto: null,
+						agreedToTerms: false,
+					});
+					setProfileImage(null);
+					onSwitchToLogin();
+					setIsLoading(false);
+				}, 2000);
+			}
 		} catch (err) {
 			try {
 				const parsedErr = JSON.parse(err.message);
@@ -257,112 +338,103 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 	};
 
 	return (
-			<div className="space-y-5 sm:space-y-6 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
-				<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
-					Create{" "}
-					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-						Account
-					</span>
-				</h1>
+		<div className="space-y-5 sm:space-y-6 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
+			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+				{mode === "edit" ? "Edit" : "Create"}{" "}
+				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+					{mode === "edit" ? "Profile" : "Account"}
+				</span>
+			</h1>
 
-				{alert.show && (
-					<CyberAlert
-						type={alert.type}
-						message={alert.message}
-						onClose={() => setAlert({ ...alert, show: false })}
-					/>
-				)}
-
-				<input
-					type="file"
-					ref={fileInputRef}
-					className="hidden"
-					accept="image/*"
-					onChange={handleFileChange}
+			{alert.show && (
+				<CyberAlert
+					type={alert.type}
+					message={alert.message}
+					onClose={() => setAlert({ ...alert, show: false })}
 				/>
+			)}
 
-				<form
-					onSubmit={handleSubmit}
-					className="space-y-4 sm:space-y-5"
-					noValidate
-				>
-					<div className="w-full p-4 bg-black/20 rounded-lg border border-white/5 flex flex-col sm:flex-row items-center gap-4">
-						<div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-[#121214] border-2 border-fuchsia-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_rgba(217,70,239,0.1)]">
-							{profileImage ? (
-								<img
-									src={profileImage}
-									alt="User Avatar"
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<User className="text-fuchsia-500/50 w-6 h-6" />
-							)}
-						</div>
-						<div className="text-center sm:text-left space-y-1.5 w-full">
-							<button
-								type="button"
-								onClick={() => fileInputRef.current.click()}
-								className="inline-flex items-center gap-2 sm:text-xs md:text-base font-black uppercase tracking-widest text-fuchsia-400 border border-fuchsia-500/20 bg-fuchsia-500/[0.02] hover:bg-fuchsia-500/[0.05] hover:border-fuchsia-500/50 px-3 py-1.5 rounded transition-all focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
-							>
-								<Image size={12} />
-								<span>
-									{profileImage ? "Change Photo" : "Add Profile Photo"}
-								</span>
-							</button>
-						</div>
+			<input
+				type="file"
+				ref={fileInputRef}
+				className="hidden"
+				accept="image/*"
+				onChange={handleFileChange}
+			/>
+
+			<form
+				onSubmit={handleSubmit}
+				className="space-y-4 sm:space-y-5"
+				noValidate
+			>
+				<div className="w-full p-4 bg-black/20 rounded-lg border border-white/5 flex flex-col sm:flex-row items-center gap-4">
+					<div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-[#121214] border-2 border-fuchsia-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_rgba(217,70,239,0.1)]">
+						{profileImage ? (
+							<img
+								src={profileImage}
+								alt="User Avatar"
+								className="w-full h-full object-cover"
+							/>
+						) : (
+							<User className="text-fuchsia-500/50 w-6 h-6" />
+						)}
 					</div>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<AuthInput
-							key={
-								errorField === "firstName"
-									? `shake-fn-${shakeTick}`
-									: "norm-fn"
-							}
-							label="FIRST NAME"
-							name="firstName"
-							value={formData.firstName}
-							onChange={handleInputChange}
-							required
-							error={errorField === "firstName"}
-							className={errorField === "firstName" ? "animate-shake" : ""}
-						/>
-						<AuthInput
-							key={
-								errorField === "lastName"
-									? `shake-ln-${shakeTick}`
-									: "norm-ln"
-							}
-							label="LAST NAME"
-							name="lastName"
-							value={formData.lastName}
-							onChange={handleInputChange}
-							required
-							error={errorField === "lastName"}
-							className={errorField === "lastName" ? "animate-shake" : ""}
-						/>
+					<div className="text-center sm:text-left space-y-1.5 w-full">
+						<button
+							type="button"
+							onClick={() => fileInputRef.current.click()}
+							className="inline-flex items-center gap-2 sm:text-xs md:text-base font-black uppercase tracking-widest text-fuchsia-400 border border-fuchsia-500/20 bg-fuchsia-500/[0.02] hover:bg-fuchsia-500/[0.05] hover:border-fuchsia-500/50 px-3 py-1.5 rounded transition-all focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
+						>
+							<Image size={12} />
+							<span>{profileImage ? "Change Photo" : "Add Profile Photo"}</span>
+						</button>
 					</div>
+				</div>
 
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<AuthInput
 						key={
-							errorField === "email" ? `shake-em-${shakeTick}` : "norm-em"
+							errorField === "firstName" ? `shake-fn-${shakeTick}` : "norm-fn"
 						}
-						label="EMAIL"
-						type="email"
-						name="email"
-						value={formData.email}
+						label="FIRST NAME"
+						name="firstName"
+						value={formData.firstName}
 						onChange={handleInputChange}
 						required
-						error={errorField === "email"}
-						className={errorField === "email" ? "animate-shake" : ""}
+						error={errorField === "firstName"}
+						className={errorField === "firstName" ? "animate-shake" : ""}
 					/>
+					<AuthInput
+						key={
+							errorField === "lastName" ? `shake-ln-${shakeTick}` : "norm-ln"
+						}
+						label="LAST NAME"
+						name="lastName"
+						value={formData.lastName}
+						onChange={handleInputChange}
+						required
+						error={errorField === "lastName"}
+						className={errorField === "lastName" ? "animate-shake" : ""}
+					/>
+				</div>
 
+				<AuthInput
+					key={errorField === "email" ? `shake-em-${shakeTick}` : "norm-em"}
+					label="EMAIL"
+					type="email"
+					name="email"
+					value={formData.email}
+					onChange={handleInputChange}
+					required
+					error={errorField === "email"}
+					className={errorField === "email" ? "animate-shake" : ""}
+				/>
+
+				{mode !== "edit" && (
 					<div className="space-y-3">
 						<AuthInput
 							key={
-								errorField === "password"
-									? `shake-pw-${shakeTick}`
-									: "norm-pw"
+								errorField === "password" ? `shake-pw-${shakeTick}` : "norm-pw"
 							}
 							label="NEW PASSWORD"
 							type={showPassword ? "text" : "password"}
@@ -400,110 +472,127 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 							}
 						/>
 					</div>
+				)}
 
-					<AuthInput
-						key={
-							errorField === "mobile" ? `shake-mo-${shakeTick}` : "norm-mo"
-						}
-						label="MOBILE NUMBER"
-						type="text"
-						inputMode="tel"
-						pattern="[0-9]*"
-						name="mobile"
-						placeholder="0611234567"
-						value={formData.mobile}
-						onChange={handleInputChange}
-						required
-						error={errorField === "mobile"}
-						className={errorField === "mobile" ? "animate-shake" : ""}
-					/>
+				<AuthInput
+					key={errorField === "mobile" ? `shake-mo-${shakeTick}` : "norm-mo"}
+					label="MOBILE NUMBER"
+					type="text"
+					inputMode="tel"
+					pattern="[0-9]*"
+					name="mobile"
+					placeholder="0611234567"
+					value={formData.mobile}
+					onChange={handleInputChange}
+					required
+					error={errorField === "mobile"}
+					className={errorField === "mobile" ? "animate-shake" : ""}
+				/>
 
-					<div
-						key={
-							errorField === "province"
-								? `shake-province-${shakeTick}`
-								: "norm-province"
-						}
-						className={`space-y-1.5 ${errorField === "province" ? "animate-shake" : ""}`}
-					>
-						<label className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest ml-0.5">
-							PROVINCE
-						</label>
-						<div className="relative">
-							<select
-								name="province"
-								value={formData.province}
-								onChange={handleInputChange}
-								className={`w-full h-11 bg-[#121214] rounded-lg text-xs sm:text-sm text-white focus:outline-none focus:border-fuchsia-500/50 appearance-none px-4 font-mono transition-all border ${errorField === "province" ? "border-rose-500 bg-rose-500/[0.02]" : "border-white/10"}`}
-								required
+				<div
+					key={
+						errorField === "province"
+							? `shake-province-${shakeTick}`
+							: "norm-province"
+					}
+					className={`space-y-1.5 ${errorField === "province" ? "animate-shake" : ""}`}
+				>
+					<label className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest ml-0.5">
+						PROVINCE
+					</label>
+					<div className="relative">
+						<select
+							name="province"
+							value={formData.province}
+							onChange={handleInputChange}
+							className={`w-full h-11 bg-[#121214] rounded-lg text-xs sm:text-sm text-white focus:outline-none focus:border-fuchsia-500/50 appearance-none px-4 font-mono transition-all border ${errorField === "province" ? "border-rose-500 bg-rose-500/[0.02]" : "border-white/10"}`}
+							required
+						>
+							<option value="" disabled className="bg-[#0c0c0e] text-slate-600">
+								Select Province
+							</option>
+							<option value="Gauteng" className="bg-[#0c0c0e] text-slate-300">
+								Gauteng [GP]
+							</option>
+							<option
+								value="Eastern Cape"
+								className="bg-[#0c0c0e] text-slate-300"
 							>
-								<option
-									value=""
-									disabled
-									className="bg-[#0c0c0e] text-slate-600"
-								>
-									Select Province
-								</option>
-								<option value="Gauteng" className="bg-[#0c0c0e] text-slate-300">
-									Gauteng [GP]
-								</option>
-								<option value="Eastern Cape" className="bg-[#0c0c0e] text-slate-300">
-									Eastern Cape [EC]
-								</option>
-								<option value="Free State" className="bg-[#0c0c0e] text-slate-300">
-									Free State [FS]
-								</option>
-								<option value="KwaZulu-Natal" className="bg-[#0c0c0e] text-slate-300">
-									KwaZulu-Natal [KZN]
-								</option>
-								<option value="Limpopo" className="bg-[#0c0c0e] text-slate-300">
-									Limpopo [LIM]
-								</option>
-								<option value="Mpumalanga" className="bg-[#0c0c0e] text-slate-300">
-									Mpumalanga [MPU]
-								</option>
-								<option value="North West" className="bg-[#0c0c0e] text-slate-300">
-									North West [NW]
-								</option>
-								<option value="Northern Cape" className="bg-[#0c0c0e] text-slate-300">
-									Northern Cape [NC]
-								</option>
-								<option value="Western Cape" className="bg-[#0c0c0e] text-slate-300">
-									Western Cape [WC]
-								</option>
-							</select>
-							<ChevronDown
-								className="absolute right-4 top-3.5 text-slate-500 pointer-events-none"
-								size={14}
-							/>
-						</div>
+								Eastern Cape [EC]
+							</option>
+							<option
+								value="Free State"
+								className="bg-[#0c0c0e] text-slate-300"
+							>
+								Free State [FS]
+							</option>
+							<option
+								value="KwaZulu-Natal"
+								className="bg-[#0c0c0e] text-slate-300"
+							>
+								KwaZulu-Natal [KZN]
+							</option>
+							<option value="Limpopo" className="bg-[#0c0c0e] text-slate-300">
+								Limpopo [LIM]
+							</option>
+							<option
+								value="Mpumalanga"
+								className="bg-[#0c0c0e] text-slate-300"
+							>
+								Mpumalanga [MPU]
+							</option>
+							<option
+								value="North West"
+								className="bg-[#0c0c0e] text-slate-300"
+							>
+								North West [NW]
+							</option>
+							<option
+								value="Northern Cape"
+								className="bg-[#0c0c0e] text-slate-300"
+							>
+								Northern Cape [NC]
+							</option>
+							<option
+								value="Western Cape"
+								className="bg-[#0c0c0e] text-slate-300"
+							>
+								Western Cape [WC]
+							</option>
+						</select>
+						<ChevronDown
+							className="absolute right-4 top-3.5 text-slate-500 pointer-events-none"
+							size={14}
+						/>
 					</div>
+				</div>
 
-					<div className="p-4 bg-black/20 rounded-lg border border-white/5 space-y-3">
-						<h3 className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest">
-							REGISTER AS
-						</h3>
-						<div className="flex flex-wrap gap-5">
-							{["buyer", "seller", "both"].map((type) => (
-								<label
-									key={type}
-									className="flex items-center gap-2 cursor-pointer group select-none"
-								>
-									<input
-										type="radio"
-										name="regType"
-										className="w-4 h-4 accent-fuchsia-500 cursor-pointer bg-black"
-										checked={formData.regType === type}
-										onChange={() => setFormData({ ...formData, regType: type })}
-									/>
-									<span className="text-xs font-bold text-slate-400 capitalize tracking-wide group-hover:text-fuchsia-400 transition-colors">
-										{type}
-									</span>
-								</label>
-							))}
-						</div>
+				<div className="p-4 bg-black/20 rounded-lg border border-white/5 space-y-3">
+					<h3 className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest">
+						REGISTER AS
+					</h3>
+					<div className="flex flex-wrap gap-5">
+						{["buyer", "seller", "both"].map((type) => (
+							<label
+								key={type}
+								className="flex items-center gap-2 cursor-pointer group select-none"
+							>
+								<input
+									type="radio"
+									name="regType"
+									className="w-4 h-4 accent-fuchsia-500 cursor-pointer bg-black"
+									checked={formData.regType === type}
+									onChange={() => setFormData({ ...formData, regType: type })}
+								/>
+								<span className="text-xs font-bold text-slate-400 capitalize tracking-wide group-hover:text-fuchsia-400 transition-colors">
+									{type}
+								</span>
+							</label>
+						))}
 					</div>
+				</div>
 
+				{mode !== "edit" && (
 					<div
 						key={
 							errorField === "agreedToTerms"
@@ -540,14 +629,23 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 							</span>
 						</label>
 					</div>
+				)}
 
-					<div className="space-y-4 pt-2 border-t border-white/5">
-						<GradientButton
-							label={isLoading ? "SUBMITTING REGISTRATION" : "REGISTER ACCOUNT"}
-							type="submit"
-							isLoading={isLoading}
-							className="w-full text-xs sm:text-sm tracking-widest font-black"
-						/>
+				<div className="space-y-4 pt-2 border-t border-white/5">
+					<GradientButton
+						label={
+							isLoading
+								? "PROCESSING..."
+								: mode === "edit"
+									? "SAVE PROFILE CHANGES"
+									: "REGISTER ACCOUNT"
+						}
+						type="submit"
+						isLoading={isLoading}
+						className="w-full text-xs sm:text-sm tracking-widest font-black"
+					/>
+
+					{mode !== "edit" && (
 						<div className="flex justify-center items-center gap-1.5 text-sm md:text-base sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
 							<ShieldAlert size={11} className="text-slate-700" />
 							<AuthFooter
@@ -556,9 +654,10 @@ const RegisterModalContent = ({ onClose, onSwitchToLogin, onSwitchToTOS }) => {
 								className="hover:text-fuchsia-400 transition-colors focus:outline-none focus:underline"
 							/>
 						</div>
-					</div>
-				</form>
-			</div>
+					)}
+				</div>
+			</form>
+		</div>
 	);
 };
 

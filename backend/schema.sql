@@ -33,7 +33,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    mobile VARCHAR(20) NULL,
+    mobile VARCHAR(100) NULL,
     hardware_id VARCHAR(255) NULL,
     province VARCHAR(64) NULL,
     avatar_url VARCHAR(512) NULL,

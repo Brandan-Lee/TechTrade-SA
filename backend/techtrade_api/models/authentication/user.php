@@ -95,7 +95,7 @@ class User
         $this->lastName = $row['last_name'];
         $this->encryptedMobile = $row['mobile'] ?? '';
         $this->hardwareId = $row['hardware_id'] ?? null;
-        $this->province = $row['province']; // Stores "Gauteng", "Western Cape", etc.
+        $this->province = $row['province']; 
         $this->avatarUrl = $row['avatar_url'];
         $this->regType = $row['reg_type'];
         $this->trustScore = (float) $row['trust_score'];
@@ -133,13 +133,11 @@ class User
         return trim($first . ' ' . $last);
     }
 
-    // NATIVE RETURN: Pulls full string data straight out of structural storage
     public function getProvince(): string
     {
         return $this->province;
     }
 
-    // NATIVE RETURN: Kept for legacy backwards compatibility alignment, returns full string
     public function getRawProvinceCode(): string
     {
         return $this->province;

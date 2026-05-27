@@ -7,6 +7,7 @@ import { mediaUrl } from "../lib/api";
 
 export default function ListingCard({
 	id,
+	sellerId,
 	title,
 	price,
 	seller,
@@ -34,7 +35,9 @@ export default function ListingCard({
 
 	const handleViewShop = (e) => {
 		e.stopPropagation();
-		navigate("/profile");
+		if (sellerId != null) {
+			navigate(`/profile/${sellerId}`);
+		}
 	};
 
 	return (

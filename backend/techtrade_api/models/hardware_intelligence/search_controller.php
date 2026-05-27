@@ -41,6 +41,40 @@ class SearchController
 
         return $results;
     }
+
+    /**
+     * Lightweight global suggestions for navbar search.
+     * Returns up to 5 matches across all categories.
+     */
+    public function suggest(string $query, int $limit = 5): array
+    {
+        $query = trim($query);
+        if ($query === '') {
+            return [];
+        }
+
+        // Prefer prefix matches, then contains.
+        $stmt = $this->db->prepare("
+            SELECT
+                h.id,
+                h.full_name,
+                c.name AS category
+            FROM hardware h
+            JOIN categories c ON c.id = h.category_id
+            WHERE h.is_active = 1
+              AND h.full_name LIKE ?
+            ORDER BY
+                CASE WHEN h.full_name LIKE ? THEN 0 ELSE 1 END,
+                h.full_name ASC
+            LIMIT {$limit}
+        ");
+
+        $likeContains = '%' . $query . '%';
+        $likePrefix = $query . '%';
+        $stmt->execute([$likeContains, $likePrefix]);
+
+        return $stmt->fetchAll() ?: [];
+    }
 }
 
 ?>

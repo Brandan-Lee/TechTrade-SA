@@ -8,7 +8,6 @@ export const apiUrl = (path) => {
 	return `${API_BASE}${normalized}`;
 };
 
-/** Resolve stored upload paths (e.g. uploads/avatars/…) to a full URL on the API host. */
 export const mediaUrl = (path) => {
 	if (!path) return "";
 	if (/^https?:\/\//i.test(path)) return path;
@@ -18,7 +17,6 @@ export const mediaUrl = (path) => {
 
 let onSessionExpired = null;
 
-/** Register a handler (e.g. from AuthContext) to clear stale client auth on 401. */
 export const setSessionExpiredHandler = (handler) => {
 	onSessionExpired = handler;
 };

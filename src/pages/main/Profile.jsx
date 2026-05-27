@@ -1,223 +1,369 @@
-import { Calendar1, Cpu, MapPin, Quote, ShieldCheck, Trophy, Terminal } from "lucide-react";
-import React, { useState } from "react";
+import {
+	Calendar1,
+	MapPin,
+	Quote,
+	ShieldCheck,
+	Trophy,
+	Loader2,
+	AlertTriangle,
+	User,
+} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import StatCard from "../../components/main/profile/StatCard";
 import CyberActionButton from "../../components/ui/CyberActionButton";
 import ActiveListingCard from "../../components/main/profile/ActiveListingCard";
-import TradeHistoryCard from "../../components/main/profile/TradeHistoryCard";
 import ReviewCard from "../../components/main/profile/ReviewCard";
+import TradeHistoryCard from "../../components/main/profile/TradeHistoryCard";
+import { useAuth } from "../../components/AuthContext";
+import { apiFetch } from "../../lib/api";
 
 export default function Profile() {
-    const [activeTab, setActiveTab] = useState("active");
+	const { userId: routeUserId } = useParams();
+	const location = useLocation();
+	const navigate = useNavigate();
+	const { user: authUser, isLoading: authLoading, logout } = useAuth(); // Extracted logout handler 
 
-    const reviews = [
-        {
-            id: 1,
-            user: "Thabo M.",
-            rating: 5,
-            comment:
-                "Excellent GPU condition. Transaction was seamless through the escrow system.",
-            date: "12 May 2026",
-        },
-        {
-            id: 2,
-            user: "Sarah J.",
-            rating: 5,
-            comment:
-                "Very knowledgeable about hardware specs. RAM was exactly as described.",
-            date: "09 May 2026",
-        },
-    ];
+	const isEditRoute = location.pathname === "/profile/edit";
 
-    return (
-        <div className="min-h-screen bg-[#050506] text-slate-300 pb-12 relative overflow-hidden">
-            {/* Ambient Interface Matrix Background */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
+	const [activeTab, setActiveTab] = useState("active");
+	const [profile, setProfile] = useState(null);
+	const [listings, setListings] = useState([]);
+	const [reviews, setReviews] = useState([]);
+	const [trades, setTrades] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false); // Account deletion loading state flag
 
-            {/* HERO IDENTITY TERMINAL */}
-            <section className="w-full bg-[#0c0c0e]/80 border-b border-white/5 pt-14 pb-16 px-4 flex flex-col items-center relative z-10 backdrop-blur-md">
-                
-                {/* Security Verified Avatar Frame */}
-                <div className="relative">
-                    <div className="absolute inset-0 bg-fuchsia-500/20 rounded-full blur-xl animate-pulse" />
-                    <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full border-2 border-fuchsia-500/40 p-1 bg-black shadow-[0_0_30px_rgba(217,70,239,0.15)]">
-                        <img
-                            src="https://placehold.co/128"
-                            alt="User Identity Portrait"
-                            className="w-full h-full rounded-full object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-500"
-                        />
-                    </div>
-                    {/* Floating Status Node */}
-                    <div className="absolute bottom-1 right-1 bg-black border border-fuchsia-500 p-2 rounded-full shadow-lg shadow-fuchsia-500/20 text-fuchsia-400">
-                        <ShieldCheck size={16} />
-                    </div>
-                </div>
+	const profileUserId = isEditRoute
+		? authUser
+			? String(authUser.id)
+			: null
+		: routeUserId || (authUser ? String(authUser.id) : null);
+	const isOwnProfile =
+		authUser && profileUserId && String(authUser.id) === String(profileUserId);
 
-                {/* Identity Metadata */}
-                <div className="mt-6 text-center space-y-1.5">
-                    <h1 className="text-white text-xl md:text-2xl lg:text-3xl font-black uppercase font-mono tracking-tight">
-                        Brandan-Lee James Sherbrooke
-                    </h1>
-                    <div className="flex items-center justify-center gap-1 text-slate-500 font-mono text-xs uppercase tracking-widest">
-                        <MapPin size={12} className="text-fuchsia-500/60" />
-                        <span>Gauteng</span>
-                    </div>
-                </div>
+	const isSeller =
+		profile?.reg_type === "seller" || profile?.reg_type === "both";
+	const isBuyer = profile?.reg_type === "buyer";
 
-                {/* Cyber Integrity Telemetry Bar */}
-                <div className="mt-8 w-full max-w-sm bg-black border border-white/10 p-3.5 rounded-xl shadow-2xl flex items-center justify-between font-mono relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-12 h-[1px] bg-fuchsia-500" />
-                    
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-fuchsia-500/5 border border-fuchsia-500/20 rounded-lg flex items-center justify-center text-fuchsia-400">
-                            <Trophy size={16} />
-                        </div>
-                        <div>
-                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
-                                Trust Integrity
-                            </p>
-                            <p className="text-base font-black text-white tracking-tight">4.9 / 5.0</p>
-                        </div>
-                    </div>
+	const loadTrades = async () => {
+		try {
+			const response = await apiFetch(
+				`/marketplace/get_user_trades.php?id=${encodeURIComponent(profileUserId)}`,
+			);
+			const data = await response.json();
+			if (response.ok) setTrades(data.trades || []);
+		} catch (err) {
+			console.error("Failed to load trades", err);
+		}
+	};
 
-                    <div className="bg-fuchsia-500/10 border border-fuchsia-500/30 px-2.5 py-1 rounded text-fuchsia-400 font-bold text-[10px] md:text-xs tracking-wider">
-                        24 TRADES
-                    </div>
-                </div>
-            </section>
+	useEffect(() => {
+		if (authLoading) return;
+		if (!profileUserId) {
+			setLoading(false);
+			setError(
+				"Log in to view your profile, or open a seller profile from a listing.",
+			);
+			return;
+		}
 
-            {/* TELEMETRY MATRIX STATS */}
-            <div className="max-w-4xl w-full mx-auto px-4 mt-8 grid grid-cols-3 gap-3 relative z-10">
-                <StatCard
-                    icon={<ShieldCheck className="text-fuchsia-400" size={16} />}
-                    label="TOTAL TRADES"
-                    value="14"
-                />
-                <StatCard
-                    icon={<Quote className="text-fuchsia-400" size={16} />}
-                    label="TOTAL REVIEWS"
-                    value="8"
-                />
-                <StatCard
-                    icon={<Calendar1 className="text-fuchsia-400" size={16} />}
-                    label="SYS_ENTRY_DATE"
-                    value="OCT 2025"
-                />
-            </div>
+		const loadProfile = async () => {
+			setLoading(true);
+			setError(null);
+			try {
+				const response = await apiFetch(
+					`/marketplace/get_user_profile.php?id=${encodeURIComponent(profileUserId)}`,
+				);
+				const data = await response.json();
+				if (!response.ok)
+					throw new Error(data.error || "Could not load this profile.");
 
-            {/* DATA LEDGERS & RECORD LOGS */}
-            <main className="max-w-4xl w-full mx-auto px-4 mt-8 flex flex-col gap-8 relative z-10">
-                <div className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.4)]">
-                    {/* Interactive Tab Controller Matrix */}
-                    <div className="flex bg-black border-b border-white/5 font-mono" role="tablist" aria-label="Profile Data Ledger">
-                        <button
-                            role="tab"
-                            aria-selected={activeTab === "active"}
-                            onClick={() => setActiveTab("active")}
-                            className={`flex-1 py-4 font-black text-xs md:text-sm uppercase tracking-widest transition-all duration-300 outline-none
-                                ${activeTab === "active"
-                                    ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500 shadow-[inset_0_-10px_20px_rgba(217,70,239,0.03)]"
-                                    : "text-slate-600 hover:text-slate-300 border-b-2 border-transparent"
-                                }`}
-                        >
-                            Active Listings
-                        </button>
-                        <button
-                            role="tab"
-                            aria-selected={activeTab === "history"}
-                            onClick={() => setActiveTab("history")}
-                            className={`flex-1 py-4 font-black text-xs md:text-sm uppercase tracking-widest transition-all duration-300 outline-none
-                                ${activeTab === "history"
-                                    ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500 shadow-[inset_0_-10px_20px_rgba(217,70,239,0.03)]"
-                                    : "text-slate-600 hover:text-slate-300 border-b-2 border-transparent"
-                                }`}
-                        >
-                            Trade History
-                        </button>
-                    </div>
+				setProfile(data.user);
+				setListings(Array.isArray(data.listings) ? data.listings : []);
+				setReviews(Array.isArray(data.reviews) ? data.reviews : []);
+				setActiveTab(data.user.reg_type === "buyer" ? "history" : "active");
+			} catch (err) {
+				setProfile(null);
+				setError(err.message || "Failed to load profile.");
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadProfile();
+	}, [profileUserId, authLoading]);
 
-                    {/* Active Tab Panel Target Wrapper */}
-                    <div className="p-4 md:p-6 flex flex-col gap-4 bg-transparent">
-                        {activeTab === "active" ? (
-                            <>
-                                <ActiveListingCard
-                                    title="NVIDIA RTX 3080 Ti Founders Edition"
-                                    price="12,500"
-                                    condition="Excellent"
-                                    time="Posted 2 days ago"
-                                    views="143"
-                                    image="https://placehold.co/200"
-                                />
-                                <ActiveListingCard
-                                    title="AMD Ryzen 9 7950X (Sealed)"
-                                    price="9,800"
-                                    condition="Brand New"
-                                    time="Posted 5 days ago"
-                                    views="98"
-                                    image="https://placehold.co/200"
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <TradeHistoryCard
-                                    title="ASUS ROG Strix RTX 3070"
-                                    buyer="Thabo M."
-                                    date="May 11, 2026"
-                                    price="R8,500"
-                                    status="COMPLETED"
-                                />
-                                <TradeHistoryCard
-                                    title="Corsair Dominator 32GB DDR5"
-                                    buyer="Sarah J."
-                                    date="May 09, 2026"
-                                    price="R3,200"
-                                    status="IN PROGRESS"
-                                />
-                            </>
-                        )}
-                    </div>
-                </div>
+	useEffect(() => {
+		if (isEditRoute || authLoading) return;
+		if (!routeUserId && authUser) {
+			navigate(`/profile/${authUser.id}`, { replace: true });
+		}
+	}, [routeUserId, authUser, authLoading, navigate, isEditRoute]);
 
-                {/* USER TELEMETRY FEEDBACK LOGS */}
-                <section className="space-y-4">
-                    <h2 className="text-white text-base md:text-lg font-black uppercase font-mono tracking-[0.2em] flex items-center gap-2">
-                        <span className="w-1 h-3 bg-fuchsia-500 inline-block shadow-[0_0_8px_#d946ef]" />
-                        User Reviews
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {reviews.map((review) => (
-                            <ReviewCard key={review.id} {...review} />
-                        ))}
-                    </div>
-                </section>
+	const renderRegistrationBadge = () => {
+		if (!profile?.reg_type) return null;
 
-                {/* DASHBOARD ACTION CONTROLS */}
-                <div className="w-full flex flex-col sm:flex-row justify-center items-center gap-4 border-t border-white/5 pt-6">
-                    <div className="w-full max-w-xs">
-                        <CyberActionButton label="EDIT PROFILE" className="w-full" />
-                    </div>
+		const badges = {
+			buyer: {
+				label: "BUYER",
+				classes: "border-cyan-500/30 bg-cyan-500/[0.04] text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.1)]",
+			},
+			seller: {
+				label: "SELLER",
+				classes: "border-fuchsia-500/30 bg-fuchsia-500/[0.04] text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.1)]",
+			},
+			both: {
+				label: "BOTH SELLER AND BUYER",
+				classes: "border-violet-500/40 bg-violet-500/[0.05] text-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
+			},
+		};
 
-                    <button
-                        type="button"
-                        aria-label="Permanently terminate this network identity profile account link"
-                        className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] 
-                            text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 
-                            hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all 
-                            duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40"
-                        onClick={() => {
-                            if (
-                                window.confirm(
-                                    "CRITICAL WARNING: Are you sure you want to delete this profile? This action is permanent.",
-                                )
-                            ) {
-                                console.log("Account deleted");
-                            }
-                        }}
-                    >
-                        Delete Profile
-                    </button>
-                </div>
-            </main>
-        </div>
-    );
+		const design = badges[profile.reg_type] || badges.buyer;
+
+		return (
+			<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase font-mono tracking-widest ${design.classes}`}>
+				<User size={10} />
+				<span>{design.label}</span>
+			</div>
+		);
+	};
+
+	const handleDeleteProfile = async () => {
+		const confirmed = window.confirm(
+			"CRITICAL WARNING:\n\nAre you sure you want to delete this profile? This action is permanent and will withdraw all active listings from circulation.",
+		);
+		
+		if (!confirmed) return;
+
+		setIsDeleting(true);
+		try {
+			const response = await apiFetch("/authentication/delete_user.php", {
+				method: "POST",
+			});
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.message || "Network system rejected profile removal execution.");
+			}
+
+			alert(data.message || "Account successfully wiped.");
+			
+			if (typeof logout === "function") {
+				await logout();
+			}
+			navigate("/marketplace", { replace: true });
+		} catch (err) {
+			console.error("Account termination workflow fault:", err);
+			alert(`TERMINATION FAULT: ${err.message}`);
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
+	const avatarSrc =
+		profile?.avatar ||
+		`https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.fullName || "User")}&background=581c87&color=fff`;
+
+	if (loading) {
+		return (
+			<div className="min-h-screen bg-[#050506] flex items-center justify-center gap-3 text-slate-500 font-mono text-xs uppercase tracking-widest">
+				<Loader2 className="animate-spin text-fuchsia-500" size={24} />
+				Loading profile...
+			</div>
+		);
+	}
+
+	if (error || !profile) {
+		return (
+			<div className="min-h-screen bg-[#050506] flex items-center justify-center p-4 font-mono">
+				<div className="max-w-md w-full border border-red-500/10 bg-red-500/5 p-6 rounded-2xl text-center">
+					<AlertTriangle size={32} className="mx-auto text-red-500 mb-3" />
+					<p className="text-red-400 text-sm mb-4">
+						{error || "Profile unavailable."}
+					</p>
+					<Link
+						to="/marketplace"
+						className="text-fuchsia-400 text-xs uppercase tracking-widest hover:underline"
+					>
+						Return to marketplace
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className="min-h-screen bg-[#050506] text-slate-300 pb-12 relative overflow-hidden">
+			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
+
+			<section className="w-full bg-[#0c0c0e]/80 border-b border-white/5 pt-14 pb-16 px-4 flex flex-col items-center relative z-10 backdrop-blur-md">
+				<div className="relative">
+					<div className="absolute inset-0 bg-fuchsia-500/20 rounded-full blur-xl animate-pulse" />
+					<div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full border-2 border-fuchsia-500/40 p-1 bg-black shadow-[0_0_30px_rgba(217,70,239,0.15)]">
+						<img
+							src={avatarSrc}
+							alt={profile.fullName}
+							className="w-full h-full rounded-full object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-500"
+						/>
+					</div>
+					<div className="absolute bottom-1 right-1 bg-black border border-fuchsia-500 p-2 rounded-full shadow-lg shadow-fuchsia-500/20 text-fuchsia-400">
+						<ShieldCheck size={16} />
+					</div>
+				</div>
+
+				<div className="mt-6 text-center space-y-2.5">
+					<h1 className="text-white text-xl md:text-2xl lg:text-3xl font-black uppercase font-mono tracking-tight leading-none">
+						{profile.fullName}
+					</h1>
+					
+					{/* ACCOUNT TYPE COMPONENT BADGE INSERTED HERE */}
+					<div className="flex flex-col items-center gap-2">
+						{renderRegistrationBadge()}
+						<div className="flex items-center justify-center gap-1 text-slate-500 font-mono text-xs uppercase tracking-widest">
+							<MapPin size={12} className="text-fuchsia-500/60" />
+							<span>{profile.province}</span>
+						</div>
+					</div>
+				</div>
+
+				<div className="mt-8 w-full max-w-sm bg-black border border-white/10 p-3.5 rounded-xl shadow-2xl flex items-center justify-between font-mono relative overflow-hidden">
+					<div className="flex items-center gap-3">
+						<div className="w-9 h-9 bg-fuchsia-500/5 border border-fuchsia-500/20 rounded-lg flex items-center justify-center text-fuchsia-400">
+							<Trophy size={16} />
+						</div>
+						<div>
+							<p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+								Trust Integrity
+							</p>
+							<p className="text-base font-black text-white tracking-tight">
+								{profile.trust_score} / 5.0
+							</p>
+						</div>
+					</div>
+					<div className="bg-fuchsia-500/10 border border-fuchsia-500/30 px-2.5 py-1 rounded text-fuchsia-400 font-bold text-[10px] md:text-xs tracking-wider">
+						{profile.trade_count} TRADES
+					</div>
+				</div>
+			</section>
+
+			<main className="max-w-4xl w-full mx-auto px-4 mt-8 flex flex-col gap-8 relative z-10">
+				<div className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+					<div
+						className="flex bg-black border-b border-white/5 font-mono"
+						role="tablist"
+					>
+						{isSeller && (
+							<>
+								<button
+									onClick={() => setActiveTab("active")}
+									className={`flex-1 py-4 font-black text-xs md:text-sm uppercase transition-all ${activeTab === "active" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
+								>
+									Active Listings
+								</button>
+								<button
+									onClick={() => {
+										setActiveTab("history");
+										if (trades.length === 0) loadTrades();
+									}}
+									className={`flex-1 py-4 font-black text-xs md:text-sm uppercase transition-all ${activeTab === "history" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
+								>
+									Trade History
+								</button>
+							</>
+						)}
+
+						{isBuyer && (
+							<button
+								onClick={() => {
+									setActiveTab("history");
+									if (trades.length === 0) loadTrades();
+								}}
+								className={`flex-1 py-4 font-black text-xs md:text-sm uppercase transition-all ${activeTab === "history" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
+							>
+								Trade History
+							</button>
+						)}
+					</div>
+
+					<div className="p-4 md:p-6 flex flex-col gap-4 bg-transparent">
+						{activeTab === "active" &&
+							isSeller &&
+							(listings.length > 0 ? (
+								listings.map((item) => (
+									<ActiveListingCard key={item.id} {...item} />
+								))
+							) : (
+								<p className="text-center text-slate-500 text-xs py-8">
+									No active listings.
+								</p>
+							))}
+						{activeTab === "history" && isBuyer && (
+							<div className="space-y-4">
+								{trades.length > 0 ? (
+									trades.map((t) => <TradeHistoryCard key={t.id} {...t} />)
+								) : (
+									<p className="text-center text-slate-500 text-xs py-8">
+										No trade history found.
+									</p>
+								)}
+							</div>
+						)}
+					</div>
+				</div>
+
+				{/* Profile Action Buttons */}
+				{!isOwnProfile && (
+					<div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/5">
+						<button
+							onClick={() => navigate(`/report/user/${profile.id}`)}
+							className="flex-1 h-12 rounded-xl border border-rose-500/20 bg-rose-500/[0.03] text-rose-400 hover:bg-rose-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
+						>
+							Report This User
+						</button>
+						<button
+							onClick={() => navigate(`/review/user/${profile.id}`)}
+							className="flex-1 h-12 rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/[0.03] text-fuchsia-400 hover:bg-fuchsia-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
+						>
+							Leave A Review
+						</button>
+					</div>
+				)}
+
+				{isOwnProfile && (
+					<div className="w-full flex flex-col sm:flex-row justify-center items-center gap-4 border-t border-white/5 pt-6">
+						<div className="w-full max-w-xs">
+							<CyberActionButton
+								label="EDIT PROFILE"
+								className="w-full"
+								onClick={() => navigate("/profile/edit")}
+							/>
+						</div>
+
+						<button
+							type="button"
+							disabled={isDeleting}
+							aria-label="Permanently terminate this network identity profile account link"
+							className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] 
+								text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 
+								hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all 
+								duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40
+								disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+							onClick={handleDeleteProfile}
+						>
+							{isDeleting ? (
+								<>
+									<Loader2 className="animate-spin text-white" size={14} />
+									<span>SHREDDING DATA...</span>
+								</>
+							) : (
+								<span>Delete Profile</span>
+							)}
+						</button>
+					</div>
+				)}
+			</main>
+		</div>
+	);
 }

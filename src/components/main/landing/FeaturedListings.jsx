@@ -143,12 +143,6 @@ export default function FeaturedListings() {
 						))}
 					</motion.div>
 				)}
-
-				<div className="mt-20 w-full h-[1px] bg-gradient-to-r from-transparent via-fuchsia-500/20 to-transparent flex justify-center">
-					<div className="bg-[#050505] px-4 -mt-2">
-						<Cpu size={16} className="text-fuchsia-900" />
-					</div>
-				</div>
 			</div>
 		</section>
 	);

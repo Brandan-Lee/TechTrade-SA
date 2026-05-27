@@ -1,12 +1,35 @@
 import React, { useState } from "react";
 import { Search, X } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function SearchBar({ className }) {
+    const navigate = useNavigate();
+	const location = useLocation();
     const [searchTerm, setSearchTerm] = useState("");
+
+    const redirectToMarketplace = (qValue) => {
+        const q = (qValue ?? "").trim();
+        if (!q) return;
+
+		// If user is already on marketplace, preserve existing filter params.
+		const params =
+			location.pathname === "/marketplace"
+				? new URLSearchParams(location.search)
+				: new URLSearchParams();
+
+		params.set("q", q);
+		params.set("page", "1");
+		navigate({
+			pathname: "/marketplace",
+			search: params.toString() ? `?${params.toString()}` : "",
+		});
+    };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            console.log("Searching data vectors for:", searchTerm);
+            e.preventDefault();
+            redirectToMarketplace(searchTerm);
+            setSearchTerm("");
         }
     };
 
@@ -33,7 +56,24 @@ export default function SearchBar({ className }) {
             {searchTerm && (
                 <button
                     type="button"
-                    onClick={() => setSearchTerm("")}
+                    onClick={() => {
+                        setSearchTerm("");
+
+						// If on marketplace, only remove q. Keep other filters.
+						if (location.pathname === "/marketplace") {
+							const params = new URLSearchParams(location.search);
+							params.delete("q");
+							params.set("page", "1");
+
+							const remaining = params.toString();
+							navigate({
+								pathname: "/marketplace",
+								search: remaining ? `?${remaining}` : "",
+							});
+						} else {
+							navigate("/marketplace");
+						}
+                    }}
                     aria-label="Clear active query parameter"
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 rounded border border-purple-500/10 hover:border-fuchsia-500/40 bg-[#120d1e] hover:bg-[#1a122b] text-slate-400 hover:text-fuchsia-400 transition-all duration-150 flex items-center gap-1.5 active:scale-95 text-[10px] sm:text-xs font-black tracking-widest uppercase"
                 >

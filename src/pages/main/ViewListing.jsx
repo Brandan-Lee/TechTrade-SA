@@ -14,13 +14,14 @@ import {
 	Loader2,
 	Edit,
 	Trash2,
+	Lock,
 } from "lucide-react";
 import CyberActionButton from "../../components/ui/CyberActionButton";
 import AuthInput from "../../components/ui/AuthInput";
 import AlternateButton from "../../components/ui/AlternateButton";
 import ActiveListingCard from "../../components/main/profile/ActiveListingCard";
 import { apiFetch, mediaUrl } from "../../lib/api";
-import { useAuth } from "../../components/AuthContext"; 
+import { useAuth } from "../../components/AuthContext";
 
 export default function ViewListing() {
 	const { id } = useParams();
@@ -189,10 +190,6 @@ export default function ViewListing() {
 		navigate(`/profile/${sellerId}`);
 	};
 
-	const handleReport = () => {
-		navigate(`/listing-report/${id}`);
-	};
-
 	if (loading) {
 		return (
 			<div className="w-full min-h-screen bg-[#050505] py-32 flex flex-col items-center justify-center gap-3 text-slate-500 font-mono text-xs uppercase tracking-widest">
@@ -225,7 +222,17 @@ export default function ViewListing() {
 
 	const { listing, seller, matching_assets } = listingData;
 
+	const handleReport = () => {
+		navigate(`/listing-report/${id}`, {
+			state: { listingTitle: listing.title ?? "" },
+		});
+	};
+
 	const isOwner = user && String(user.id) === String(listing.seller_id);
+
+	// CORE ENFORCEMENT CONDITION: Blocks execution strings if status parameters match
+	const isLocked =
+		listing.status === "committed" || listing.status === "completed";
 
 	const displayImages =
 		listing.images && listing.images.length > 0
@@ -303,13 +310,20 @@ export default function ViewListing() {
 								</h1>
 							</div>
 
-							<div className="sm:text-right shrink-0">
-								<p className="text-fuchsia-400 text-2xl sm:text-3xl font-black tracking-tight">
+							<div className="sm:text-right shrink-0 flex flex-col items-start sm:items-end gap-2">
+								<p className="text-fuchsia-400 text-2xl sm:text-3xl font-black tracking-tight leading-none">
 									{formatCurrency(listing.price_cents)}
 								</p>
-								<span className="inline-block mt-1.5 px-2 py-0.5 border border-emerald-500/30 bg-emerald-500/10 rounded text-emerald-400 text-[10px] font-black tracking-wider uppercase">
-									{listing.condition_grade}
-								</span>
+								<div className="flex gap-2.5">
+									<span className="inline-block px-2 py-0.5 border border-emerald-500/30 bg-emerald-500/10 rounded text-emerald-400 text-[10px] font-black tracking-wider uppercase">
+										{listing.condition_grade}
+									</span>
+									{isLocked && (
+										<span className="inline-flex items-center gap-1 px-2 py-0.5 border border-amber-500/30 bg-amber-500/10 rounded text-amber-400 text-[10px] font-black tracking-wider uppercase">
+											<Lock size={10} /> {listing.status}
+										</span>
+									)}
+								</div>
 							</div>
 						</div>
 
@@ -377,7 +391,15 @@ export default function ViewListing() {
 								Listing Management
 							</h3>
 
-							{!showDeleteConfirm ? (
+							{isLocked ? (
+								/* Renders a lock notice block instead of edit buttons if status is locked */
+								<div className="border border-amber-500/20 bg-amber-500/[0.02] text-amber-400 p-4 rounded-lg text-center text-xs font-bold uppercase tracking-wider flex flex-col items-center gap-2">
+									<Lock size={18} className="text-amber-500" />
+									<span>
+										This listing is {listing.status} and cannot be modified.
+									</span>
+								</div>
+							) : !showDeleteConfirm ? (
 								<div className="flex flex-col gap-3">
 									<CyberActionButton
 										onClick={() =>
@@ -494,7 +516,13 @@ export default function ViewListing() {
 					</section>
 
 					{!isOwner &&
-						(listing.accepts_offers !== false ? (
+						(isLocked ? (
+							/* Blocks offers from buyers if the item status is already locked */
+							<section className="bg-[#0c0c0e]/90 border border-amber-500/20 rounded-xl p-5 text-center text-amber-500 text-xs uppercase tracking-widest font-black flex flex-col items-center gap-2">
+								<Lock size={16} />
+								<span>This listing is no longer accepting offers.</span>
+							</section>
+						) : listing.accepts_offers !== false ? (
 							<section
 								aria-label="Make an Offer Interface"
 								className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-5 md:p-6 shadow-xl relative"
