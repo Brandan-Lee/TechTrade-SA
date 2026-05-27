@@ -84,7 +84,6 @@ const ListingReportPage = () => {
 			return;
 		}
 
-		// --- API SUBMISSION ---
 		setIsSubmitting(true);
 		try {
 			const response = await apiFetch("/reports/report_listing.php", {
@@ -101,9 +100,7 @@ const ListingReportPage = () => {
 
 			if (!response.ok) {
 				throw new Error(
-					result.error ||
-						result.message ||
-						"Failed to submit report.",
+					result.error || result.message || "Failed to submit report.",
 				);
 			}
 
@@ -132,6 +129,13 @@ const ListingReportPage = () => {
 		<div className="min-h-screen bg-[#050506] font-mono text-slate-300 pb-20 relative selection:bg-fuchsia-500/30">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808002_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
+			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+				Report User{" "}
+				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+					Listing
+				</span>
+			</h1>
+
 			<header className="w-full max-w-3xl mx-auto px-4 pt-8 relative z-10">
 				<div className="flex gap-4 items-start">
 					<button
@@ -145,9 +149,6 @@ const ListingReportPage = () => {
 						<h1 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight leading-none break-words">
 							Report: {listingTitle}
 						</h1>
-						<p className="mt-2 text-xs sm:text-sm md:text-base font-bold text-slate-500 uppercase tracking-wider truncate">
-							Listing Reference: // #{listingId || "NOT_DEFINED"}
-						</p>
 					</div>
 				</div>
 			</header>

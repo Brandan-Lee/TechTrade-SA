@@ -22,7 +22,7 @@ export default function Profile() {
 	const { userId: routeUserId } = useParams();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { user: authUser, isLoading: authLoading, logout } = useAuth(); // Extracted logout handler 
+	const { user: authUser, isLoading: authLoading, logout } = useAuth();
 
 	const isEditRoute = location.pathname === "/profile/edit";
 
@@ -33,7 +33,7 @@ export default function Profile() {
 	const [trades, setTrades] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [isDeleting, setIsDeleting] = useState(false); // Account deletion loading state flag
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const profileUserId = isEditRoute
 		? authUser
@@ -107,22 +107,27 @@ export default function Profile() {
 		const badges = {
 			buyer: {
 				label: "BUYER",
-				classes: "border-cyan-500/30 bg-cyan-500/[0.04] text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.1)]",
+				classes:
+					"border-cyan-500/30 bg-cyan-500/[0.04] text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.1)]",
 			},
 			seller: {
 				label: "SELLER",
-				classes: "border-fuchsia-500/30 bg-fuchsia-500/[0.04] text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.1)]",
+				classes:
+					"border-fuchsia-500/30 bg-fuchsia-500/[0.04] text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.1)]",
 			},
 			both: {
 				label: "BOTH SELLER AND BUYER",
-				classes: "border-violet-500/40 bg-violet-500/[0.05] text-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
+				classes:
+					"border-violet-500/40 bg-violet-500/[0.05] text-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
 			},
 		};
 
 		const design = badges[profile.reg_type] || badges.buyer;
 
 		return (
-			<div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase font-mono tracking-widest ${design.classes}`}>
+			<div
+				className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase font-mono tracking-widest ${design.classes}`}
+			>
 				<User size={10} />
 				<span>{design.label}</span>
 			</div>
@@ -133,7 +138,7 @@ export default function Profile() {
 		const confirmed = window.confirm(
 			"CRITICAL WARNING:\n\nAre you sure you want to delete this profile? This action is permanent and will withdraw all active listings from circulation.",
 		);
-		
+
 		if (!confirmed) return;
 
 		setIsDeleting(true);
@@ -144,11 +149,13 @@ export default function Profile() {
 			const data = await response.json();
 
 			if (!response.ok) {
-				throw new Error(data.message || "Network system rejected profile removal execution.");
+				throw new Error(
+					data.message || "Network system rejected profile removal execution.",
+				);
 			}
 
 			alert(data.message || "Account successfully wiped.");
-			
+
 			if (typeof logout === "function") {
 				await logout();
 			}
@@ -159,6 +166,10 @@ export default function Profile() {
 		} finally {
 			setIsDeleting(false);
 		}
+	};
+
+	const handleReport = () => {
+		navigate(`/report-user/${profile.id}`, { state: { profile } });
 	};
 
 	const avatarSrc =
@@ -194,9 +205,16 @@ export default function Profile() {
 	}
 
 	return (
-		<div className="min-h-screen bg-[#050506] text-slate-300 pb-12 relative overflow-hidden">
+		<div className="bg-[#050506] text-slate-300 pb-12 relative overflow-hidden">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
+
+			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+				User{" "}
+				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+					Profile
+				</span>
+			</h1>
 
 			<section className="w-full bg-[#0c0c0e]/80 border-b border-white/5 pt-14 pb-16 px-4 flex flex-col items-center relative z-10 backdrop-blur-md">
 				<div className="relative">
@@ -217,8 +235,7 @@ export default function Profile() {
 					<h1 className="text-white text-xl md:text-2xl lg:text-3xl font-black uppercase font-mono tracking-tight leading-none">
 						{profile.fullName}
 					</h1>
-					
-					{/* ACCOUNT TYPE COMPONENT BADGE INSERTED HERE */}
+
 					<div className="flex flex-col items-center gap-2">
 						{renderRegistrationBadge()}
 						<div className="flex items-center justify-center gap-1 text-slate-500 font-mono text-xs uppercase tracking-widest">
@@ -317,7 +334,7 @@ export default function Profile() {
 				{!isOwnProfile && (
 					<div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/5">
 						<button
-							onClick={() => navigate(`/report/user/${profile.id}`)}
+							onClick={handleReport}
 							className="flex-1 h-12 rounded-xl border border-rose-500/20 bg-rose-500/[0.03] text-rose-400 hover:bg-rose-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
 						>
 							Report This User
@@ -346,10 +363,10 @@ export default function Profile() {
 							disabled={isDeleting}
 							aria-label="Permanently terminate this network identity profile account link"
 							className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] 
-								text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 
-								hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all 
-								duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40
-								disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 
+                hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all 
+                duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40
+                disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 							onClick={handleDeleteProfile}
 						>
 							{isDeleting ? (

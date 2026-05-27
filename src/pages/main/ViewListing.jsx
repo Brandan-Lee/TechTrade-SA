@@ -230,7 +230,6 @@ export default function ViewListing() {
 
 	const isOwner = user && String(user.id) === String(listing.seller_id);
 
-	// CORE ENFORCEMENT CONDITION: Blocks execution strings if status parameters match
 	const isLocked =
 		listing.status === "committed" || listing.status === "completed";
 
@@ -246,6 +245,13 @@ export default function ViewListing() {
 	return (
 		<div className="min-h-screen bg-[#050506] text-slate-300 pb-20 font-mono selection:bg-fuchsia-500/30 selection:text-white relative">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808002_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+
+			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+				View{" "}
+				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+					Listing
+				</span>
+			</h1>
 
 			<main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
 				<div className="lg:col-span-7 flex flex-col gap-6 min-w-0">
