@@ -216,7 +216,7 @@ function App() {
 						element={<ListingReportPage />}
 					/>
 					<Route path="escrow-tracker" element={<EscrowTrackerPage />} />
-					<Route path="review" element={<ReviewPage />} />
+					<Route path="review/:userId" element={<ReviewPage />} />
 					<Route path="report-user/:userId" element={<ReportUser />} />
 					<Route path="dispute" element={<LaunchDisputePage />} />
 					<Route path="whatsapp-ttl" element={<WhatsAppTTLPage />} />

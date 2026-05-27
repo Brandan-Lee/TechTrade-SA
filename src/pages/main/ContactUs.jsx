@@ -1,23 +1,137 @@
-import React from "react";
-import {
-	Mail,
-	Phone,
-	MapPin,
-	MessageSquare,
-	ChevronDown,
-	Terminal,
-} from "lucide-react";
+import React, { useState } from "react";
+import { Mail, Phone, MapPin, MessageSquare, ChevronDown } from "lucide-react";
 import AuthInput from "../../components/ui/AuthInput";
 import CyberActionButton from "../../components/ui/CyberActionButton";
+import CyberAlert from "../../components/ui/CyberAlert";
+import { useAuth } from "../../components/AuthContext";
+import { apiFetch } from "../../lib/api";
 
 export default function ContactUs() {
-	return (
-		<div className="min-h-screen bg-[#050505] text-slate-300 py-12 px-4 relative overflow-x-hidden">
-			{/* Ambient Background Grid Matrix */}
-			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808007_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-			<div className="absolute top-1/4 left-10 w-[400px] h-[400px] bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
+	const { user } = useAuth();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [formData, setFormData] = useState({
+		firstName: "",
+		lastName: "",
+		inquiryType: "",
+		message: "",
+		contactPreference: "Email",
+	});
 
-			{/* HEADER METADATA */}
+	const [errorField, setErrorField] = useState("");
+	const [shakeTick, setShakeTick] = useState(0);
+	const [alert, setAlert] = useState({
+		show: false,
+		message: "",
+		type: "error",
+	});
+
+	const triggerStatus = (message, type = "error", fieldName = "") => {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+		setAlert({ show: true, message, type });
+
+		if (type === "error" && fieldName) {
+			setErrorField("");
+			setShakeTick((tick) => tick + 1);
+			requestAnimationFrame(() => setErrorField(fieldName));
+		} else {
+			setErrorField("");
+		}
+	};
+
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormData((prev) => ({ ...prev, [name]: value }));
+
+		setAlert({ show: false, message: "", type: "error" });
+		if (errorField === name) {
+			setErrorField("");
+		}
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+
+		if (!formData.firstName.trim()) {
+			triggerStatus(
+				"Validation Error: Please enter your first name before sending.",
+				"error",
+				"firstName",
+			);
+			return;
+		}
+
+		if (!formData.lastName.trim()) {
+			triggerStatus(
+				"Validation Error: Please enter your last name before sending.",
+				"error",
+				"lastName",
+			);
+			return;
+		}
+
+		if (!formData.inquiryType) {
+			triggerStatus(
+				"Validation Error: Please select a valid inquiry type category.",
+				"error",
+				"inquiryType",
+			);
+			return;
+		}
+
+		if (!formData.message.trim()) {
+			triggerStatus(
+				"Validation Error: Please provide a description message outlining your inquiry details.",
+				"error",
+				"message",
+			);
+			return;
+		}
+
+		setIsSubmitting(true);
+		setAlert({ show: false, message: "", type: "error" });
+
+		try {
+			const response = await apiFetch(
+				"/marketplace/submit_support_message.php",
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(formData),
+				},
+			);
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.error || "Failed to submit support message.");
+			}
+
+			triggerStatus(
+				data.message || "Your support message has been sent successfully.",
+				"success",
+			);
+
+			setFormData({
+				firstName: "",
+				lastName: "",
+				inquiryType: "",
+				message: "",
+				contactPreference: "Email",
+			});
+			setErrorField("");
+		} catch (err) {
+			triggerStatus(
+				err.message || "An unexpected network error occurred.",
+				"error",
+				"message",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	return (
+		<div className="min-h-screen bg-[#050505] text-slate-300 py-12 px-4 relative overflow-x-hidden selection:bg-fuchsia-500/30">
+			{/* HEADER SECTION */}
 			<header className="w-full max-w-[1200px] mx-auto px-4 md:px-8 mb-12 relative z-10">
 				<h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-black uppercase italic tracking-tighter leading-none">
 					Contact <span className="text-fuchsia-500">Us</span>
@@ -27,23 +141,24 @@ export default function ContactUs() {
 				</p>
 			</header>
 
-			{/* CONTEXT DASHBOARD */}
-			<main className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
+			{/* MAIN CONTAINER */}
+			<main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-					{/* LEFT COLUMN: TELEMETRY INTELLIGENCE */}
+					{/* LEFT COLUMN: CONTACT DETAILS */}
 					<div className="lg:col-span-5 space-y-6">
 						<div className="bg-[#0c0c0e]/60 border border-white/5 rounded-2xl p-6 backdrop-blur-md">
 							<h2 className="text-xs md:text-sm font-black uppercase tracking-[0.25em] text-fuchsia-400 font-mono mb-4 flex items-center gap-2">
 								<span className="w-1.5 h-3 bg-fuchsia-500 inline-block" />
-								Core_Nodes
+								Help Center
 							</h2>
 							<p className="text-slate-400 font-mono text-xs md:text-sm leading-relaxed uppercase">
-								Our Managed Trust & Negotiation Hub is standing by to assist
-								with your hardware transactions and technical inquiries.
+								Our support team is standing by to assist with your hardware
+								transactions, account requirements, or general service
+								inquiries.
 							</p>
 						</div>
 
-						{/* Tactical Informational Rows */}
+						{/* Informational Rows */}
 						<div className="space-y-3">
 							{[
 								{
@@ -81,17 +196,17 @@ export default function ContactUs() {
 							))}
 						</div>
 
-						{/* Status System Plate */}
+						{/* Live Availability Status Card */}
 						<div className="p-5 bg-gradient-to-r from-purple-950/40 via-fuchsia-950/20 to-purple-950/40 border border-fuchsia-500/20 text-white rounded-xl relative overflow-hidden">
 							<div className="relative z-10 font-mono">
 								<div className="flex items-center gap-2 mb-1.5">
 									<div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
 									<span className="text-[10px] font-black tracking-[0.3em] text-emerald-400 uppercase">
-										ADMIN NUKE SUITE ONLINE
+										Support Desk Active
 									</span>
 								</div>
 								<p className="text-slate-400 text-[11px] uppercase tracking-wide">
-									Response {" "}
+									Average response time{" "}
 									<span className="text-white font-bold">within 24h</span>
 								</p>
 							</div>
@@ -99,49 +214,98 @@ export default function ContactUs() {
 						</div>
 					</div>
 
-					{/* RIGHT COLUMN: SECURE TRANSMISSION PACKET */}
+					{/* RIGHT COLUMN: CONTACT FORM CONTAINER */}
 					<div className="lg:col-span-7 bg-[#0c0c0e]/90 border border-white/10 p-6 md:p-8 rounded-2xl relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-						{/* Interactive Design Accent Tab */}
 						<div className="absolute top-0 right-8 w-16 h-[2px] bg-fuchsia-500 shadow-[0_0_10px_#d946ef]" />
 
-						<form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								<AuthInput
-									label="First Name"
-									name="firstName"
-									type="text"
-									placeholder="BRANDAN-LEE"
-									required
-								/>
-								<AuthInput
-									label="Last Name"
-									name="lastName" // Fixed: case assignment from 'name="text"'
-									type="text"
-									placeholder="SHERBROOKE"
-									required
+						{alert.show && (
+							<div className="mb-6">
+								<CyberAlert
+									type={alert.type}
+									message={alert.message}
+									onClose={() => setAlert({ ...alert, show: false })}
 								/>
 							</div>
+						)}
 
-							{/* Dropdown Menu Track */}
+						<form className="space-y-6" onSubmit={handleSubmit} noValidate>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div
+									className={errorField === "firstName" ? "animate-shake" : ""}
+								>
+									<AuthInput
+										key={
+											errorField === "firstName"
+												? `shake-${shakeTick}`
+												: "fn-normal"
+										}
+										label="First Name"
+										name="firstName"
+										type="text"
+										placeholder="e.g. John"
+										value={formData.firstName}
+										onChange={handleInputChange}
+										className={
+											errorField === "firstName" ? "border-red-500/50" : ""
+										}
+										required
+									/>
+								</div>
+								<div
+									className={errorField === "lastName" ? "animate-shake" : ""}
+								>
+									<AuthInput
+										key={
+											errorField === "lastName"
+												? `shake-${shakeTick}`
+												: "ln-normal"
+										}
+										label="Last Name"
+										name="lastName"
+										type="text"
+										placeholder="e.g. Doe"
+										value={formData.lastName}
+										onChange={handleInputChange}
+										className={
+											errorField === "lastName" ? "border-red-500/50" : ""
+										}
+										required
+									/>
+								</div>
+							</div>
+
+							{/* Category Inquiry Dropdown Menu with Error Shake Ring */}
 							<div className="space-y-2">
 								<label className="block text-slate-400 text-[10px] font-mono font-black uppercase tracking-[0.3em] ml-1">
 									Select Inquiry Type
 								</label>
-								<div className="relative">
+								<div
+									className={`relative ${errorField === "inquiryType" ? "animate-shake" : ""}`}
+								>
 									<select
-										name="inquiry_type"
-										className="w-full h-12 md:h-14 bg-black rounded-xl px-4 border border-white/10 text-slate-400 focus:text-slate-200 transition-all focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-xs md:text-sm font-mono appearance-none"
+										key={
+											errorField === "inquiryType"
+												? `shake-${shakeTick}`
+												: "sel-normal"
+										}
+										name="inquiryType"
+										value={formData.inquiryType}
+										onChange={handleInputChange}
+										className={`w-full h-12 md:h-14 bg-black rounded-xl px-4 border text-slate-400 focus:text-slate-200 transition-all focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-xs md:text-sm font-mono appearance-none ${
+											errorField === "inquiryType"
+												? "border-red-500/50"
+												: "border-white/10"
+										}`}
 										required
-										defaultValue=""
 									>
 										<option value="" disabled>
 											CHOOSE INQUIRY TYPE...
 										</option>
 										<option value="marketplace">MARKETPLACE SUPPORT</option>
 										<option value="escrow">ESCROW DISPUTE</option>
-										<option value="intel">HARDWARE INTELLIGENCE</option>
+										<option value="technical">TECHNICAL ASSISTANCE</option>
 										<option value="general">GENERAL INQUIRIES</option>
-										<option value="general">FEATURE RECOMMENDATION</option>
+										<option value="feedback">FEEDBACK & SUGGESTIONS</option>
 									</select>
 									<ChevronDown
 										className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none"
@@ -150,30 +314,46 @@ export default function ContactUs() {
 								</div>
 							</div>
 
-							{/* Deep Terminal Area Block */}
+							{/* Message Area with Error Shake border configuration */}
 							<div className="space-y-2">
 								<label className="block text-slate-400 text-[10px] font-mono font-black uppercase tracking-[0.3em] ml-1">
 									Message
 								</label>
 								<textarea
-									className="w-full h-40 bg-black rounded-xl px-4 py-4 border border-white/10 text-slate-200 focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-xs md:text-sm font-mono leading-relaxed placeholder:text-slate-800"
-									placeholder="WRITE PACKET INSTRUCTIONS HERE..."
+									key={
+										errorField === "message"
+											? `shake-${shakeTick}`
+											: "msg-normal"
+									}
+									name="message"
+									value={formData.message}
+									disabled={isSubmitting}
+									onChange={handleInputChange}
+									className={`w-full h-40 bg-black rounded-xl px-4 py-4 border text-slate-200 focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-xs md:text-sm font-mono leading-relaxed placeholder:text-slate-700 resize-none ${
+										errorField === "message"
+											? "border-red-500/50 animate-shake"
+											: "border-white/10"
+									}`}
+									placeholder="Type your message description details here..."
 									required
 								/>
 							</div>
 
-							{/* Radio Toggles */}
+							{/* Follow-up Toggles */}
 							<div className="p-4 bg-black rounded-xl border border-white/5 space-y-3">
 								<label className="block text-[10px] font-mono font-black uppercase tracking-[0.25em] text-fuchsia-500/80">
-									Choose your preferred contact method
+									Preferred Contact Method
 								</label>
 								<div className="flex flex-col sm:flex-row gap-6">
 									<label className="cursor-pointer flex items-center gap-2.5 group font-mono text-xs text-slate-400 select-none">
 										<input
 											type="radio"
-											name="contact_pref"
+											name="contactPreference"
+											value="Email"
+											checked={formData.contactPreference === "Email"}
+											onChange={handleInputChange}
 											className="w-3.5 h-3.5 accent-fuchsia-500"
-											defaultChecked
+											disabled={isSubmitting}
 										/>
 										<span className="uppercase tracking-widest group-hover:text-slate-200 transition-colors">
 											Email
@@ -183,8 +363,12 @@ export default function ContactUs() {
 									<label className="cursor-pointer flex items-center gap-2.5 group font-mono text-xs text-slate-400 select-none">
 										<input
 											type="radio"
-											name="contact_pref"
+											name="contactPreference"
+											value="WhatsApp"
+											checked={formData.contactPreference === "WhatsApp"}
+											onChange={handleInputChange}
 											className="w-3.5 h-3.5 accent-fuchsia-500"
+											disabled={isSubmitting}
 										/>
 										<span className="uppercase tracking-widest group-hover:text-slate-200 transition-colors">
 											WhatsApp
@@ -193,11 +377,31 @@ export default function ContactUs() {
 								</div>
 							</div>
 
-							<CyberActionButton label="SEND MESSAGE" className="w-full" />
+							<CyberActionButton
+								label={isSubmitting ? "SENDING..." : "SEND MESSAGE"}
+								className="w-full"
+								disabled={isSubmitting}
+								type="submit"
+							/>
 						</form>
 					</div>
 				</div>
 			</main>
+
+			<style
+				dangerouslySetInnerHTML={{
+					__html: `
+					@keyframes shake {
+						0%, 100% { transform: translateX(0); }
+						20%, 60% { transform: translateX(-6px); }
+						40%, 80% { transform: translateX(6px); }
+					}
+					.animate-shake {
+						animation: shake 0.4s ease-in-out;
+					}
+				`,
+				}}
+			/>
 		</div>
 	);
 }

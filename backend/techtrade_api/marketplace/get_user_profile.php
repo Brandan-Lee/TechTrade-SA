@@ -18,6 +18,13 @@ try {
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
 
+    if (!function_exists('publicMediaUrl')) {
+        function publicMediaUrl($path)
+        {
+            return $path;
+        }
+    }
+
     $db = Database::getConnection();
     if (!$db) {
         throw new Exception("Database connection could not be established.");
@@ -30,7 +37,6 @@ try {
 
     $crypto = defined('ENCRYPTION_KEY') ? new EncryptionEngine(ENCRYPTION_KEY) : null;
 
-    // ADDED reg_type TO SELECT
     $sqlUser = "
         SELECT
             u.id,
@@ -70,6 +76,7 @@ try {
         ? date('M Y', strtotime($row['created_at']))
         : 'Unknown';
 
+
     $sqlListings = "
         SELECT
             l.id,
@@ -101,6 +108,47 @@ try {
         ];
     }, $listingRows);
 
+
+    $sqlReviews = "
+        SELECT
+            r.id,
+            r.reviewer_id,
+            r.rating,
+            r.comment,
+            r.created_at,
+            u.id as reviewer_user_id,
+            u.first_name,
+            u.last_name,
+            u.avatar_url
+        FROM reviews r
+        INNER JOIN users u ON r.reviewer_id = u.id
+        WHERE r.reviewee_id = ? AND r.is_deleted = 0
+        ORDER BY r.created_at DESC
+        LIMIT 50
+    ";
+    $stmtReviews = $db->prepare($sqlReviews);
+    $stmtReviews->execute([$userId]);
+    $reviewRows = $stmtReviews->fetchAll(PDO::FETCH_ASSOC);
+
+    $reviews = array_map(function ($item) use ($crypto) {
+        $reviewerFirstName = $crypto ? ($crypto->decrypt($item['first_name']) ?? '') : $item['first_name'];
+        $reviewerLastName = $crypto ? ($crypto->decrypt($item['last_name']) ?? '') : $item['last_name'];
+        $reviewerFullName = trim($reviewerFirstName . ' ' . $reviewerLastName) ?: 'Anonymous Peer';
+
+        return [
+            "id" => (int) $item['id'],
+            "reviewer" => [
+                "id" => (int) $item['reviewer_user_id'],
+                "name" => $reviewerFullName,
+                "avatar" => !empty($item['avatar_url']) ? publicMediaUrl($item['avatar_url']) : null,
+            ],
+            "rating" => (int) $item['rating'],
+            "comment" => $item['comment'],
+            "date" => $item['created_at'] ? date('M j, Y', strtotime($item['created_at'])) : 'Unknown',
+        ];
+    }, $reviewRows);
+
+
     http_response_code(200);
     echo json_encode([
         "user" => [
@@ -115,7 +163,7 @@ try {
             "member_since" => $memberSince,
         ],
         "listings" => $listings,
-        "reviews" => [],
+        "reviews" => $reviews,
     ]);
 
 } catch (Exception $e) {

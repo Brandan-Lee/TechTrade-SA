@@ -589,6 +589,7 @@ CREATE TABLE reviews (
     
     comment TEXT NOT NULL,
     is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    is_flagged TINYINT(1) NOT NULL DEFAULT 0
     deleted_at DATETIME NULL DEFAULT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -599,6 +600,23 @@ CREATE TABLE reviews (
     CONSTRAINT fk_reviews_transaction FOREIGN KEY (transaction_id) REFERENCES transactions (id),
     CONSTRAINT fk_reviews_reviewer FOREIGN KEY (reviewer_id) REFERENCES users (id),
     CONSTRAINT fk_reviews_reviewee FOREIGN KEY (reviewee_id) REFERENCES users (id)
+) ENGINE = InnoDB;
+
+CREATE TABLE review_reports (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    review_id BIGINT UNSIGNED NOT NULL,
+    reporter_id BIGINT UNSIGNED NOT NULL,
+    reason_code VARCHAR(50) NOT NULL, -- e.g., 'SPAM', 'HARASSMENT', 'ABUSE', 'OTHER'
+    details TEXT NULL,
+    status ENUM('PENDING', 'INVESTIGATING', 'RESOLVED', 'DISMISSED') NOT NULL DEFAULT 'PENDING',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (id),
+    -- Prevents the same user from spam-reporting the exact same review multiple times
+    UNIQUE KEY uq_review_reporter (review_id, reporter_id), 
+    CONSTRAINT fk_reports_review FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE,
+    CONSTRAINT fk_reports_reporter FOREIGN KEY (reporter_id) REFERENCES users (id)
 ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------------------------------
@@ -721,6 +739,7 @@ CREATE TABLE
     email VARCHAR(255) NOT NULL,
     subject VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
+    contact_preference ENUM('Email', 'WhatsApp') NOT NULL DEFAULT 'Email'
     status ENUM ('new', 'in_progress', 'resolved', 'closed') NOT NULL DEFAULT 'new',
     assigned_to BIGINT UNSIGNED NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

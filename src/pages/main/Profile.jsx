@@ -7,6 +7,7 @@ import {
 	Loader2,
 	AlertTriangle,
 	User,
+	MessageSquare,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
@@ -172,6 +173,11 @@ export default function Profile() {
 		navigate(`/report-user/${profile.id}`, { state: { profile } });
 	};
 
+	const handleReview = () => {
+		if (!profile?.id) return;
+		navigate(`/review/${profile.id}`, { state: { profile } });
+	};
+
 	const avatarSrc =
 		profile?.avatar ||
 		`https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.fullName || "User")}&background=581c87&color=fff`;
@@ -205,11 +211,11 @@ export default function Profile() {
 	}
 
 	return (
-		<div className="bg-[#050506] text-slate-300 pb-12 relative overflow-hidden">
+		<div className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
 
-			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none p-4 max-w-4xl mx-auto mt-4">
 				User{" "}
 				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 					Profile
@@ -266,6 +272,7 @@ export default function Profile() {
 			</section>
 
 			<main className="max-w-4xl w-full mx-auto px-4 mt-8 flex flex-col gap-8 relative z-10">
+				{/* PRIMARY ACTIVITY CONTAINER (LISTINGS / TRADES) */}
 				<div className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.4)]">
 					<div
 						className="flex bg-black border-b border-white/5 font-mono"
@@ -316,7 +323,8 @@ export default function Profile() {
 									No active listings.
 								</p>
 							))}
-						{activeTab === "history" && isBuyer && (
+
+						{activeTab === "history" && (
 							<div className="space-y-4">
 								{trades.length > 0 ? (
 									trades.map((t) => <TradeHistoryCard key={t.id} {...t} />)
@@ -330,9 +338,9 @@ export default function Profile() {
 					</div>
 				</div>
 
-				{/* Profile Action Buttons */}
+				{/* PROFILE ACTION CONFIGURATIONS */}
 				{!isOwnProfile && (
-					<div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/5">
+					<div className="flex flex-col sm:flex-row gap-4 pt-2">
 						<button
 							onClick={handleReport}
 							className="flex-1 h-12 rounded-xl border border-rose-500/20 bg-rose-500/[0.03] text-rose-400 hover:bg-rose-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
@@ -340,7 +348,7 @@ export default function Profile() {
 							Report This User
 						</button>
 						<button
-							onClick={() => navigate(`/review/user/${profile.id}`)}
+							onClick={handleReview}
 							className="flex-1 h-12 rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/[0.03] text-fuchsia-400 hover:bg-fuchsia-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
 						>
 							Leave A Review
@@ -349,7 +357,7 @@ export default function Profile() {
 				)}
 
 				{isOwnProfile && (
-					<div className="w-full flex flex-col sm:flex-row justify-center items-center gap-4 border-t border-white/5 pt-6">
+					<div className="w-full flex flex-col sm:flex-row justify-center items-center gap-4 pt-2">
 						<div className="w-full max-w-xs">
 							<CyberActionButton
 								label="EDIT PROFILE"
@@ -362,11 +370,7 @@ export default function Profile() {
 							type="button"
 							disabled={isDeleting}
 							aria-label="Permanently terminate this network identity profile account link"
-							className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] 
-                text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 
-                hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all 
-                duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40
-                disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+							className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 							onClick={handleDeleteProfile}
 						>
 							{isDeleting ? (
@@ -380,6 +384,77 @@ export default function Profile() {
 						</button>
 					</div>
 				)}
+
+				{/* PERMANENT BOTTOM USER REVIEWS CONTAINER */}
+				<section className="mt-4 space-y-4">
+					<div className="flex items-center gap-2 px-1 border-b border-white/5 pb-2">
+						<MessageSquare className="text-fuchsia-400" size={16} />
+						<h2 className="text-white text-sm md:text-base font-black uppercase tracking-wider font-mono">
+							User Feedback History ({reviews.length})
+						</h2>
+					</div>
+
+					<div className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-4 md:p-6 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+						<div className="space-y-4">
+							{reviews.length > 0 ? (
+								reviews.map((review) => (
+									<ReviewCard
+										key={review.id}
+										{...review}
+										onReport={(reviewId) => {
+											// 1. Initial warning threshold verification prompt
+											const confirmReport = window.confirm(
+												"CRITICAL: Flag this transmission block for moderation review?",
+											);
+											if (!confirmReport) return;
+
+											// 2. Open inline input node to capture reason string parameter
+											const reportReason = window.prompt(
+												"ENTER VIOLATION REASON:\n(e.g., Spam, Harassment, Fraudulent Feedback, False Information)",
+											);
+
+											if (reportReason === null) return; 
+											if (reportReason.trim() === "") {
+												alert(
+													"REPORT ABORTED: A valid reason string must be specified.",
+												);
+												return;
+											}
+
+											apiFetch(`/reports/flag_review.php`, {
+												method: "POST",
+												headers: { "Content-Type": "application/json" },
+												body: JSON.stringify({
+													review_id: reviewId,
+													reason: reportReason.trim(),
+												}),
+											})
+												.then(async (res) => {
+													const data = await res.json();
+													if (!res.ok)
+														throw new Error(
+															data.error || "Server transaction rejected.",
+														);
+													alert(
+														data.message ||
+															"Incident ticket authorized. Review queued for moderation.",
+													);
+												})
+												.catch((err) => {
+													console.error("Reporting transaction error:", err);
+													alert(`REPORT FAULT: ${err.message}`);
+												});
+										}}
+									/>
+								))
+							) : (
+								<p className="text-center text-slate-500 text-xs py-8 font-mono">
+									No network feedback profiles logged yet for this identity.
+								</p>
+							)}
+						</div>
+					</div>
+				</section>
 			</main>
 		</div>
 	);
