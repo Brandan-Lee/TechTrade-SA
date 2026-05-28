@@ -32,7 +32,7 @@ try {
         if ($user && !$user->isBanned() ) {
             $roleId = (int)$user->getRoleId();
 
-            if (in_array($roleId, [1, 2, 5], true)) {
+            if (in_array($roleId, [1, 2, 4, 5], true)) {
                 echo json_encode([
                     "status" => "authenticated",
                     "user" => [

@@ -55,6 +55,7 @@ CREATE TABLE users (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_deleted TINYINT (1) NOT NULL DEFAULT 0,
+    MFA TINYINT (1) NOT NULL DEFAULT 1,
     deleted_at DATETIME NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uq_users_email (email),
@@ -416,8 +417,6 @@ CREATE TABLE
     -- 1 Awaiting Payment | 2 Awaiting Dispatch | 3 In Transit
     -- 4 Hardware Inspection | 5 Complete
     escrow_released TINYINT (1) NOT NULL DEFAULT 0,
-    tracking_number VARCHAR(128) NULL,
-    carrier_name VARCHAR(64) NULL,
     shipped_at DATETIME NULL,
     delivered_at DATETIME NULL,
     inspection_ends_at DATETIME NULL, -- 48h testing window (step 4)
@@ -696,6 +695,9 @@ CREATE TABLE
     is_read TINYINT (1) NOT NULL DEFAULT 0,
     read_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    is_deleted TINYINT (1) NOT NULL DEFAULT 0,
+    deleted_at DATETIME NULL,
     PRIMARY KEY (id),
     KEY idx_notifications_user (user_id, is_read),
     CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

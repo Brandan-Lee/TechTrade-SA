@@ -93,6 +93,7 @@ function App() {
 	const [isResetOpen, setIsResetOpen] = useState(false);
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
+	const [counterOfferId, setCounterOfferId] = useState(null);
 	const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 	const [isDataModalOpen, setIsDataModalOpen] = useState(false);
 
@@ -203,10 +204,13 @@ function App() {
 					<Route path="transactions" element={<MyTransactions />} />
 					<Route path="view-listing/:id" element={<ViewListing />} />
 					<Route
-						path="manage-offer"
+						path="manage-offer/:offerId"
 						element={
 							<ManageOffer
-								openCounterModal={() => setIsCounterModalOpen(true)}
+								openCounterModal={(id) => {
+									setCounterOfferId(id);
+									setIsCounterModalOpen(true);
+								}}
 							/>
 						}
 					/>
@@ -219,7 +223,7 @@ function App() {
 					<Route path="review/:userId" element={<ReviewPage />} />
 					<Route path="report-user/:userId" element={<ReportUser />} />
 					<Route path="dispute" element={<LaunchDisputePage />} />
-					<Route path="whatsapp-ttl" element={<WhatsAppTTLPage />} />
+					<Route path="whatsapp-ttl/:transactionId" element={<WhatsAppTTLPage />} />
 				</Route>
 
 				<Route
@@ -244,7 +248,15 @@ function App() {
 				onSwitchToRegister={switchToRegister}
 				onSwitchToForgot={switchToForgot}
 				onSwitchToOTP={switchToOTP}
+				purpose={authPurpose}
+				onLoginSuccess={(data) => {
+					loginContext(data.user);
+					closeAllModals();
+					const isAdmin = ["3", "4"].includes(String(data.user.roleId));
+					navigate(isAdmin ? "/admin" : "/", { replace: true });
+				}}
 			/>
+			
 			<RegisterModal
 				isOpen={isRegisterOpen}
 				mode={registerMode}
@@ -292,7 +304,11 @@ function App() {
 			/>
 			<CounterOfferModal
 				isOpen={isCounterModalOpen}
-				onClose={() => setIsCounterModalOpen(false)}
+				onClose={() => {
+					setIsCounterModalOpen(false);
+					setCounterOfferId(null);
+				}}
+				offerId={counterOfferId}
 			/>
 			<TOSModal
 				isOpen={isTOSModalOpen}

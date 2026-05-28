@@ -29,22 +29,27 @@ export default function NavBar({
         alert("You have been successfully logged out.");
     }
 
-	const showSellGearViewOffers = user && user.roleId !== null && String(user.roleId) !== "0" && String(user.roleId) !== "1";
+	const userRoleId = user && user.roleId !== undefined && user.roleId !== null ? Number(user.roleId) : null;
+	const isAdmin = [3, 4].includes(userRoleId);
+	const showSellGearViewOffers = userRoleId !== null && ![0, 1, 3, 4].includes(userRoleId);
+	const showBuildDoctor = !isAdmin;
+	const showProfile = !isAdmin;
+	const showTransactions = !isAdmin;
 
 	const menuItems = [
-		{
-			label: "Manage Profile",
-			icon: <UserCircle size={18} />,
-			path: "/profile",
-		},
+		...(showProfile
+			? [{ label: "My Profile", icon: <UserCircle size={18} />, path: "/profile" }]
+			: []),
 		...(showSellGearViewOffers
 			? [{ label: "View Offers", icon: <File size={18} />, path: "/offers" }]
 			: []),
-		{
-			label: "My Transactions",
-			icon: <File size={18} />,
-			path: "/transactions",
-		},
+		...(showTransactions
+			? [{
+				label: "My Transactions",
+				icon: <File size={18} />,
+				path: "/transactions",
+			}]
+			: []),
 		{
 			label: "Logout",
 			icon: <LogOut size={18} />,
@@ -59,7 +64,9 @@ export default function NavBar({
 		...(showSellGearViewOffers 
 			? [{ name: "Sell Gear", path: "/sell" }] 
 			: []),
-		{ name: "Build Doctor", path: "/build-doctor" },
+		...(showBuildDoctor
+			? [{ name: "Build Doctor", path: "/build-doctor" }]
+			: []),
 		{ name: "About", path: "/about" },
 		{ name: "Support", path: "/contact-us" },
 		{ name: "Login/Register", isModal: true },

@@ -118,7 +118,6 @@ try {
         "status" => "success",
         "message" => "Your support message has been securely submitted. A consultant will review your ticket within 24 hours."
     ]);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
@@ -137,4 +136,3 @@ try {
         "debug" => $t->getMessage()
     ]);
 }
-?>

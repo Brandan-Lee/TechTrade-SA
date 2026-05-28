@@ -94,7 +94,7 @@ try {
     $stmtDup->execute([$listingId, $buyerId]);
     
     if ($stmtDup->fetch()) {
-        http_response_code(409); // Conflict
+        http_response_code(409);
         throw new Exception("Action Blocked: You already have an active pending offer submitted for this hardware item.");
     }
 
@@ -119,7 +119,7 @@ try {
     $sqlInsertTx = "
         INSERT INTO transactions (
             public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status, escrow_step, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', 1, NOW())
+        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', 2, NOW())
     ";
     $stmtInsertTx = $db->prepare($sqlInsertTx);
     $stmtInsertTx->execute([

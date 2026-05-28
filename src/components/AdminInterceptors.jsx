@@ -14,6 +14,10 @@ const AdminInterceptors = ({ openLogin }) => {
 	useEffect(() => {
 		if (isLoading) return;
 
+		if (isAdminUser && !user.isMFAEnabled?.()) {
+			navigate("/admin");
+		}
+
 		if (!isAdminUser) {
 			openLogin();
 			navigate("/", { replace: true, state: { fromAdmin: true } });

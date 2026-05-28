@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import ScrollToTop from "../main/common/ScrollToTop";
 import AdminSidebar from "./common/AdminSideBar";
-import { Menu } from "lucide-react"; // Import Menu icon for the mobile drawer toggle button
+import { Menu } from "lucide-react"; 
+import WelcomeBanner from "../main/common/WelcomeBanner";
 
 export default function AdminLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const location = useLocation();
 
-    // Auto-scroll the main panel and automatically shut the mobile drawer view on URL changes
     useEffect(() => {
-        setIsSidebarOpen(false); // Closes drawer when navigating via links
+        setIsSidebarOpen(false);
         
         const mainPanel = document.getElementById("admin-main-content");
         if (mainPanel) mainPanel.scrollTo(0, 0);
@@ -37,7 +37,7 @@ export default function AdminLayout() {
             </div>
 
             <div className="flex flex-col flex-grow h-full overflow-hidden">
-                
+                <WelcomeBanner />
                 {/* Responsive Header Row */}
                 <header className="h-16 border-b border-neutral-800 bg-[#0d0a1f] flex items-center justify-between px-4 sm:px-8 shrink-0">
                     <div className="flex items-center gap-4">
@@ -49,6 +49,8 @@ export default function AdminLayout() {
                         >
                             <Menu className="w-5 h-5" />
                         </button>
+
+                        
 
                         <div className="text-sm font-medium text-neutral-400 hidden sm:block">
                             Operational Environment: <span className="text-emerald-400 font-semibold">Live</span>

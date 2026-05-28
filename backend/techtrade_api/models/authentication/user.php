@@ -30,6 +30,7 @@ class User
     private ?string $banReason;
     private bool $isDeleted;
     private ?string $deletedAt;
+    private bool $isMFA = false;
 
     public function __construct(PDO $db)
     {
@@ -111,6 +112,7 @@ class User
         $this->banReason = $row['ban_reason'];
         $this->isDeleted = (bool) $row['is_deleted'];
         $this->deletedAt = $row['deleted_at'];
+        $this->isMFA = (bool) ($row['is_mfa'] ?? 0);
     }
 
     public function getId(): int
@@ -182,6 +184,11 @@ class User
     public function getSuspendedUntil(): ?string
     {
         return $this->suspendedUntil;
+    }
+
+    public function isMFAEnabled(): bool
+    {
+        return $this->isMFA;
     }
 
     public function getMobile(): string

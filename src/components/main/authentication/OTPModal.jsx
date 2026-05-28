@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RefreshCw, Terminal, HelpCircle } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthModalWrapper from "./AuthModalWrapper";
 import CyberActionButton from "../../ui/CyberActionButton";
 import AuthFooter from "./AuthFooter";
@@ -32,6 +32,7 @@ export const OTPModal = ({
 	const location = useLocation();
 	const isFromAdmin = purpose === "admin";
 	const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (isOpen) {

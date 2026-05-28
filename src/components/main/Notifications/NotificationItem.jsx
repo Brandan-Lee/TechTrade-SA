@@ -15,23 +15,28 @@ const NotificationItem = ({
 	id,
 	title,
 	time,
-	type, // 'offer', 'bridge', 'counter'
+	type, // 'offer', 'bridge', 'counter', 'system'
 	status, // 'pending', 'accepted', 'declined', 'expired'
 	onAction, // Triggered via onAction(id, "accept" | "decline")
 	onDelete,
-	isRead,
+	is_read, // Ingested directly from MySQL tinyint row conversion data
 	offerAmount,
 	listingName,
 	buyerName,
 	sellerName,
+	isSeller, // Boolean flag from backend calculating user perspective context
 }) => {
-	// Icon matrix selector for explicit data feeds
+	const isItemRead = Number(is_read) === 1;
+	const amISeller = Number(isSeller) === 1;
+	const shouldShowActions = status === "pending" && type === "counter" && !amISeller;
+
+	// Select an icon based on the notification type
 	const getIcon = () => {
 		const iconSize = 16;
 		switch (type) {
 			case "offer":
 				return <DollarSign size={iconSize} className="text-fuchsia-400" />;
-			case "bridge":
+			case "system": // FIX: Standardized to lowercase matching 'system'
 				return <Shield size={iconSize} className="text-cyan-400" />;
 			case "counter":
 				return <Handshake size={iconSize} className="text-amber-400" />;
@@ -40,54 +45,54 @@ const NotificationItem = ({
 		}
 	};
 
-	// Live-rendered decryption feed strings
+	// Generate descriptive text matching the item type, status, and user perspective
 	const renderMessage = () => {
-		const highlightedCipher = "text-fuchsia-400 font-bold tracking-wide";
-		const successCipher =
-			"text-emerald-400 font-black tracking-widest uppercase";
-		const failureCipher = "text-red-400 font-black tracking-widest uppercase";
+		const textHighlight = "text-fuchsia-400 font-bold tracking-wide";
+		const textSuccess = "text-emerald-400 font-black tracking-widest uppercase";
+		const textFailure = "text-red-400 font-black tracking-widest uppercase";
 
 		if (type === "offer") {
 			if (status === "accepted") {
+				// FIX: Added 'return' keyword
 				return (
 					<span>
-						Your offer of{" "}
-						<span className={highlightedCipher}>R{offerAmount}</span> for{" "}
-						<span className="text-white">[{listingName}]</span> was{" "}
-						<span className={successCipher}>ACCEPTED</span> by{" "}
-						{sellerName || "NODE_SELLER"}.
+						You <span className={textSuccess}>ACCEPTED</span> the offer from{" "}
+						{buyerName} of <span className={textHighlight}>R{offerAmount}</span>{" "}
+						for <span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
 
 			if (status === "declined") {
+				// FIX: Added 'return' keyword
 				return (
 					<span>
-						Your offer for <span className="text-white">[{listingName}]</span>{" "}
-						was <span className={failureCipher}>DECLINED</span> by{" "}
-						{sellerName || "NODE_SELLER"}.
+						You <span className={textFailure}>DECLINED</span> the offer from{" "}
+						{buyerName} for <span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
 
-			return (
-				<span>
-					Incoming transaction payload of{" "}
-					<span className={highlightedCipher}>R{offerAmount}</span> detected for{" "}
-					<span className="text-white">[{listingName}]</span> via{" "}
-					{buyerName || "UNKNOWN_NODE"}.
-				</span>
-			);
+			if (status === "pending") {
+				// FIX: Added 'return' keyword
+				return (
+					<span>
+						You received an offer of{" "}
+						<span className={textHighlight}>R{offerAmount}</span> for{" "}
+						<span className="text-white">[{listingName}]</span> from{" "}
+						{buyerName || "a buyer"}. Please review and take action.
+					</span>
+				);
+			}
 		}
 
 		if (type === "counter") {
 			if (status === "accepted") {
 				return (
 					<span>
-						Counter-negotiation value{" "}
-						<span className={highlightedCipher}>R{offerAmount}</span> for{" "}
-						<span className="text-white">[{listingName}]</span> has been
-						finalized to <span className={successCipher}>ACCEPTED</span>.
+						You <span className={textSuccess}>ACCEPTED</span> the counter offer
+						of <span className={textHighlight}>R{offerAmount}</span> for{" "}
+						<span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
@@ -95,47 +100,28 @@ const NotificationItem = ({
 			if (status === "declined") {
 				return (
 					<span>
-						Counter-negotiation parameter for{" "}
-						<span className="text-white">[{listingName}]</span> was{" "}
-						<span className={failureCipher}>DECLINED</span>.
+						You <span className={textFailure}>DECLINED</span> the counter offer
+						for <span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
 
+			// Default Pending State for Counter
 			return (
 				<span>
 					<span className="text-white font-bold">
-						{sellerName || "SELLER_NODE"}
+						{sellerName || "The seller"}
 					</span>{" "}
-					pushed a counter-override allocation of{" "}
-					<span className={highlightedCipher}>R{offerAmount}</span> for your
-					active terminal request.
-				</span>
-			);
-		}
-
-		if (type === "bridge") {
-			if (status === "expired") {
-				return (
-					<span className="text-slate-600 italic">
-						[SIGNAL_LOSS]: Secure encryption bridge for [{listingName}] has
-						dropped offline.
-					</span>
-				);
-			}
-			return (
-				<span>
-					Secure bridge data channel active. Comm-window with{" "}
-					{sellerName || "HOST_NODE"} for{" "}
-					<span className="text-white">[{listingName}]</span> remains clear for
-					24 hours.
+					sent you a counter offer of{" "}
+					<span className={textHighlight}>R{offerAmount}</span> for{" "}
+					<span className="text-white">[{listingName}]</span>.
 				</span>
 			);
 		}
 
 		return (
 			<span className="text-slate-400">
-				Standard system log update recorded for [{listingName}].
+				Notification update recorded for [{listingName}].
 			</span>
 		);
 	};
@@ -144,18 +130,18 @@ const NotificationItem = ({
 		<div
 			role="status"
 			className={`relative w-full p-4 sm:p-5 font-mono border rounded-lg flex flex-col gap-3.5 transition-all duration-300 selection:bg-fuchsia-500/30 ${
-				isRead
+				isItemRead
 					? "bg-[#0c0c0e]/40 border-white/5 opacity-60 hover:opacity-80"
 					: "bg-[#110d1a]/90 border-purple-500/30 shadow-[inset_0_0_12px_rgba(168,85,247,0.05)] shadow-black/50"
 			}`}
 		>
-			{/* Top Interactive Metric Data Header Line */}
+			{/* Header area */}
 			<div className="w-full flex justify-between items-start gap-4">
 				<div className="flex items-start gap-3 sm:gap-4">
-					{/* Hardened Matrix Type Telemetry Icon */}
+					{/* Notification icon slot */}
 					<div
 						className={`w-9 h-9 sm:w-10 sm:h-10 rounded shrink-0 flex items-center justify-center border transition-colors ${
-							isRead
+							isItemRead
 								? "bg-slate-900 border-white/5"
 								: "bg-purple-950/40 border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.1)]"
 						}`}
@@ -163,56 +149,56 @@ const NotificationItem = ({
 						{getIcon()}
 					</div>
 
-					{/* Meta String Configuration Block */}
+					{/* Notification labels */}
 					<div className="space-y-0.5 sm:space-y-1">
 						<div className="flex flex-wrap items-center gap-2">
 							<h4
 								className={`text-xs sm:text-sm md:text-base font-black uppercase tracking-tight ${
-									isRead ? "text-slate-500" : "text-white"
+									isItemRead ? "text-slate-500" : "text-white"
 								}`}
 							>
-								{title || "SYSTEM_BROADCAST"}
+								{title || "System Notification"}
 							</h4>
 
-							{/* Live Alert Tracking Micro-Pill */}
-							{!isRead && (
+							{/* Unread tracking pill */}
+							{!isItemRead && (
 								<span
 									className="inline-flex items-center gap-1 bg-fuchsia-500/10 border border-fuchsia-500/30 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] text-fuchsia-400 font-extrabold tracking-widest uppercase animate-pulse"
-									aria-label="Unread broadcast"
+									aria-label="New notification"
 								>
 									<AlertCircle size={8} /> LIVE
 								</span>
 							)}
 						</div>
 
-						{/* Network Datetime Readout Link */}
+						{/* Timestamp display */}
 						<div className="text-[10px] sm:text-xs text-slate-500 flex items-center gap-1.5 font-bold uppercase tracking-wider">
 							<Clock size={11} className="text-slate-600" />
-							<span>{time || "00:00_SYS"}</span>
+							<span>{time || "Recently"}</span>
 						</div>
 					</div>
 				</div>
 
-				{/* Secure Data Disposal Link Action */}
+				{/* Delete item action button */}
 				<button
 					onClick={() => onDelete?.(id)}
-					aria-label={`Purge log entry ${title}`}
+					aria-label={`Delete notification ${title}`}
 					className="p-1.5 sm:p-2 rounded border border-transparent text-slate-600 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all focus:outline-none focus:border-red-500/30"
 				>
 					<Trash2 size={14} />
 				</button>
 			</div>
 
-			{/* Core Message Readout Shell */}
 			<div
 				className={`text-[11px] sm:text-xs md:text-sm leading-relaxed tracking-wide ${
-					isRead ? "text-slate-500" : "text-slate-300 font-medium"
+					isItemRead ? "text-slate-500" : "text-slate-300 font-medium"
 				}`}
 			>
 				{renderMessage()}
 			</div>
 
-			{type === "counter" && status === "pending" && (
+			{/* Action Control Interface Block */}
+			{shouldShowActions && (
 				<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
 					<button
 						onClick={() => onAction?.(id, "accept")}

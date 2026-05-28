@@ -18,7 +18,10 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 		};
 	}, [isOpen]);
 
-	const showSellGear = user && user.roleId !== null && String(user.roleId) !== "0" && String(user.roleId) !== "1";
+	const userRoleId = user && user.roleId !== undefined && user.roleId !== null ? Number(user.roleId) : null;
+	const isAdmin = [3, 4].includes(userRoleId);
+	const showSellGear = userRoleId !== null && ![0, 1, 3, 4].includes(userRoleId);
+	const showBuildDoctor = !isAdmin;
 
 	const menuItems = [
 		{ name: "HOME", label: "Home", path: "/" },
@@ -27,7 +30,9 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 		...(showSellGear
 			? [{ name: "Sell Your Gear", label: "Sell Your Gear", path: "/sell" }]
 			: []),
-		{ name: "Build Doctor", label: "Build Doctor", path: "/build-doctor" },
+		...(showBuildDoctor
+			? [{ name: "Build Doctor", label: "Build Doctor", path: "/build-doctor" }]
+			: []),
 		{ name: "divider", path: null },
 		{ name: "Contact Us", label: "Contact Us", path: "/contact" },
 		{

@@ -229,6 +229,7 @@ export default function ViewListing() {
 	};
 
 	const isOwner = user && String(user.id) === String(listing.seller_id);
+	const isStaff = user && user.roleId && [3, 4].includes(Number(user.roleId));
 
 	const isLocked =
 		listing.status === "committed" || listing.status === "completed";
@@ -522,6 +523,7 @@ export default function ViewListing() {
 					</section>
 
 					{!isOwner &&
+						!isStaff &&
 						(isLocked ? (
 							/* Blocks offers from buyers if the item status is already locked */
 							<section className="bg-[#0c0c0e]/90 border border-amber-500/20 rounded-xl p-5 text-center text-amber-500 text-xs uppercase tracking-widest font-black flex flex-col items-center gap-2">

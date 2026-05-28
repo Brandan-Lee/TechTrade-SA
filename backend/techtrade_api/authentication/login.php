@@ -39,6 +39,16 @@ try {
 
     $user = User::findByEmail($db, $email);
 
+    if ($user && $user->isMFAEnabled()) {
+        http_response_code(200);
+        echo json_encode([
+            "status" => "pending_otp",
+            "message" => "Verification code sent to your email.",
+            "rememberMe" => $rememberMe
+        ]);
+        exit();
+    }
+
     if ($user && $user->verifyPassword($password)) {
 
         if ($user->isBanned()) {
@@ -52,6 +62,65 @@ try {
             echo json_encode([
                 "status" => "error",
                 "message" => "Account is suspended until " . $user->getSuspendedUntil() . ". Reason: " . $user->getSuspendedReason()
+            ]);
+            exit();
+        }
+
+        if (!$user->isMFAEnabled() && $user->getRoleId() === 4 || $user->getRoleId() === 5) {
+            $userModel = User::findByEmail($db, $email);
+
+            if (!$userModel) {
+                http_response_code(404);
+                echo json_encode(["status" => "error", "message" => "Profile link verification dropped."]);
+                exit();
+            }
+
+            if ($userModel->isBanned()) {
+                http_response_code(403);
+                echo json_encode(["status" => "error", "message" => "This account has been banned."]);
+                exit();
+            }
+            SessionManager::login($db, (int) $user->getId(), (int) $user->getRoleId());
+            $user->updateLastLogin();
+
+            if ($rememberMe || !$rememberMe) {
+                $selector = bin2hex(random_bytes(8));
+                $validator = random_bytes(32);
+                $hashedValidator = hash('sha256', $validator);
+
+                $duration = 30 * 24 * 60 * 60;
+                $expiresAt = date('Y-m-d H:i:s', time() + $duration);
+
+                $clearOld = $db->prepare("DELETE FROM  user_tokens
+                WHERE        user_id = ?");
+                $clearOld->execute([$userModel->getId()]);
+
+                $insertToken = $db->prepare("INSERT INTO  user_tokens (user_id, selector, hashed_validator, expires_at)
+                VALUES (?, ?, ?, ?)");
+                $insertToken->execute([$userModel->getId(), $selector, $hashedValidator, $expiresAt]);
+
+                $cookieValue = $selector . ':' . bin2hex($validator);
+                setcookie('remember_me', $cookieValue, [
+                    'expires' => time() + $duration,
+                    'path' => '/',
+                    'secure' => false,
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
+            }
+
+            http_response_code(200);
+            echo json_encode([
+                "status" => "success",
+                "message" => "Login successful (MFA bypassed).",
+                "user" => [
+                    "id" => $user->getId(),
+                    "email" => $user->getEmail(),
+                    "fullName" => $user->getFullName(),
+                    "regType" => $user->getRegType(),
+                    "roleId" => $user->getRoleId()
+                ],
+                "rememberMe" => $rememberMe
             ]);
             exit();
         }
@@ -70,12 +139,10 @@ try {
             http_response_code(500);
             echo json_encode(["status" => "error", "message" => "Failed to send verification code."]);
         }
-
     } else {
         http_response_code(401);
         echo json_encode(["status" => "error", "message" => "Invalid credentials."]);
     }
-
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
@@ -85,4 +152,3 @@ try {
     ]);
     exit();
 }
-?>
