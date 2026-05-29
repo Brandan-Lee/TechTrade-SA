@@ -138,6 +138,9 @@ export default function ViewListing() {
 				if (refresh.ok) {
 					const refreshed = await refresh.json();
 					setListingData(refreshed);
+					setTimeout(() => {
+						navigate(-1);
+					}, 1500);
 				}
 			} else {
 				setOfferFeedback({

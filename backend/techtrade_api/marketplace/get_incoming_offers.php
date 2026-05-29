@@ -60,13 +60,14 @@ try {
         o.created_at,
         l.title AS listing_title,
         l.price_cents AS listing_price_cents,
-        NULL AS primary_image_url, -- Placeholder for image path if not directly on listings table
+        img.url AS primary_image_url, -- Dynamically pulled from your listing_images table
         u.first_name AS buyer_fn,
         u.last_name AS buyer_ln,
         u.avatar_url AS buyer_avatar
     FROM offers o
     INNER JOIN listings l ON o.listing_id = l.id
     INNER JOIN users u ON o.buyer_id = u.id
+    LEFT JOIN listing_images img ON l.id = img.listing_id AND img.is_primary = 1
     WHERE l.seller_id = ? 
       AND l.is_deleted = 0
       AND o.status = 'pending'

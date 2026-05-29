@@ -74,7 +74,7 @@ try {
         FROM listings l
         INNER JOIN users u ON l.seller_id = u.id
         INNER JOIN categories c ON l.category_id = c.id
-        WHERE l.id = ? AND l.is_deleted = 0 AND l.status IN ('AVAILABLE', 'OFFERED')
+        WHERE l.id = ? AND l.is_deleted = 0
         LIMIT 1
     ";
 

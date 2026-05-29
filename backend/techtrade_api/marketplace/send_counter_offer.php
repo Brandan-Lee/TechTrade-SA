@@ -45,7 +45,6 @@ try {
 
     $counterAmountCents = intval($counterAmount * 100);
 
-    // FIXED: Selected l.seller_id AS listing_seller_id so it can be used below
     $sqlFetch = "
         SELECT o.buyer_id, o.listing_id, l.title AS item_title, l.seller_id AS listing_seller_id
         FROM offers o
@@ -55,7 +54,7 @@ try {
     ";
     $stmtFetch = $db->prepare($sqlFetch);
     $stmtFetch->execute([$incomingOfferId]);
-    $originalOffer = $stmtFetch->fetch(PDO::FETCH_ASSOC); // FIXED: Added FETCH_ASSOC for consistency
+    $originalOffer = $stmtFetch->fetch(PDO::FETCH_ASSOC);
 
     if (!$originalOffer) {
         http_response_code(422);
@@ -75,7 +74,7 @@ try {
 
     $sqlInsertOffer = "
         INSERT INTO offers (listing_id, buyer_id, amount_cents, status, parent_offer_id, expires_at, created_at, updated_at)
-        VALUES (?, ?, ?, 'pending', ?, DATE_ADD(NOW(), INTERVAL 3 DAY), NOW(), NOW())
+        VALUES (?, ?, ?, 'countered', ?, DATE_ADD(NOW(), INTERVAL 3 DAY), NOW(), NOW())
     ";
     $stmtInsertOffer = $db->prepare($sqlInsertOffer);
     $stmtInsertOffer->execute([
@@ -102,6 +101,7 @@ try {
             SET offer_id = ?, agreed_price_cents = ?, updated_at = NOW()
             WHERE id = ?
         ";
+
         $stmtUpdateTx = $db->prepare($sqlUpdateTx);
         $stmtUpdateTx->execute([$newOfferId, $counterAmountCents, $existingTx['id']]);
         $transactionId = $existingTx['id'];

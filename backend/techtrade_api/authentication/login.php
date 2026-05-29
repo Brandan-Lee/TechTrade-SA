@@ -39,18 +39,13 @@ try {
 
     $user = User::findByEmail($db, $email);
 
-    if ($user && $user->isMFAEnabled()) {
-        http_response_code(200);
-        echo json_encode([
-            "status" => "pending_otp",
-            "message" => "Verification code sent to your email.",
-            "rememberMe" => $rememberMe
-        ]);
+    if (!$user) {
+        http_response_code(404);
+        echo json_encode(["status" => "error", "message" => "Profile link verification dropped."]);
         exit();
     }
 
     if ($user && $user->verifyPassword($password)) {
-
         if ($user->isBanned()) {
             http_response_code(403);
             echo json_encode(["status" => "error", "message" => "Access denied: Account is permanently banned."]);
@@ -66,49 +61,36 @@ try {
             exit();
         }
 
-        if (!$user->isMFAEnabled() && $user->getRoleId() === 4 || $user->getRoleId() === 5) {
-            $userModel = User::findByEmail($db, $email);
+        SessionManager::login($db, (int) $user->getId(), (int) $user->getRoleId());
+        $user->updateLastLogin();
 
-            if (!$userModel) {
-                http_response_code(404);
-                echo json_encode(["status" => "error", "message" => "Profile link verification dropped."]);
-                exit();
-            }
+        if ($rememberMe) {
+            $selector = bin2hex(random_bytes(8));
+            $validator = random_bytes(32);
+            $hashedValidator = hash('sha256', $validator);
 
-            if ($userModel->isBanned()) {
-                http_response_code(403);
-                echo json_encode(["status" => "error", "message" => "This account has been banned."]);
-                exit();
-            }
-            SessionManager::login($db, (int) $user->getId(), (int) $user->getRoleId());
-            $user->updateLastLogin();
+            $duration = 30 * 24 * 60 * 60;
+            $expiresAt = date('Y-m-d H:i:s', time() + $duration);
 
-            if ($rememberMe || !$rememberMe) {
-                $selector = bin2hex(random_bytes(8));
-                $validator = random_bytes(32);
-                $hashedValidator = hash('sha256', $validator);
-
-                $duration = 30 * 24 * 60 * 60;
-                $expiresAt = date('Y-m-d H:i:s', time() + $duration);
-
-                $clearOld = $db->prepare("DELETE FROM  user_tokens
+            $clearOld = $db->prepare("DELETE FROM  user_tokens
                 WHERE        user_id = ?");
-                $clearOld->execute([$userModel->getId()]);
+            $clearOld->execute([$user->getId()]);
 
-                $insertToken = $db->prepare("INSERT INTO  user_tokens (user_id, selector, hashed_validator, expires_at)
+            $insertToken = $db->prepare("INSERT INTO  user_tokens (user_id, selector, hashed_validator, expires_at)
                 VALUES (?, ?, ?, ?)");
-                $insertToken->execute([$userModel->getId(), $selector, $hashedValidator, $expiresAt]);
+            $insertToken->execute([$user->getId(), $selector, $hashedValidator, $expiresAt]);
 
-                $cookieValue = $selector . ':' . bin2hex($validator);
-                setcookie('remember_me', $cookieValue, [
-                    'expires' => time() + $duration,
-                    'path' => '/',
-                    'secure' => false,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ]);
-            }
+            $cookieValue = $selector . ':' . bin2hex($validator);
+            setcookie('remember_me', $cookieValue, [
+                'expires' => time() + $duration,
+                'path' => '/',
+                'secure' => false,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
 
+        if (!$user->isMFAEnabled()) {
             http_response_code(200);
             echo json_encode([
                 "status" => "success",
@@ -118,26 +100,35 @@ try {
                     "email" => $user->getEmail(),
                     "fullName" => $user->getFullName(),
                     "regType" => $user->getRegType(),
-                    "roleId" => $user->getRoleId()
+                    "roleId" => $user->getRoleId(),
+                    "isMFA" => $user->isMFAEnabled()
                 ],
                 "rememberMe" => $rememberMe
             ]);
             exit();
-        }
-
-        $emailService = new EmailService();
-        $otpManager = new OTPManager($db, $emailService);
-
-        if ($otpManager->sendNewOTP($user->getEmail(), 'login', $user->getId())) {
-            http_response_code(200);
-            echo json_encode([
-                "status" => "pending_otp",
-                "message" => "Verification code sent to your email.",
-                "rememberMe" => $rememberMe
-            ]);
         } else {
-            http_response_code(500);
-            echo json_encode(["status" => "error", "message" => "Failed to send verification code."]);
+            error_log("MFA Check: Initiating OTP generation sequence for user ID: " . $user->getId());
+            $emailService = new EmailService();
+            $otpManager = new OTPManager($db, $emailService);
+
+            if ($otpManager->sendNewOTP($user->getEmail(), 'login', $user->getId())) {
+                http_response_code(200);
+                echo json_encode([
+                    "status" => "pending_otp",
+                    "message" => "Verification code sent to your email.",
+                    "rememberMe" => $rememberMe,
+                    "debug_status" => "SUCCESS: sendNewOTP returned true. Email handed off to PHPMailer successfully."
+                ]);
+                exit();
+            } else {
+                http_response_code(500);
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "Failed to send verification code.",
+                    "debug_status" => "FAILURE: sendNewOTP returned false. Check your .env credentials path or your mail server connection."
+                ]);
+                exit();
+            }
         }
     } else {
         http_response_code(401);

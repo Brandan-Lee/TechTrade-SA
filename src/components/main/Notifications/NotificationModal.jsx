@@ -4,7 +4,7 @@ import BaseModal from "../../ui/BaseModal";
 import NotificationItem from "./NotificationItem";
 import { apiFetch } from "../../../lib/api";
 
-const NotificationModal = ({ isOpen, onClose }) => {
+const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 	const [notifications, setNotifications] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -48,10 +48,16 @@ const NotificationModal = ({ isOpen, onClose }) => {
 	}, [isOpen]);
 
 	const handleDelete = async (id) => {
+		const confirmed = window.confirm(
+			"CRITICAL WARNING:\n\nAre you sure you want to delete this notifcation? This action is permanent and you won't be able to retrieve this notification again.",
+		);
+
+		if (!confirmed) return;
+
 		try {
 			setNotifications((prev) => prev.filter((n) => n.id !== id));
 
-			await apiFetch("/marketplace/delete_notification.php", {
+			await apiFetch("/marketplace/delete_notifcation.php", {
 				method: "POST",
 				body: JSON.stringify({ id }),
 			});
@@ -60,7 +66,6 @@ const NotificationModal = ({ isOpen, onClose }) => {
 		}
 	};
 
-	// Sends action decisions (accept/decline) down to the transactions backend
 	const handleAction = async (id, actionType) => {
 		const targetNotif = notifications.find((n) => n.id === id);
 		if (!targetNotif) return;
@@ -72,43 +77,46 @@ const NotificationModal = ({ isOpen, onClose }) => {
 						return {
 							...n,
 							status: actionType === "accept" ? "accepted" : "declined",
-							is_read: n.is_read,
 						};
 					}
 					return n;
 				}),
 			);
 
-			// -----------------------------------------------------------------
-			// Routing Layer: Route Counter Actions vs. Generic Base Offers
-			// -----------------------------------------------------------------
 			if (targetNotif.type === "counter") {
 				const endpoint =
 					actionType === "accept"
 						? "/marketplace/accept_counter_offer.php"
 						: "/marketplace/decline_counter_offer.php";
 
-				await apiFetch(endpoint, {
+				const response = await apiFetch(endpoint, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						offer_id: parseInt(targetNotif.offer_id || targetNotif.id, 10),
+						offer_id: parseInt(targetNotif.offer_id),
 					}),
 				});
-			} else {
-				// Standard Base Offers process through normal routing fallbacks
-				await apiFetch("/marketplace/respond_to_notification.php", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ id, action: actionType }),
-				});
+
+				const data = await response.json();
+
+				if (!response.ok || data.status === "error") {
+					throw new Error(data.message || "Sign-in credentials rejected.");
+				}
+
+				setTimeout(() => {
+					onClose();
+
+					if (onCounterAccept) {
+						onCounterAccept(data.transaction_id);
+						console.log(data.transaction_id);
+					}
+				}, 2000);
 			}
 		} catch (err) {
 			console.error("Failed to execute action request update:", err);
 		}
 	};
 
-	// Marks everything as read collectively
 	const markAllAsRead = async () => {
 		try {
 			setNotifications((prev) => prev.map((n) => ({ ...n, is_read: 1 })));
@@ -121,7 +129,6 @@ const NotificationModal = ({ isOpen, onClose }) => {
 		}
 	};
 
-	// Utility calculator to convert database timestamps into relative intervals
 	const getTimeAgo = (dateString) => {
 		if (!dateString) return "Recently";
 		const now = new Date();
@@ -139,7 +146,6 @@ const NotificationModal = ({ isOpen, onClose }) => {
 		return `${diffDays}d ago`;
 	};
 
-	// Database schema layer filters - Enforced Strict Integer Casting Checks
 	const activeNotifications = notifications.filter(
 		(n) => Number(n.is_deleted) !== 1,
 	);
@@ -152,7 +158,6 @@ const NotificationModal = ({ isOpen, onClose }) => {
 
 	const hasUnread = unreadNotifications.length > 0;
 
-	// Modal secondary header toolbar actions button
 	const notificationActions =
 		activeNotifications.length > 0 ? (
 			<button
@@ -218,6 +223,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
 											time={getTimeAgo(notif.created_at)}
 											onAction={handleAction}
 											onDelete={handleDelete}
+											isRead={notif.is_read}
 										/>
 									))}
 								</div>

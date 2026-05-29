@@ -6,17 +6,20 @@ class User
 {
     private PDO $db;
     private ?EncryptionEngine $crypto = null;
+
+    // Properties matching database columns
     private int $id;
     private int $roleId;
     private string $email;
     private string $passwordHash;
     private string $firstName;
     private string $lastName;
-    private string $encryptedMobile;
-    private ?string $hardwareId;
-    private string $province;
-    private ?string $avatarUrl;
+    private ?string $encryptedMobile; // Nullable in schema
+    private ?string $hardwareId;      // Nullable in schema
+    private ?string $province;        // Nullable in schema
+    private ?string $avatarUrl;       // Nullable in schema
     private string $regType;
+    private string $memberSince;      // Added from schema
     private float $trustScore;
     private int $tradeCount;
     private int $strikeCount;
@@ -28,9 +31,13 @@ class User
     private bool $isBanned;
     private ?string $bannedAt;
     private ?string $banReason;
+    private ?string $tosAcceptedAt;   // Added from schema
+    private ?string $lastLoginAt;     // Added from schema
+    private string $createdAt;        // Added from schema
+    private string $updatedAt;        // Added from schema
     private bool $isDeleted;
+    private bool $isMFA;              // Maps to 'MFA' in schema
     private ?string $deletedAt;
-    private bool $isMFA = false;
 
     public function __construct(PDO $db)
     {
@@ -42,15 +49,17 @@ class User
 
     private function isEncrypted(?string $value): bool
     {
-        if (empty($value))
+        if (empty($value)) {
             return false;
+        }
         return (bool) preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value);
     }
 
     private function safeDecrypt(?string $payload): string
     {
-        if (empty($payload))
+        if (empty($payload)) {
             return '';
+        }
         if ($this->crypto && $this->isEncrypted($payload)) {
             return $this->crypto->decrypt($payload) ?? $payload;
         }
@@ -62,8 +71,9 @@ class User
         $stmt = $db->prepare("SELECT * FROM users WHERE id = ? AND is_deleted = 0 LIMIT 1");
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row)
+        if (!$row) {
             return null;
+        }
         $user = new self($db);
         $user->hydrate($row);
         return $user;
@@ -74,8 +84,9 @@ class User
         $stmt = $db->prepare("SELECT * FROM users WHERE email = ? AND is_deleted = 0 LIMIT 1");
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row)
+        if (!$row) {
             return null;
+        }
         $user = new self($db);
         $user->hydrate($row);
         return $user;
@@ -94,35 +105,44 @@ class User
         $this->passwordHash = $row['password_hash'];
         $this->firstName = $row['first_name'];
         $this->lastName = $row['last_name'];
-        $this->encryptedMobile = $row['mobile'] ?? '';
+        $this->encryptedMobile = $row['mobile'] ?? null;
         $this->hardwareId = $row['hardware_id'] ?? null;
-        $this->province = $row['province']; 
-        $this->avatarUrl = $row['avatar_url'];
+        $this->province = $row['province'] ?? null;
+        $this->avatarUrl = $row['avatar_url'] ?? null;
         $this->regType = $row['reg_type'];
+        $this->memberSince = $row['member_since'];
         $this->trustScore = (float) $row['trust_score'];
         $this->tradeCount = (int) $row['trade_count'];
         $this->strikeCount = (int) $row['strike_count'];
         $this->isSuspended = (bool) $row['is_suspended'];
         $this->hasBeenSuspended = (bool) $row['has_been_suspended'];
-        $this->suspendedAt = $row['suspended_at'];
-        $this->suspendedReason = $row['suspended_reason'];
-        $this->suspendedUntil = $row['suspended_until'];
+        $this->suspendedAt = $row['suspended_at'] ?? null;
+        $this->suspendedReason = $row['suspended_reason'] ?? null;
+        $this->suspendedUntil = $row['suspended_until'] ?? null;
         $this->isBanned = (bool) $row['is_banned'];
-        $this->bannedAt = $row['banned_at'];
-        $this->banReason = $row['ban_reason'];
+        $this->bannedAt = $row['banned_at'] ?? null;
+        $this->banReason = $row['ban_reason'] ?? null;
+        $this->tosAcceptedAt = $row['tos_accepted_at'] ?? null;
+        $this->lastLoginAt = $row['last_login_at'] ?? null;
+        $this->createdAt = $row['created_at'];
+        $this->updatedAt = $row['updated_at'];
         $this->isDeleted = (bool) $row['is_deleted'];
-        $this->deletedAt = $row['deleted_at'];
-        $this->isMFA = (bool) ($row['is_mfa'] ?? 0);
+        $this->isMFA = (bool) ($row['MFA'] ?? 1); // Exact uppercase database mapping fixed here
+        $this->deletedAt = $row['deleted_at'] ?? null;
     }
+
+    // --- GETTERS ---
 
     public function getId(): int
     {
         return $this->id;
     }
+
     public function getRoleId(): int
     {
         return $this->roleId;
     }
+
     public function getEmail(): string
     {
         return $this->email;
@@ -135,12 +155,22 @@ class User
         return trim($first . ' ' . $last);
     }
 
-    public function getProvince(): string
+    public function getMobile(): string
+    {
+        return $this->safeDecrypt($this->encryptedMobile);
+    }
+
+    public function getHardwareId(): ?string
+    {
+        return $this->hardwareId;
+    }
+
+    public function getProvince(): ?string
     {
         return $this->province;
     }
 
-    public function getRawProvinceCode(): string
+    public function getRawProvinceCode(): ?string
     {
         return $this->province;
     }
@@ -149,41 +179,100 @@ class User
     {
         return $this->avatarUrl;
     }
+
     public function getRegType(): string
     {
         return $this->regType;
     }
+
+    public function getMemberSince(): string
+    {
+        return $this->memberSince;
+    }
+
     public function getTrustScore(): float
     {
         return $this->trustScore;
     }
+
+    public function getTradeCount(): int
+    {
+        return $this->tradeCount;
+    }
+
     public function getStrikeCount(): int
     {
         return $this->strikeCount;
     }
-    public function getHardwareId(): ?string
-    {
-        return $this->hardwareId;
-    }
+
     public function isSuspended(): bool
     {
         return $this->isSuspended;
     }
-    public function isBanned(): bool
+
+    public function hasBeenSuspended(): bool
     {
-        return $this->isBanned;
+        return $this->hasBeenSuspended;
     }
-    public function isDeleted(): bool
+
+    public function getSuspendedAt(): ?string
     {
-        return $this->isDeleted;
+        return $this->suspendedAt;
     }
+
     public function getSuspendedReason(): ?string
     {
         return $this->suspendedReason;
     }
+
     public function getSuspendedUntil(): ?string
     {
         return $this->suspendedUntil;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->isBanned;
+    }
+
+    public function getBannedAt(): ?string
+    {
+        return $this->bannedAt;
+    }
+
+    public function getBanReason(): ?string
+    {
+        return $this->banReason;
+    }
+
+    public function getTosAcceptedAt(): ?string
+    {
+        return $this->tosAcceptedAt;
+    }
+
+    public function getLastLoginAt(): ?string
+    {
+        return $this->lastLoginAt;
+    }
+
+    public function getCreatedAt(): string
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): string
+    {
+        return $this->updatedAt;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function getDeletedAt(): ?string
+    {
+        return $this->deletedAt;
     }
 
     public function isMFAEnabled(): bool
@@ -191,10 +280,7 @@ class User
         return $this->isMFA;
     }
 
-    public function getMobile(): string
-    {
-        return $this->safeDecrypt($this->encryptedMobile);
-    }
+    // --- WRITE OPERATIONS ---
 
     public function addStrike(int $count = 1, string $reason = ''): bool
     {
@@ -245,4 +331,3 @@ class User
         return $stmt->execute([$this->id]);
     }
 }
-?>

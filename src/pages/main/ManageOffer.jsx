@@ -20,7 +20,7 @@ const ManageOffer = ({ openCounterModal }) => {
 
 	const [offerData, setOfferData] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const [isProcessing, setIsProcessing] = useState(false); // Controls action loader state transitions
+	const [isProcessing, setIsProcessing] = useState(false);
 	const [error, setError] = useState(null);
 
 	useEffect(() => {

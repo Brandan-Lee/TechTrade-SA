@@ -687,6 +687,9 @@ export default function SellGear() {
 						"Compatibility matrix generated for tri-vector builds",
 						"Market velocity analysis applied for pricing intelligence",
 					]);
+					setTimeout(() => {
+						navigate(`/view-listing/${data.listing_id || listingId}`);
+					}, 1200);
 				}
 			} else if (response.status === 401) {
 				await refreshAuth();

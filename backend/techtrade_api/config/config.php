@@ -43,6 +43,7 @@ define('SMTP_PASS', getEnvVariable('SMTP_PASS'));
 define('FROM_EMAIL', getEnvVariable('FROM_EMAIL'));
 define('FROM_NAME', getEnvVariable('FROM_NAME', 'TechTrade Security'));
 
+
 function setFrontendCookie(string $name, string $value, int $durationInSeconds = 3600): void
 {
     setcookie($name, $value, [
@@ -57,7 +58,8 @@ function setFrontendCookie(string $name, string $value, int $durationInSeconds =
 
 function getEnvVariable(string $key, string $fallback = ''): string
 {
-    $envPath = __DIR__ . '/../.env';
+    $baseDir = defined('API_ROOT') ? API_ROOT : dirname(__DIR__);
+    $envPath = $baseDir . DIRECTORY_SEPARATOR . '.env';
 
     if (file_exists($envPath)) {
         $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -122,4 +124,4 @@ function publicMediaUrl(?string $storedPath): ?string
     return $base . '/' . $path;
 }
 
-?>
+

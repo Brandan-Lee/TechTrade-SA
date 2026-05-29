@@ -99,7 +99,7 @@ try {
 
     $db->beginTransaction();
 
-    $sqlMarkRead = "UPDATE notifications SET is_read = 1, read_at = NOW() WHERE id = ?";
+    $sqlMarkRead = "UPDATE notifications SET is_read = 1, status = 'declined', read_at = NOW() WHERE id = ?";
     $db->prepare($sqlMarkRead)->execute([$notificationIdToClear]);
 
     $sqlUpdateTargetOffer = "UPDATE offers SET status = 'declined', responded_at = NOW() WHERE id = ?";

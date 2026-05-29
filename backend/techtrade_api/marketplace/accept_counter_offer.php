@@ -45,11 +45,6 @@ try {
     }
     $userIdValue = intval($activeUserId);
 
-    // -------------------------------------------------------------------------
-    // Phase 1: Context Resolution via Notifications Schema Model
-    // -------------------------------------------------------------------------
-
-    // Look up via notification id OR matching offer_id column data block context
     $sqlFindMap = "
         SELECT id, offer_id 
         FROM notifications 
@@ -59,6 +54,7 @@ try {
           AND is_deleted = 0
         LIMIT 1
     ";
+
     $stmtMap = $db->prepare($sqlFindMap);
     $stmtMap->execute([$incomingId, $incomingId, $userIdValue]);
     $resolvedNotification = $stmtMap->fetch(PDO::FETCH_ASSOC);
@@ -71,7 +67,6 @@ try {
     $notificationIdToClear = intval($resolvedNotification['id']);
     $offerId = intval($resolvedNotification['offer_id']);
 
-    // Fetch the target offer properties to double check transaction validity
     $sqlVerify = "
         SELECT o.id, o.listing_id, o.buyer_id, o.amount_cents, o.status, l.seller_id, l.title AS listing_title
         FROM offers o
@@ -79,6 +74,7 @@ try {
         WHERE o.id = ? AND l.is_deleted = 0
         LIMIT 1
     ";
+
     $stmt = $db->prepare($sqlVerify);
     $stmt->execute([$offerId]);
     $currentOffer = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -88,7 +84,6 @@ try {
         throw new Exception("The underlying counter offer context record was not found.");
     }
 
-    // Security check: Only the designated buyer can accept this counter offer
     if (intval($currentOffer['buyer_id']) !== $userIdValue) {
         http_response_code(403);
         throw new Exception("Access Denied. Identity validation mismatch.");
@@ -104,16 +99,11 @@ try {
     $agreedPriceCents = intval($currentOffer['amount_cents']);
     $listingTitle = $currentOffer['listing_title'];
 
-    // -------------------------------------------------------------------------
-    // Phase 2: Open Atomic SQL Database Transaction
-    // -------------------------------------------------------------------------
     $db->beginTransaction();
 
-    // 1. Mark the target user notification row as read instantly
-    $sqlMarkRead = "UPDATE notifications SET is_read = 1, read_at = NOW() WHERE id = ?";
+    $sqlMarkRead = "UPDATE notifications SET is_read = 1, status = 'accepted', read_at = NOW() WHERE id = ?";
     $db->prepare($sqlMarkRead)->execute([$notificationIdToClear]);
 
-    // 2. Accept target selected counter offer
     $sqlUpdateTargetOffer = "UPDATE offers SET status = 'accepted', responded_at = NOW() WHERE id = ?";
     $db->prepare($sqlUpdateTargetOffer)->execute([$offerId]);
 
@@ -125,11 +115,9 @@ try {
     ";
     $db->prepare($sqlUpdateOtherOffers)->execute([$listingId, $offerId]);
 
-    // 4. Update parent listing status block to COMMITED
     $sqlUpdateListing = "UPDATE listings SET status = 'COMMITED' WHERE id = ?";
     $db->prepare($sqlUpdateListing)->execute([$listingId]);
 
-    // 5. Instantiate global transactional escrow ledger record entry
     $publicTxId = "TX-" . strval(rand(1000000, 9999999));
     $sqlCreateTx = "
         INSERT INTO transactions (
@@ -139,7 +127,6 @@ try {
     $db->prepare($sqlCreateTx)->execute([$publicTxId, $listingId, $offerId, $userIdValue, $sellerId, $agreedPriceCents]);
     $newTransactionId = $db->lastInsertId();
 
-    // 6. Push real-time success tracking event out to original Seller's feed
     $sqlNotifySeller = "
         INSERT INTO notifications (user_id, type, title, body, status, offer_id, transaction_id, listing_id)
         VALUES (?, 'counter', 'Counter Offer Accepted!', ?, 'accepted', ?, ?, ?)
@@ -147,7 +134,6 @@ try {
     $bodySeller = "Great news! The buyer accepted your counter offer for [{$listingTitle}].";
     $db->prepare($sqlNotifySeller)->execute([$sellerId, $bodySeller, $offerId, $newTransactionId, $listingId]);
 
-    // 7. Loop down separate losers and dispatch decline tracking indexes
     $sqlFindDeclinedBuyers = "
         SELECT id, buyer_id FROM offers WHERE listing_id = ? AND id != ? AND status = 'declined' AND responded_at >= NOW() - INTERVAL 2 SECOND
     ";

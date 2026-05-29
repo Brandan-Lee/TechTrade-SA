@@ -141,7 +141,6 @@ export default function MarketPlace() {
 									exit={{ opacity: 0, scale: 0.95 }}
 									transition={{ duration: 0.4, ease: "circOut" }}
 								>
-									{/* Pass extra props for cyberpunk style if ListingCard supports them */}
 									<ListingCard {...item} theme="dark" />
 								</motion.div>
 							))}
@@ -212,7 +211,7 @@ export default function MarketPlace() {
 						>
 							<FilterX size={48} className="text-slate-700 mb-4" />
 							<h2 className="text-slate-400 font-black uppercase tracking-widest text-xl">
-								{error ? "Scan Failed" : "Zero Signals Found"}
+								{error ? "Scan Failed" : "No Active Listings Found"}
 							</h2>
 							<p className="text-slate-600 text-xs uppercase tracking-widest mt-2">
 								{error

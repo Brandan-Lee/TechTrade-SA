@@ -437,49 +437,6 @@ CREATE TABLE
     CONSTRAINT fk_transactions_seller FOREIGN KEY (seller_id) REFERENCES users (id)
   ) ENGINE = InnoDB;
 
--- -----------------------------------------------------------------------------
--- 5b. WHATSAPP TTL BRIDGES (per-transaction ephemeral contact channel)
---     UI: WhatsAppTTLPage (user policy), MyTransactions “Open TTL Bridge”,
---         TOSModal 24h bridge, notifications.type = 'bridge'
--- -----------------------------------------------------------------------------
-CREATE TABLE whatsapp_bridges (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    transaction_id BIGINT UNSIGNED NOT NULL,
-    buyer_id BIGINT UNSIGNED NOT NULL,
-    seller_id BIGINT UNSIGNED NOT NULL,
-    ttl_preset ENUM ('24h', '7d', '90d', 'custom') NOT NULL,
-    ttl_custom_days TINYINT UNSIGNED NULL,
-    expires_at DATETIME NOT NULL,
-    status ENUM ('pending', 'active', 'expired', 'revoked') NOT NULL DEFAULT 'pending',
-    activated_at DATETIME NULL,
-    expired_at DATETIME NULL,
-    revoked_at DATETIME NULL,
-    revoked_by_id BIGINT UNSIGNED NULL,
-    -- Ephemeral channel fields — MUST be NULLed when status -> expired/revoked
-    bridge_token_hash VARCHAR(255) NULL,
-    wa_deeplink VARCHAR(512) NULL,
-    -- Dispute-only metadata after purge (no phone numbers — POPIA / zero retention)
-    audit_metadata_json JSON NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY uq_whatsapp_bridges_transaction (transaction_id),
-    KEY idx_whatsapp_bridges_expires (status, expires_at),
-    KEY idx_whatsapp_bridges_buyer (buyer_id),
-    KEY idx_whatsapp_bridges_seller (seller_id),
-    CONSTRAINT fk_whatsapp_bridges_transaction FOREIGN KEY (transaction_id) REFERENCES transactions (id),
-    CONSTRAINT fk_whatsapp_bridges_buyer FOREIGN KEY (buyer_id) REFERENCES users (id),
-    CONSTRAINT fk_whatsapp_bridges_seller FOREIGN KEY (seller_id) REFERENCES users (id),
-    CONSTRAINT fk_whatsapp_bridges_revoked_by FOREIGN KEY (revoked_by_id) REFERENCES users (id),
-    
-    -- FIXED CHECK CONSTRAINT LOGIC
-    CONSTRAINT chk_whatsapp_bridges_custom_days CHECK (
-        (ttl_preset != 'custom') 
-        OR 
-        (ttl_preset = 'custom' AND ttl_custom_days IS NOT NULL AND ttl_custom_days BETWEEN 1 AND 365)
-    )
-) ENGINE = InnoDB;
-
 CREATE TABLE
   transaction_events (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

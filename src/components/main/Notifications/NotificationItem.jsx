@@ -15,20 +15,21 @@ const NotificationItem = ({
 	id,
 	title,
 	time,
-	type, // 'offer', 'bridge', 'counter', 'system'
-	status, // 'pending', 'accepted', 'declined', 'expired'
-	onAction, // Triggered via onAction(id, "accept" | "decline")
+	type,
+	status,
+	onAction,
 	onDelete,
-	is_read, // Ingested directly from MySQL tinyint row conversion data
+	is_read,
 	offerAmount,
 	listingName,
 	buyerName,
 	sellerName,
-	isSeller, // Boolean flag from backend calculating user perspective context
+	isSeller,
 }) => {
 	const isItemRead = Number(is_read) === 1;
 	const amISeller = Number(isSeller) === 1;
-	const shouldShowActions = status === "pending" && type === "counter" && !amISeller;
+	const shouldShowActions =
+		status === "pending" && type === "counter" && !amISeller;
 
 	// Select an icon based on the notification type
 	const getIcon = () => {
@@ -36,7 +37,7 @@ const NotificationItem = ({
 		switch (type) {
 			case "offer":
 				return <DollarSign size={iconSize} className="text-fuchsia-400" />;
-			case "system": // FIX: Standardized to lowercase matching 'system'
+			case "system":
 				return <Shield size={iconSize} className="text-cyan-400" />;
 			case "counter":
 				return <Handshake size={iconSize} className="text-amber-400" />;
@@ -51,14 +52,15 @@ const NotificationItem = ({
 		const textSuccess = "text-emerald-400 font-black tracking-widest uppercase";
 		const textFailure = "text-red-400 font-black tracking-widest uppercase";
 
+		//For Buyer's perspective on incoming offers
 		if (type === "offer") {
 			if (status === "accepted") {
-				// FIX: Added 'return' keyword
 				return (
 					<span>
-						You <span className={textSuccess}>ACCEPTED</span> the offer from{" "}
-						{buyerName} of <span className={textHighlight}>R{offerAmount}</span>{" "}
-						for <span className="text-white">[{listingName}]</span>.
+						{buyerName} <span className={textSuccess}>ACCEPTED</span> the offer
+						from {buyerName} of{" "}
+						<span className={textHighlight}>R{offerAmount}</span> for{" "}
+						<span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
@@ -67,7 +69,7 @@ const NotificationItem = ({
 				// FIX: Added 'return' keyword
 				return (
 					<span>
-						You <span className={textFailure}>DECLINED</span> the offer from{" "}
+						{sellerName} <span className={textFailure}>DECLINED</span> the offer from{" "}
 						{buyerName} for <span className="text-white">[{listingName}]</span>.
 					</span>
 				);
@@ -86,45 +88,74 @@ const NotificationItem = ({
 			}
 		}
 
-		if (type === "counter") {
+		if (type === "counter" && amISeller) {
 			if (status === "accepted") {
 				return (
 					<span>
-						You <span className={textSuccess}>ACCEPTED</span> the counter offer
-						of <span className={textHighlight}>R{offerAmount}</span> for{" "}
+						{buyerName} <span className={textSuccess}>ACCEPTED</span> the
+						counter offer of{" "}
+						<span className={textHighlight}>R{offerAmount}</span> for{" "}
 						<span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
 
-			if (status === "declined") {
+			if (status === "declined" && amISeller) {
 				return (
 					<span>
-						You <span className={textFailure}>DECLINED</span> the counter offer
-						for <span className="text-white">[{listingName}]</span>.
+						{buyerName} <span className={textFailure}>DECLINED</span> the
+						counter offer for{" "}
+						<span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
-
-			// Default Pending State for Counter
-			return (
-				<span>
-					<span className="text-white font-bold">
-						{sellerName || "The seller"}
-					</span>{" "}
-					sent you a counter offer of{" "}
-					<span className={textHighlight}>R{offerAmount}</span> for{" "}
-					<span className="text-white">[{listingName}]</span>.
-				</span>
-			);
+		} else {
+			if (status === "pending") {
+				return (
+					<span>
+						<span className="text-white font-bold">
+							{sellerName || "The seller"}
+						</span>{" "}
+						sent you a counter offer of{" "}
+						<span className={textHighlight}>R{offerAmount}</span> for{" "}
+						<span className="text-white">[{listingName}]</span>.
+						<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
+							<button
+								onClick={() => onAction?.(id, "accept")}
+								className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.2)] transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-fuchsia-400"
+							>
+								<Check size={12} strokeWidth={3} />
+								<span>ACCEPT</span>
+							</button>
+							<button
+								onClick={() => onAction?.(id, "decline")}
+								className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-red-400"
+							>
+								<X size={12} strokeWidth={3} />
+								<span>DECLINE</span>
+							</button>
+						</div>
+					</span>
+				);
+			} else {
+				return (
+					<span>
+						You already reacted on this offer for{" "}
+						<span className="text-white">[{listingName}]</span>.
+					</span>
+				);
+			}
 		}
+	};
 
+	if (type === "review") {
 		return (
 			<span className="text-slate-400">
-				Notification update recorded for [{listingName}].
+				You have received a new review. You can find it on your profile page.
+				Please check it out and respond if necessary.
 			</span>
 		);
-	};
+	}
 
 	return (
 		<div
@@ -196,26 +227,6 @@ const NotificationItem = ({
 			>
 				{renderMessage()}
 			</div>
-
-			{/* Action Control Interface Block */}
-			{shouldShowActions && (
-				<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
-					<button
-						onClick={() => onAction?.(id, "accept")}
-						className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.2)] transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-fuchsia-400"
-					>
-						<Check size={12} strokeWidth={3} />
-						<span>ACCEPT</span>
-					</button>
-					<button
-						onClick={() => onAction?.(id, "decline")}
-						className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-red-400"
-					>
-						<X size={12} strokeWidth={3} />
-						<span>DECLINE</span>
-					</button>
-				</div>
-			)}
 		</div>
 	);
 };

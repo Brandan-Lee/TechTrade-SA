@@ -108,6 +108,8 @@ const LoginModal = ({
 				throw new Error(data.message || "Sign-in credentials rejected.");
 			}
 
+			console.log("Login response data:", data.isFromAdmin);
+
 			if (data.status === "pending_otp") {
 				triggerStatus("Sign-in matching. Verifying access key...", "success");
 				setTimeout(() => {

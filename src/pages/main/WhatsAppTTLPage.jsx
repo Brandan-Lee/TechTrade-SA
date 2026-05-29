@@ -1,184 +1,216 @@
-import React, { useState } from "react";
-import { MessageSquare, ShieldAlert, Clock, HelpCircle, Save, CheckCircle2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Phone, Copy, Check, AlertTriangle, Loader2 } from "lucide-react";
+import { apiFetch } from "../../lib/api";
 
-export default function WhatsAppTTLPage() {
-    const [selectedTTL, setSelectedTTL] = useState("24h");
-    const [customDays, setCustomDays] = useState("");
-    const [isSaving, setIsSaving] = useState(false);
-    const [showToast, setShowToast] = useState(false);
+export default function SecureContactPage() {
+	const { transactionId } = useParams();
 
-    const ttlOptions = [
-        { id: "24h", label: "24 Hours", desc: "For high-velocity trade chats containing temporary pricing coordinates.", icon: "⚡" },
-        { id: "7d", label: "7 Days", desc: "Standard cycle. Ideal for normal escrow settlement and transport windows.", icon: "⏳" },
-        { id: "90d", label: "90 Days", desc: "Long-term tracking. Recommended for bulk wholesale vendor accounts.", icon: "𗢙" },
-        { id: "custom", label: "Custom Lifespan", desc: "Specify an explicit cryptographic time-horizon for structural data drop.", icon: "⚙️" }
-    ];
+	const [transactionData, setTransactionData] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [errorMessage, setErrorMessage] = useState(null);
+	const [copiedTarget, setCopiedTarget] = useState(null);
 
-    const handleSave = (e) => {
-        e.preventDefault();
-        setIsSaving(true);
-        
-        // Simulating backend cryptographic state synchronization
-        setTimeout(() => {
-            setIsSaving(false);
-            setShowToast(true);
-            setTimeout(() => setShowToast(false), 4000);
-        }, 1200);
-    };
+	useEffect(() => {
+		// 1. Trace the parameter: Open your browser console (F12) to see this log
+		console.log("SecureContactPage: Loading data for transactionId:", transactionId);
 
-    return (
-        <div className="min-h-screen bg-base-100 text-base-content py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            
-            {/* Cyberpunk background accent glows */}
-            <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
+		if (!transactionId) {
+			setErrorMessage("Missing transaction ID.");
+			setIsLoading(false);
+			return;
+		}
 
-            <div className="max-w-3xl mx-auto relative z-10">
-                
-                {/* Header Section */}
-                <header className="mb-10 text-center sm:text-left">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono font-bold tracking-wider uppercase mb-3">
-                        <MessageSquare className="w-3.5 h-3.5" /> Secure Handshake Node
-                    </div>
-                    <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-neutral-100 uppercase">
-                        WhatsApp <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">TTL Protocols</span>
-                    </h1>
-                    <p className="text-base-content/70 mt-2 text-sm sm:text-base max-w-xl">
-                        Enforce auto-expiring ephemeral lifespans on external platform metadata. Once timer parameters clear, chat records dissolve automatically.
-                    </p>
-                </header>
+		const loadSecureContact = async () => {
+			setIsLoading(true);
+			setErrorMessage(null);
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    {/* Left & Center: Configuration Core Form */}
-                    <main className="lg:col-span-2" id="main-content" aria-label="TTL Configuration Panel">
-                        <form onSubmit={handleSave} className="space-y-6">
-                            
-                            {/* Radio Option Cards Group */}
-                            <fieldset className="space-y-3">
-                                <legend className="text-sm font-bold tracking-wide uppercase text-neutral-300 font-mono mb-3">
-                                    Select Active Retain Window
-                                </legend>
-                                <div className="grid grid-cols-1 gap-3" role="radiogroup" aria-required="true">
-                                    {ttlOptions.map((option) => {
-                                        const isChecked = selectedTTL === option.id;
-                                        return (
-                                            <label
-                                                key={option.id}
-                                                className={`flex items-start gap-4 p-4 rounded-xl border transition-all duration-200 cursor-pointer select-none focus-within:ring-2 focus-within:ring-primary ${
-                                                    isChecked
-                                                        ? "bg-primary/5 border-primary shadow-lg shadow-primary/5"
-                                                        : "bg-base-200/50 border-neutral-800 hover:border-neutral-700 hover:bg-base-200"
-                                                }`}
-                                            >
-                                                {/* Hidden input field optimized for screen reader focus maps */}
-                                                <input
-                                                    type="radio"
-                                                    name="whatsapp-ttl-interval"
-                                                    value={option.id}
-                                                    checked={isChecked}
-                                                    onChange={() => setSelectedTTL(option.id)}
-                                                    className="radio radio-primary mt-1 shrink-0"
-                                                    aria-describedby={`desc-${option.id}`}
-                                                />
-                                                <div>
-                                                    <span className="font-bold text-neutral-100 text-sm sm:text-base flex items-center gap-2">
-                                                        <span>{option.icon}</span> {option.label}
-                                                    </span>
-                                                    <span 
-                                                        id={`desc-${option.id}`} 
-                                                        className="block text-xs sm:text-sm text-base-content/60 mt-1 leading-relaxed"
-                                                    >
-                                                        {option.desc}
-                                                    </span>
-                                                </div>
-                                            </label>
-                                        );
-                                    })}
-                                </div>
-                            </fieldset>
+			try {
+				// 2. Perform the fetch
+				const response = await apiFetch(
+					`/marketplace/get_secure_contact.php?public_id=${encodeURIComponent(transactionId)}`,
+				);
 
-                            {/* Conditional Custom Selection Parameter Input View */}
-                            {selectedTTL === "custom" && (
-                                <div className="p-4 rounded-xl border border-neutral-800 bg-base-200/30 animate-fade-in">
-                                    <label htmlFor="custom-ttl-days" className="block text-xs font-mono font-bold uppercase text-neutral-400 mb-2">
-                                        Explicit Lifespan Period (In Days)
-                                    </label>
-                                    <div className="flex items-center gap-3 max-w-xs">
-                                        <input
-                                            id="custom-ttl-days"
-                                            type="number"
-                                            min="1"
-                                            max="365"
-                                            required
-                                            value={customDays}
-                                            onChange={(e) => setCustomDays(e.target.value)}
-                                            placeholder="e.g. 14"
-                                            className="input input-bordered input-primary w-full font-mono bg-base-300 text-neutral-100"
-                                            aria-label="Custom dynamic lifespan countdown ceiling value"
-                                        />
-                                        <span className="text-sm font-mono text-neutral-400 uppercase tracking-wider">Days</span>
-                                    </div>
-                                </div>
-                            )}
+				const res = await response.json();
 
-                            {/* Form Execution Submission Trigger */}
-                            <div className="pt-2">
-                                <button
-                                    type="submit"
-                                    disabled={isSaving}
-                                    className={`btn btn-primary w-full sm:w-auto px-8 gap-2 uppercase font-bold tracking-wider rounded-xl ${
-                                        isSaving ? "loading" : ""
-                                    }`}
-                                    aria-live="polite"
-                                >
-                                    {!isSaving && <Save className="w-4 h-4" />}
-                                    {isSaving ? "Syncing Grid..." : "Commit TTL Policy"}
-                                </button>
-                            </div>
-                        </form>
-                    </main>
+				if (!response.ok) {
+					throw new Error(res.error || "Server error: Unable to fetch data.");
+				}
 
-                    {/* Right Side Info Section / Informational Sidebar */}
-                    <aside className="space-y-4" aria-label="Policy Information & System Warnings">
-                        
-                        {/* Notice Card A */}
-                        <div className="card bg-base-200 border border-neutral-800 p-5 rounded-2xl">
-                            <h2 className="text-sm font-bold uppercase tracking-wider font-mono text-amber-400 flex items-center gap-2 mb-3">
-                                <ShieldAlert className="w-4 h-4 shrink-0" /> Integrity Note
-                            </h2>
-                            <p className="text-xs sm:text-sm text-base-content/70 leading-relaxed">
-                                Enabling Time-To-Live parameters limits secondary platform vectors from crawling old deal metadata. However, this does not prevent manual screenshot logging or platform-native archiving by your recipient.
-                            </p>
-                        </div>
+				if (res.status === "success") {
+					setTransactionData(res.data);
+				} else {
+					throw new Error(res.error || "Database returned failure status.");
+				}
+			} catch (err) {
+				console.error("Fetch Error:", err);
+				setErrorMessage(err.message);
+			} finally {
+				// 3. Guarantee that loading is turned off
+				setIsLoading(false);
+			}
+		};
 
-                        {/* Notice Card B */}
-                        <div className="card bg-base-200/40 border border-neutral-800/60 p-5 rounded-2xl text-xs sm:text-sm">
-                            <h2 className="text-sm font-bold uppercase tracking-wider font-mono text-neutral-300 flex items-center gap-2 mb-3">
-                                <Clock className="w-4 h-4 shrink-0" /> Execution Matrix
-                            </h2>
-                            <ul className="space-y-2 text-base-content/60 list-disc list-inside">
-                                <li>Applies to system logs & trade boards</li>
-                                <li>Realtime counter synchronizations</li>
-                                <li>Revocable or mutable at any step</li>
-                            </ul>
-                        </div>
-                    </aside>
-                </div>
-            </div>
+		loadSecureContact();
+	}, [transactionId]);
 
-            {/* Accessible Live Region Popup Toast Alert Feedback */}
-            <div className="toast toast-end z-50 p-4" role="alert" aria-live="assertive">
-                {showToast && (
-                    <div className="alert alert-success shadow-xl border border-emerald-500/30 rounded-xl flex items-center gap-3 bg-[#0a2416] text-emerald-300">
-                        <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
-                        <div>
-                            <span className="font-bold block text-sm">Security Protocols Updated</span>
-                            <span className="text-xs text-emerald-400/80 font-mono">WhatsApp TTL profile linked successfully.</span>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
+	const handleCopy = (text, type) => {
+		if (!text) return;
+		navigator.clipboard.writeText(text);
+		setCopiedTarget(type);
+		setTimeout(() => setCopiedTarget(null), 2000);
+	};
+
+	if (isLoading) {
+		return (
+			<div className="bg-[#07050e] flex flex-col items-center justify-center font-mono text-purple-400">
+				<Loader2 className="w-8 h-8 animate-spin mb-2 text-fuchsia-500" />
+				<span className="text-xs uppercase tracking-widest font-bold">
+					Decrypting Records...
+				</span>
+			</div>
+		);
+	}
+
+	if (errorMessage || !transactionData) {
+		return (
+			<div className="bg-[#07050e] flex flex-col items-center justify-center font-mono text-rose-400 p-4">
+				<AlertTriangle className="w-8 h-8 mb-3 text-rose-500" />
+				<span className="text-sm font-bold uppercase tracking-wider text-white">
+					Access Violation
+				</span>
+				<p className="text-xs text-slate-400 mt-1 max-w-xs text-center border border-rose-500/20 bg-rose-950/10 p-3 rounded-xl">
+					{errorMessage || "Data mismatch exception."}
+				</p>
+			</div>
+		);
+	}
+
+	return (
+		<div className="bg-[#07050e] text-slate-300 py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-mono selection:bg-purple-500/30">
+			<div className="max-w-4xl mx-auto relative z-10">
+				<header className="mb-10 text-center sm:text-left border-b border-purple-500/10 pb-6">
+					<h1 className="text-3xl sm:text-4xl font-black tracking-wider text-white uppercase drop-shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+						Secure{" "}
+						<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-400">
+							Contact Info
+						</span>
+					</h1>
+					<p className="text-slate-400 mt-2 text-xs sm:text-sm max-w-2xl leading-relaxed">
+						The offer has been accepted! Use the verified mobile numbers below
+						to get in touch, talk about the item details, or arrange your
+						handover.
+					</p>
+				</header>
+
+				<div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+					<main className="md:col-span-8 space-y-6">
+						{/* Buyer Contact Card */}
+						<div className="p-6 bg-[#0c081d] border border-purple-500/20 rounded-2xl relative group hover:border-purple-500/40 transition-all duration-300 shadow-xl shadow-black/40">
+							<div className="absolute top-0 left-4 -translate-y-1/2 bg-purple-600 text-white text-[10px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded shadow">
+								Buyer Details
+							</div>
+
+							<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-1">
+								<div>
+									<h3 className="text-white font-black text-lg tracking-wide">
+										{transactionData.buyer.name}
+									</h3>
+									<p className="text-slate-500 text-xs uppercase tracking-wider font-semibold mt-0.5">
+										Mobile Number
+									</p>
+									<div className="text-fuchsia-400 text-xl font-bold tracking-widest mt-2 bg-[#06040f] border border-purple-950 px-3 py-1.5 rounded-lg inline-block">
+										{transactionData.buyer.phone}
+									</div>
+								</div>
+
+								<div className="flex sm:flex-col gap-2 shrink-0">
+									<button
+										onClick={() =>
+											handleCopy(transactionData.buyer.phone, "buyer")
+										}
+										className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-[#130d2a] border border-purple-500/20 hover:border-purple-500/60 text-slate-300 rounded-xl text-xs font-bold transition-all"
+									>
+										{copiedTarget === "buyer" ? (
+											<Check className="w-3.5 h-3.5 text-emerald-400" />
+										) : (
+											<Copy className="w-3.5 h-3.5" />
+										)}
+										{copiedTarget === "buyer" ? "Copied" : "Copy Number"}
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* Seller Contact Card */}
+						<div className="p-6 bg-[#0c081d] border border-fuchsia-500/20 rounded-2xl relative group hover:border-fuchsia-500/40 transition-all duration-300 shadow-xl shadow-black/40">
+							<div className="absolute top-0 left-4 -translate-y-1/2 bg-fuchsia-600 text-white text-[10px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded shadow">
+								Seller Details
+							</div>
+
+							<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-1">
+								<div>
+									<h3 className="text-white font-black text-lg tracking-wide">
+										{transactionData.seller.name}
+									</h3>
+									<p className="text-slate-500 text-xs uppercase tracking-wider font-semibold mt-0.5">
+										Mobile Number
+									</p>
+									<div className="text-fuchsia-400 text-xl font-bold tracking-widest mt-2 bg-[#06040f] border border-fuchsia-950 px-3 py-1.5 rounded-lg inline-block">
+										{transactionData.seller.phone}
+									</div>
+								</div>
+
+								<div className="flex sm:flex-col gap-2 shrink-0">
+									<button
+										onClick={() =>
+											handleCopy(transactionData.seller.phone, "seller")
+										}
+										className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-[#130d2a] border border-fuchsia-500/20 hover:border-fuchsia-500/60 text-slate-300 rounded-xl text-xs font-bold transition-all"
+									>
+										{copiedTarget === "seller" ? (
+											<Check className="w-3.5 h-3.5 text-emerald-400" />
+										) : (
+											<Copy className="w-3.5 h-3.5" />
+										)}
+										{copiedTarget === "seller" ? "Copied" : "Copy Number"}
+									</button>
+								</div>
+							</div>
+						</div>
+					</main>
+
+					<aside className="md:col-span-4 space-y-4">
+						<div className="p-5 bg-[#0a0615] border border-purple-500/10 rounded-2xl">
+							<span className="text-slate-500 text-[10px] font-black uppercase tracking-widest block mb-1">
+								Transaction Number
+							</span>
+							<div className="text-white font-bold text-xs font-mono mb-4 text-purple-400">
+								{transactionData.publicId}
+							</div>
+
+							<span className="text-slate-500 text-[10px] font-black uppercase tracking-widest block mb-1">
+								Item Ordered
+							</span>
+							<div className="text-slate-200 font-bold text-sm leading-snug">
+								{transactionData.itemTitle}
+							</div>
+						</div>
+
+						<div className="p-5 bg-amber-950/10 border border-amber-500/20 rounded-2xl text-xs">
+							<h2 className="text-amber-400 font-black uppercase tracking-wider flex items-center gap-2 mb-2">
+								<AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />{" "}
+								Trading Safely
+							</h2>
+							<p className="text-slate-400 leading-relaxed font-medium">
+								Never share password pins, bank account details, or login codes
+								over the phone. Keep your personal information private and
+								confirm all handovers safely.
+							</p>
+						</div>
+					</aside>
+				</div>
+			</div>
+		</div>
+	);
 }

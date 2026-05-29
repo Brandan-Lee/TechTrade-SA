@@ -32,7 +32,7 @@ export default function NavBar({
 	const userRoleId = user && user.roleId !== undefined && user.roleId !== null ? Number(user.roleId) : null;
 	const isAdmin = [3, 4].includes(userRoleId);
 	const showSellGearViewOffers = userRoleId !== null && ![0, 1, 3, 4].includes(userRoleId);
-	const showBuildDoctor = !isAdmin;
+	const showBuildDoctor = !isAdmin && userRoleId !== null && userRoleId !== null;
 	const showProfile = !isAdmin;
 	const showTransactions = !isAdmin;
 

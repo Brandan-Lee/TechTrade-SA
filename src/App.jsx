@@ -94,6 +94,7 @@ function App() {
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
 	const [counterOfferId, setCounterOfferId] = useState(null);
+	const [transactionId, setTransactionId] = useState(null);
 	const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 	const [isDataModalOpen, setIsDataModalOpen] = useState(false);
 
@@ -219,7 +220,7 @@ function App() {
 						path="listing-report/:listingId"
 						element={<ListingReportPage />}
 					/>
-					<Route path="escrow-tracker" element={<EscrowTrackerPage />} />
+					<Route path="escrow-tracker/:transactionId" element={<EscrowTrackerPage />} />
 					<Route path="review/:userId" element={<ReviewPage />} />
 					<Route path="report-user/:userId" element={<ReportUser />} />
 					<Route path="dispute" element={<LaunchDisputePage />} />
@@ -254,6 +255,7 @@ function App() {
 					closeAllModals();
 					const isAdmin = ["3", "4"].includes(String(data.user.roleId));
 					navigate(isAdmin ? "/admin" : "/", { replace: true });
+					window.location.reload();
 				}}
 			/>
 			
@@ -290,6 +292,7 @@ function App() {
 					navigate(isAdmin ? "/admin" : "/", { replace: true });
 				}}
 			/>
+			
 			<ResetModal
 				isOpen={isResetOpen}
 				onClose={() => setIsResetOpen(false)}
@@ -298,10 +301,17 @@ function App() {
 				email={authEmail}
 				otpCode={authOTP}
 			/>
+
 			<NotificationModal
 				isOpen={isNotificationOpen}
 				onClose={() => setIsNotificationOpen(false)}
+                onCounterAccept={(id) => {
+                    setTransactionId(id);
+                    closeAllModals();
+                    navigate(`/whatsapp-ttl/${id}`);
+				}}
 			/>
+
 			<CounterOfferModal
 				isOpen={isCounterModalOpen}
 				onClose={() => {
@@ -309,6 +319,10 @@ function App() {
 					setCounterOfferId(null);
 				}}
 				offerId={counterOfferId}
+				onSuccess={() => {
+					setIsCounterModalOpen(false);
+					navigate("/offers");
+				}}
 			/>
 			<TOSModal
 				isOpen={isTOSModalOpen}

@@ -7,7 +7,14 @@ import CyberActionButton from "../../ui/CyberActionButton";
 import CyberAlert from "../../ui/CyberAlert";
 import { apiFetch } from "../../../lib/api";
 
-const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName, offerId }) => {
+const CounterOfferModal = ({
+	isOpen,
+	onClose,
+	onSubmit,
+	listingName,
+	offerId,
+	onSuccess
+}) => {
 	const [amount, setAmount] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorField, setErrorField] = useState("");
@@ -47,7 +54,6 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName, offerId }) 
 		setErrorField("");
 		setAlert({ show: false, message: "", type: "error" });
 
-		// Basic client side number check
 		if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
 			triggerStatus(
 				"Please enter a valid offer amount higher than R0.",
@@ -69,7 +75,6 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName, offerId }) 
 		setIsLoading(true);
 
 		try {
-			// Send database updates and dispatch buyer notifications
 			const response = await apiFetch("/marketplace/send_counter_offer.php", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -85,7 +90,6 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, listingName, offerId }) 
 				throw new Error(resData.error || "The server rejected your offer.");
 			}
 
-			// Show success confirmation banner
 			triggerStatus(resData.message || "Offer sent successfully!", "success");
 
 			// Clear form, notify parent layout to refresh data, and close window after delay

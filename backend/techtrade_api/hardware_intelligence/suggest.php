@@ -21,7 +21,6 @@ if ($query === '' || mb_strlen($query) < 2) {
 
 try {
     $db = Database::getConnection();
-    // Suggest from active marketplace listings (more reliable than hardware DB).
     $stmt = $db->prepare("
         SELECT
             l.id,

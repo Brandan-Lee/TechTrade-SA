@@ -73,8 +73,8 @@ try {
 
     $sqlInsertListing = "INSERT INTO listings (
         seller_id, category_id, hardware_id, title, description, 
-        condition_grade, price_cents, accepts_offers, location_province, status, published_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'AVAILABLE', NOW())";
+        condition_grade, price_cents, location_province, status, published_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'AVAILABLE', NOW())";
 
     $stmtListing = $db->prepare($sqlInsertListing);
     $stmtListing->execute([
@@ -85,7 +85,6 @@ try {
         $description,
         $conditionGrade,
         $priceCents,
-        $acceptsOffers,
         $locationProvince
     ]);
 
@@ -155,7 +154,6 @@ try {
 
     http_response_code(200);
     echo json_encode(["success" => true, "listing_id" => $newListingId]);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
@@ -169,4 +167,3 @@ try {
     http_response_code(500);
     echo json_encode(["error" => "Critical Server System Bootstrap Handshake Exception Encountered.", "debug" => $t->getMessage()]);
 }
-?>
