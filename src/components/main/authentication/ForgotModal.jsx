@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Terminal, Cpu } from "lucide-react";
 import AuthModalWrapper from "./AuthModalWrapper";
 import { apiFetch } from "../../../lib/api";
@@ -6,30 +6,44 @@ import AuthInput from "../../ui/AuthInput";
 import CyberActionButton from "../../ui/CyberActionButton";
 import AuthFooter from "./AuthFooter";
 import CyberAlert from "../../ui/CyberAlert";
+import { useAuthModalScroll } from "./AuthModalScrollContext";
 
 export const ForgotModal = ({
 	isOpen,
 	onClose,
 	onSwitchToOTP,
 	onSwitchToLogin,
+	onSwitchToReset,
 }) => {
 	const [email, setEmail] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorField, setErrorField] = useState("");
 	const [shakeTick, setShakeTick] = useState(0);
+	const scrollToTop = useAuthModalScroll();
 	const [alert, setAlert] = useState({
 		show: false,
 		message: "",
 		type: "error",
 	});
 
+	useEffect(() => {
+		if (isOpen) {
+			setEmail("");
+			setErrorField("");
+			setAlert({ show: false, message: "", type: "error" });
+		}
+	}, [isOpen]);
+
 	const triggerStatus = (message, type = "error", fieldName = "") => {
+		scrollToTop?.();
 		setAlert({ show: true, message, type });
 
 		if (type === "error" && fieldName) {
 			setErrorField("");
 			setShakeTick((tick) => tick + 1);
-			requestAnimationFrame(() => setErrorField(fieldName));
+			requestAnimationFrame(() => {
+				setTimeout(() => setErrorField(fieldName), 0);
+			});
 		} else {
 			setErrorField("");
 		}
@@ -39,7 +53,7 @@ export const ForgotModal = ({
 		const { name, value } = e.target;
 
 		setAlert({ show: false, message: "", type: "error" });
-		if (errorField === name) {
+		if (errorField === name || errorField === "email") {
 			setErrorField("");
 		}
 		setEmail(value);
@@ -68,25 +82,40 @@ export const ForgotModal = ({
 
 			const data = await response.json();
 
-			if (response.ok) {
-				triggerStatus("Email Found! REDIRECTING...", "success");
+			if (!response.ok || data.status === "error") {
+				throw new Error(
+					data.message || "Network gateway authentication recovery dropped.",
+				);
+			}
+
+			if (data.status === "pending_otp") {
+				triggerStatus(
+					"MFA Protocol Triggered. Routing access key...",
+					"success",
+				);
 
 				setTimeout(() => {
 					setIsLoading(false);
 					onSwitchToOTP(email.trim(), "reset");
 				}, 2000);
-			} else {
-				const fieldTarget = data.field || "email";
+
+			} else if (data.status === "success") {
 				triggerStatus(
-					data.message || "Gateway rejection.",
-					"error",
-					fieldTarget,
+					data.message ||
+						"Bypass confirmation ready. Token successfully dispatched.",
+					"success",
 				);
-				setIsLoading(false);
+
+				setTimeout(() => {
+					setIsLoading(false);
+					onSwitchTReset(email.trim());
+					onClose();
+				}, 200);
 			}
 		} catch (error) {
 			triggerStatus(
-				"CONNECTION TO THE TECHTRADE NETWORK FAILED.",
+				error.message.toUpperCase() ||
+					"CONNECTION TO THE TECHTRADE NETWORK FAILED.",
 				"error",
 				"email",
 			);
@@ -140,9 +169,9 @@ export const ForgotModal = ({
 							id="recovery-email"
 							label="Email"
 							type="email"
-							name="email" 
+							name="email"
 							value={email}
-							onChange={handleInputChange} 
+							onChange={handleInputChange}
 							placeholder="user@network.com"
 							required
 							disabled={isLoading}

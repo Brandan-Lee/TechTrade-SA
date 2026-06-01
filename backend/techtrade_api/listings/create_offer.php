@@ -118,8 +118,8 @@ try {
     $publicTxId = generatePublicTxId();
     $sqlInsertTx = "
         INSERT INTO transactions (
-            public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status, escrow_step, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', 2, NOW())
+            public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())
     ";
     $stmtInsertTx = $db->prepare($sqlInsertTx);
     $stmtInsertTx->execute([

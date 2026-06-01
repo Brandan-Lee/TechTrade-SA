@@ -330,4 +330,21 @@ class User
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$this->id]);
     }
+
+    public function updatePassword(string $newPassword): bool
+    {
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $sql = "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?";
+
+        $stmt = $this->db->prepare($sql);
+        $success = $stmt->execute([$newHash, $this->id]);
+
+        if ($success) {
+            $this->passwordHash = $newHash;
+            $this->updatedAt = date('Y-m-d H:i:s');
+        }
+
+        return $success;
+    }
 }

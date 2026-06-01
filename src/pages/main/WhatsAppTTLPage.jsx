@@ -28,7 +28,7 @@ export default function SecureContactPage() {
 			try {
 				// 2. Perform the fetch
 				const response = await apiFetch(
-					`/marketplace/get_secure_contact.php?public_id=${encodeURIComponent(transactionId)}`,
+					`/secure_contact/get_secure_contact.php?public_id=${encodeURIComponent(transactionId)}`,
 				);
 
 				const res = await response.json();

@@ -15,7 +15,7 @@ const LoginModal = ({
 	onSwitchToForgot,
 	onSwitchToRegister,
 	onSwitchToOTP,
-	onLoginSuccess
+	onLoginSuccess,
 }) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [formData, setFormData] = useState({
@@ -36,7 +36,6 @@ const LoginModal = ({
 	const navigate = useNavigate();
 	const isFromAdmin = purpose === "admin";
 
-	// Reset form state cleanly whenever modal window visibility switches
 	useEffect(() => {
 		if (isOpen) {
 			setFormData({ email: "", password: "", rememberMe: false });
@@ -116,11 +115,10 @@ const LoginModal = ({
 					setIsLoading(false);
 					onSwitchToOTP(formData.email.trim(), purpose);
 				}, 2000);
-			}
-			else if (
+			} else if (
 				data.status === "success" &&
 				data.user &&
-				data.user.roleId === 4
+				data.user.roleId === 4 || data.user.roleId === 3
 			) {
 				triggerStatus(
 					"Welcome back. Routing to control dashboard...",
@@ -133,8 +131,7 @@ const LoginModal = ({
 						onLoginSuccess(data, isFromAdmin);
 					}
 				}, 2000);
-			}
-			else {
+			} else {
 				triggerStatus("Sign-in verified successfully!", "success");
 				setTimeout(() => {
 					setIsLoading(false);

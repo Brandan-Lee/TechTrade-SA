@@ -414,6 +414,7 @@ CREATE TABLE
       'disputed'
     ) NOT NULL DEFAULT 'pending',
     escrow_step TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    step_expires_at DATETIME,
     -- 1 Awaiting Payment | 2 Awaiting Dispatch | 3 In Transit
     -- 4 Hardware Inspection | 5 Complete
     escrow_released TINYINT (1) NOT NULL DEFAULT 0,
@@ -720,55 +721,3 @@ CREATE TABLE
     KEY idx_user_strikes_user (user_id),
     CONSTRAINT fk_user_strikes_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
   ) ENGINE = InnoDB;
-
--- -----------------------------------------------------------------------------
--- SEED: roles & categories (matches FilterBar / IntelSection)
--- -----------------------------------------------------------------------------
-INSERT INTO
-  roles (code, name)
-VALUES
-  ('buyer', 'Buyer'),
-  ('seller', 'Seller'),
-  ('moderator', 'Moderator'),
-  ('admin', 'Administrator');
-
-INSERT INTO
-  categories (group_label, name, slug, spec_table, sort_order)
-VALUES
-  ('COMPONENTS', 'GPUs', 'gpus', 'gpus', 1),
-  ('COMPONENTS', 'CPUs', 'cpus', 'cpus', 2),
-  (
-    'COMPONENTS',
-    'Motherboards',
-    'motherboards',
-    'motherboards',
-    3
-  ),
-  ('COMPONENTS', 'PSUs', 'psus', 'psus', 4),
-  ('COMPONENTS', 'Memory', 'memory', 'memory', 5),
-  ('COOLING', 'AIOs', 'aios', 'aios', 10),
-  (
-    'COOLING',
-    'Air Coolers',
-    'air-coolers',
-    'air_coolers',
-    11
-  ),
-  (
-    'COOLING',
-    'Case Fans',
-    'case-fans',
-    'case_fans',
-    12
-  ),
-  ('STORAGE', 'SSDs', 'ssds', 'ssds', 20),
-  ('STORAGE', 'HDDs', 'hdds', 'hdds', 21),
-  ('CHASSIS', 'PC Cases', 'pc-cases', NULL, 30);
-
--- Example catalog row (GPU) — insert hardware first, then child specs
--- INSERT INTO hardware (category_id, brand, model, full_name, slug)
---   VALUES (1, 'NVIDIA', 'GeForce RTX 3080 Ti FE', 'NVIDIA GeForce RTX 3080 Ti FE', 'nvidia-rtx-3080-ti-fe');
--- INSERT INTO gpus (hardware_id, vram_gb, vram_type, core_clock_mhz, boost_clock_mhz, pcie_version, power_connectors, tdp_watts, outputs)
---   VALUES (LAST_INSERT_ID(), 12, 'GDDR6X', 1665, 1770, 'PCIe 4.0 x16', '2x 8-pin', 350, '3x DP 1.4a, 1x HDMI 2.1');
-SET
-  FOREIGN_KEY_CHECKS = 1;

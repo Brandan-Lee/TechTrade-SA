@@ -18,7 +18,7 @@ export default function MyOffers() {
 				setError(null);
 
 				const response = await apiFetch(
-					"/marketplace/get_incoming_offers.php",
+					"/offers/get_incoming_offers.php",
 					{
 						method: "GET",
 					},

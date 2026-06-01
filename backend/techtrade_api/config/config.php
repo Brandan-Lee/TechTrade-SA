@@ -36,13 +36,18 @@ define('COOKIE_SAMESITE', 'Lax');
 define('OFFER_LIFETIME_HOURS', 48);
 define('OFFER_LIFETIME_SECONDS', OFFER_LIFETIME_HOURS * 60 * 60);
 
-// Email
+// Email Configuration ---
 define('SMTP_HOST', getEnvVariable('SMTP_HOST', 'smtp.gmail.com'));
 define('SMTP_USER', getEnvVariable('SMTP_USER'));
 define('SMTP_PASS', getEnvVariable('SMTP_PASS'));
 define('FROM_EMAIL', getEnvVariable('FROM_EMAIL'));
 define('FROM_NAME', getEnvVariable('FROM_NAME', 'TechTrade Security'));
 
+// PayFast Vault Configuration Pipeline ---
+define('PAYFAST_MERCHANT_ID', getEnvVariable('PAYFAST_MERCHANT_ID'));
+define('PAYFAST_MERCHANT_KEY', getEnvVariable('PAYFAST_MERCHANT_KEY'));
+define('PAYFAST_PASSPHRASE', getEnvVariable('PAYFAST_PASSPHRASE'));
+define('PAYFAST_SANDBOX_MODE', filter_var(getEnvVariable('PAYFAST_SANDBOX_MODE', 'true'), FILTER_VALIDATE_BOOLEAN));
 
 function setFrontendCookie(string $name, string $value, int $durationInSeconds = 3600): void
 {
@@ -123,5 +128,3 @@ function publicMediaUrl(?string $storedPath): ?string
 
     return $base . '/' . $path;
 }
-
-

@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Cpu, Wifi, FilterX } from "lucide-react";
-import ListingCard from "../../ListingCard";
+import ListingCard from "../market/ListingCard";
 import { apiFetch } from "../../../lib/api";
 
 export default function MarketPlace() {

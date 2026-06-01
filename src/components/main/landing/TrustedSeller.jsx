@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight, Zap, Loader2 } from "lucide-react";
-import TrustedSellerCard from "../../TrustedSellerCard";
+import TrustedSellerCard from "../market/TrustedSellerCard";
 import { apiFetch } from "../../../lib/api";
 
 export default function TrustedSellers() {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Cpu, Terminal, Zap, Lock, Loader2, MapPin } from "lucide-react";
-import ListingCard from "../../ListingCard.jsx";
+import ListingCard from "../market/ListingCard";
 import { useAuth } from "../../AuthContext.jsx";
 import { apiFetch } from "../../../lib/api";
 

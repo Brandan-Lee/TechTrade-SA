@@ -96,8 +96,8 @@ try {
 
     $sqlCreateTx = "
         INSERT INTO transactions (
-            public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status, escrow_step
-        ) VALUES (?, ?, ?, ?, ?, ?, 'committed', 3)
+            public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status
+        ) VALUES (?, ?, ?, ?, ?, ?, 'committed')
     ";
     $stmtTx = $db->prepare($sqlCreateTx);
     $stmtTx->execute([$publicTxId, $listingId, $offerId, $buyerId, $userIdValue, $agreedPriceCents]);

@@ -88,7 +88,10 @@ export default function ViewListing() {
 	};
 
 	const formatRelativeTime = (datetimeStr) => {
-		if (!datetimeStr) return "Unknown date";
+		if (!datetimeStr) {
+			return "Unknown date";
+		}
+		
 		const uploadDate = new Date(datetimeStr.replace(/-/g, "/"));
 		const now = new Date();
 		const diffTime = Math.abs(now - uploadDate);
@@ -235,12 +238,12 @@ export default function ViewListing() {
 	const isStaff = user && user.roleId && [3, 4].includes(Number(user.roleId));
 
 	const isLocked =
-		listing.status === "committed" || listing.status === "completed";
+		listing.status === "COMMITED" || listing.status === "COMPLETED";
 
 	const displayImages =
 		listing.images && listing.images.length > 0
 			? listing.images.map((img) => mediaUrl(img))
-			: ["https://placehold.co/600x600/1e1b4b/38bdf8?text=NO_IMAGE_AVAILABLE"];
+			: null;
 
 	const sellerAvatar =
 		seller.avatar ||

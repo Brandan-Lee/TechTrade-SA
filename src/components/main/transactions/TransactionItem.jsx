@@ -94,7 +94,7 @@ export default function TransactionItem({
 
 									<button
 										onClick={() =>
-											navigate(`/escrow-tracker/${transaction.transaction_id}`)
+											navigate(`/escrow-tracker/${transaction.id}`)
 										}
 										className="btn btn-sm w-full sm:w-auto font-black tracking-widest text-[11px] uppercase h-9 px-5 rounded-lg border bg-white/5 border-white/10 hover:bg-white/10 hover:border-purple-500/30 text-slate-300 hover:text-white flex items-center justify-center gap-2 transition-all duration-200"
 									>

@@ -75,7 +75,7 @@ const CounterOfferModal = ({
 		setIsLoading(true);
 
 		try {
-			const response = await apiFetch("/marketplace/send_counter_offer.php", {
+			const response = await apiFetch("/offers/send_counter_offer.php", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

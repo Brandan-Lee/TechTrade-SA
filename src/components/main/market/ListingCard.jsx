@@ -1,9 +1,9 @@
 import React from "react";
 import { MapPin, User, Zap, Award, Package, Clock } from "lucide-react";
-import CyberActionButton from "./ui/CyberActionButton";
+import CyberActionButton from "../../ui/CyberActionButton";
 import { useNavigate } from "react-router-dom";
-import AlternateButton from "./ui/AlternateButton";
-import { mediaUrl } from "../lib/api";
+import AlternateButton from "../../ui/AlternateButton";
+import { mediaUrl } from "../../../lib/api";
 
 export default function ListingCard({
 	id,

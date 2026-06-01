@@ -18,7 +18,7 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await apiFetch("/marketplace/get_notifications.php", {
+				const response = await apiFetch("/notifications/get_notifications.php", {
 					method: "GET",
 				});
 				const data = await response.json();
@@ -57,7 +57,7 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 		try {
 			setNotifications((prev) => prev.filter((n) => n.id !== id));
 
-			await apiFetch("/marketplace/delete_notifcation.php", {
+			await apiFetch("/notifications/delete_notification.php", {
 				method: "POST",
 				body: JSON.stringify({ id }),
 			});
@@ -86,8 +86,8 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 			if (targetNotif.type === "counter") {
 				const endpoint =
 					actionType === "accept"
-						? "/marketplace/accept_counter_offer.php"
-						: "/marketplace/decline_counter_offer.php";
+						? "/offers/accept_counter_offer.php"
+						: "/offers/decline_counter_offer.php";
 
 				const response = await apiFetch(endpoint, {
 					method: "POST",
@@ -121,7 +121,7 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 		try {
 			setNotifications((prev) => prev.map((n) => ({ ...n, is_read: 1 })));
 
-			await apiFetch("/marketplace/mark_all_read.php", {
+			await apiFetch("/notifications/mark_all_read.php", {
 				method: "POST",
 			});
 		} catch (err) {

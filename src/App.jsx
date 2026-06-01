@@ -160,8 +160,9 @@ function App() {
 	};
 	const switchToReset = (emailValue = "", otpValue = "") => {
 		closeAllModals();
+		// Automatically purge any stale OTP state text codes if bypassed via non-MFA route track
+		setAuthOTP(otpValue);
 		if (emailValue) setAuthEmail(emailValue);
-		if (otpValue) setAuthOTP(otpValue);
 		setIsResetOpen(true);
 	};
 
@@ -220,11 +221,17 @@ function App() {
 						path="listing-report/:listingId"
 						element={<ListingReportPage />}
 					/>
-					<Route path="escrow-tracker/:transactionId" element={<EscrowTrackerPage />} />
+					<Route
+						path="escrow-tracker/:transactionId"
+						element={<EscrowTrackerPage />}
+					/>
 					<Route path="review/:userId" element={<ReviewPage />} />
 					<Route path="report-user/:userId" element={<ReportUser />} />
-					<Route path="dispute" element={<LaunchDisputePage />} />
-					<Route path="whatsapp-ttl/:transactionId" element={<WhatsAppTTLPage />} />
+					<Route path="dispute/:transactionId" element={<LaunchDisputePage />} />
+					<Route
+						path="whatsapp-ttl/:transactionId"
+						element={<WhatsAppTTLPage />}
+					/>
 				</Route>
 
 				<Route
@@ -258,7 +265,7 @@ function App() {
 					window.location.reload();
 				}}
 			/>
-			
+
 			<RegisterModal
 				isOpen={isRegisterOpen}
 				mode={registerMode}
@@ -266,11 +273,14 @@ function App() {
 				onSwitchToLogin={switchToLogin}
 				onSwitchToTOS={() => setIsTOSModalOpen(true)}
 			/>
+
 			<ForgotModal
 				isOpen={isForgotOpen}
 				onClose={() => setIsForgotOpen(false)}
 				onSwitchToLogin={switchToLogin}
 				onSwitchToOTP={(email) => switchToOTP(email, "reset")}
+				onSwitchToReset={switchToReset}
+				onSwitchTReset={switchToReset}
 			/>
 
 			<OTPModal
@@ -292,7 +302,7 @@ function App() {
 					navigate(isAdmin ? "/admin" : "/", { replace: true });
 				}}
 			/>
-			
+
 			<ResetModal
 				isOpen={isResetOpen}
 				onClose={() => setIsResetOpen(false)}
@@ -305,10 +315,10 @@ function App() {
 			<NotificationModal
 				isOpen={isNotificationOpen}
 				onClose={() => setIsNotificationOpen(false)}
-                onCounterAccept={(id) => {
-                    setTransactionId(id);
-                    closeAllModals();
-                    navigate(`/whatsapp-ttl/${id}`);
+				onCounterAccept={(id) => {
+					setTransactionId(id);
+					closeAllModals();
+					navigate(`/whatsapp-ttl/${id}`);
 				}}
 			/>
 

@@ -185,7 +185,7 @@ export default function BuildDoctor() {
 			setIsDataFetching(true);
 			try {
 				const response = await apiFetch(
-					"/hardware_intelligence/get_user_build.php",
+					"/build_doctor/get_user_build.php",
 					{
 						method: "GET",
 						headers: { Accept: "application/json" },
@@ -448,8 +448,8 @@ export default function BuildDoctor() {
 		}
 
 		const targetEndpoint = editingBuildId
-			? "/hardware_intelligence/update_user_build.php"
-			: "/hardware_intelligence/save_user_build.php";
+			? "/build_doctor/update_user_build.php"
+			: "/build_doctor/save_user_build.php";
 
 		try {
 			const response = await apiFetch(targetEndpoint, {
@@ -508,7 +508,7 @@ export default function BuildDoctor() {
 
 		try {
 			const response = await apiFetch(
-				"hardware_intelligence/delete_user_build.php",
+				"/build_doctor/delete_user_build.php",
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },

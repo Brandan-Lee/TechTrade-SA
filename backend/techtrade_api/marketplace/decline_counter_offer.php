@@ -106,7 +106,7 @@ try {
     $db->prepare($sqlUpdateTargetOffer)->execute([$offerId]);
 
     // 3. Update related transactions if any exist for this offer sequence to 'declined'
-    $sqlUpdateTx = "UPDATE transactions SET status = 'declined', escrow_step = 1 WHERE offer_id = ? AND status = 'pending'";
+    $sqlUpdateTx = "UPDATE transactions SET status = 'declined' WHERE offer_id = ? AND status = 'pending'";
     $db->prepare($sqlUpdateTx)->execute([$offerId]);
 
     // 4. Check if there are any remaining active pending offers left on this listing

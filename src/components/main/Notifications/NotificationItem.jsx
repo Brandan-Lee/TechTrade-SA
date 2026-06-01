@@ -14,6 +14,7 @@ import {
 const NotificationItem = ({
 	id,
 	title,
+	body, // Extracted directly from backend system-generated entries
 	time,
 	type,
 	status,
@@ -28,8 +29,6 @@ const NotificationItem = ({
 }) => {
 	const isItemRead = Number(is_read) === 1;
 	const amISeller = Number(isSeller) === 1;
-	const shouldShowActions =
-		status === "pending" && type === "counter" && !amISeller;
 
 	// Select an icon based on the notification type
 	const getIcon = () => {
@@ -52,7 +51,22 @@ const NotificationItem = ({
 		const textSuccess = "text-emerald-400 font-black tracking-widest uppercase";
 		const textFailure = "text-red-400 font-black tracking-widest uppercase";
 
-		//For Buyer's perspective on incoming offers
+		// PRIORITIZATION: If a direct backend string message exists, display it verbatim
+		if (body) {
+			return <span className="uppercase tracking-wide">{body}</span>;
+		}
+
+		// Fallback to evaluating explicit review action notifications
+		if (type === "review") {
+			return (
+				<span className="text-slate-400">
+					You have received a new review. You can find it on your profile page.
+					Please check it out and respond if necessary.
+				</span>
+			);
+		}
+
+		// Fallback logic for legacy marketplace offer processing structures
 		if (type === "offer") {
 			if (status === "accepted") {
 				return (
@@ -66,17 +80,16 @@ const NotificationItem = ({
 			}
 
 			if (status === "declined") {
-				// FIX: Added 'return' keyword
 				return (
 					<span>
-						{sellerName} <span className={textFailure}>DECLINED</span> the offer from{" "}
-						{buyerName} for <span className="text-white">[{listingName}]</span>.
+						{sellerName} <span className={textFailure}>DECLINED</span> the offer
+						from {buyerName} for{" "}
+						<span className="text-white">[{listingName}]</span>.
 					</span>
 				);
 			}
 
 			if (status === "pending") {
-				// FIX: Added 'return' keyword
 				return (
 					<span>
 						You received an offer of{" "}
@@ -88,74 +101,73 @@ const NotificationItem = ({
 			}
 		}
 
-		if (type === "counter" && amISeller) {
-			if (status === "accepted") {
-				return (
-					<span>
-						{buyerName} <span className={textSuccess}>ACCEPTED</span> the
-						counter offer of{" "}
-						<span className={textHighlight}>R{offerAmount}</span> for{" "}
-						<span className="text-white">[{listingName}]</span>.
-					</span>
-				);
-			}
+		if (type === "counter") {
+			if (amISeller) {
+				if (status === "accepted") {
+					return (
+						<span>
+							{buyerName} <span className={textSuccess}>ACCEPTED</span> the
+							counter offer of{" "}
+							<span className={textHighlight}>R{offerAmount}</span> for{" "}
+							<span className="text-white">[{listingName}]</span>.
+						</span>
+					);
+				}
 
-			if (status === "declined" && amISeller) {
-				return (
-					<span>
-						{buyerName} <span className={textFailure}>DECLINED</span> the
-						counter offer for{" "}
-						<span className="text-white">[{listingName}]</span>.
-					</span>
-				);
-			}
-		} else {
-			if (status === "pending") {
-				return (
-					<span>
-						<span className="text-white font-bold">
-							{sellerName || "The seller"}
-						</span>{" "}
-						sent you a counter offer of{" "}
-						<span className={textHighlight}>R{offerAmount}</span> for{" "}
-						<span className="text-white">[{listingName}]</span>.
-						<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
-							<button
-								onClick={() => onAction?.(id, "accept")}
-								className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.2)] transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-fuchsia-400"
-							>
-								<Check size={12} strokeWidth={3} />
-								<span>ACCEPT</span>
-							</button>
-							<button
-								onClick={() => onAction?.(id, "decline")}
-								className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-red-400"
-							>
-								<X size={12} strokeWidth={3} />
-								<span>DECLINE</span>
-							</button>
-						</div>
-					</span>
-				);
+				if (status === "declined") {
+					return (
+						<span>
+							{buyerName} <span className={textFailure}>DECLINED</span> the
+							counter offer for{" "}
+							<span className="text-white">[{listingName}]</span>.
+						</span>
+					);
+				}
 			} else {
-				return (
-					<span>
-						You already reacted on this offer for{" "}
-						<span className="text-white">[{listingName}]</span>.
-					</span>
-				);
+				if (status === "pending") {
+					return (
+						<span>
+							<span className="text-white font-bold">
+								{sellerName || "The seller"}
+							</span>{" "}
+							sent you a counter offer of{" "}
+							<span className={textHighlight}>R{offerAmount}</span> for{" "}
+							<span className="text-white">[{listingName}]</span>.
+							<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
+								<button
+									onClick={() => onAction?.(id, "accept")}
+									className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.2)] transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-fuchsia-400"
+								>
+									<Check size={12} strokeWidth={3} />
+									<span>ACCEPT</span>
+								</button>
+								<button
+									onClick={() => onAction?.(id, "decline")}
+									className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-black text-[10px] sm:text-xs tracking-widest rounded uppercase flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] focus:outline-none focus:ring-1 focus:ring-red-400"
+								>
+									<X size={12} strokeWidth={3} />
+									<span>DECLINE</span>
+								</button>
+							</div>
+						</span>
+					);
+				} else {
+					return (
+						<span>
+							You already reacted on this offer for{" "}
+							<span className="text-white">[{listingName}]</span>.
+						</span>
+					);
+				}
 			}
 		}
-	};
 
-	if (type === "review") {
 		return (
-			<span className="text-slate-400">
-				You have received a new review. You can find it on your profile page.
-				Please check it out and respond if necessary.
+			<span className="text-slate-500">
+				No message data available for this notification type index.
 			</span>
 		);
-	}
+	};
 
 	return (
 		<div
@@ -180,7 +192,6 @@ const NotificationItem = ({
 						{getIcon()}
 					</div>
 
-					{/* Notification labels */}
 					<div className="space-y-0.5 sm:space-y-1">
 						<div className="flex flex-wrap items-center gap-2">
 							<h4
@@ -191,7 +202,6 @@ const NotificationItem = ({
 								{title || "System Notification"}
 							</h4>
 
-							{/* Unread tracking pill */}
 							{!isItemRead && (
 								<span
 									className="inline-flex items-center gap-1 bg-fuchsia-500/10 border border-fuchsia-500/30 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] text-fuchsia-400 font-extrabold tracking-widest uppercase animate-pulse"
@@ -210,7 +220,6 @@ const NotificationItem = ({
 					</div>
 				</div>
 
-				{/* Delete item action button */}
 				<button
 					onClick={() => onDelete?.(id)}
 					aria-label={`Delete notification ${title}`}

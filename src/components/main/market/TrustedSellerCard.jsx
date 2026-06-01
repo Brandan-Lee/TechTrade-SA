@@ -1,7 +1,7 @@
 import React from "react";
 import { Star, CheckCircle, Shield, Zap, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mediaUrl } from "../lib/api";
+import { mediaUrl } from "../../../lib/api";
 
 export default function TrustedSellerCard({
 	id,

@@ -34,7 +34,7 @@ export default function AdminSidebar({ closeSidebar }) {
                         <img 
                             src={logo} 
                             alt="TechTrade" 
-                            className="w-8 h-8 object-contain group-hover:rotate-12 transition-transform duration-300" 
+                            className="w-8 h-8 object-cover group-hover:rotate-12 transition-transform duration-300" 
                         /> 
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-100 to-purple-400">
                             TechTrade Admin

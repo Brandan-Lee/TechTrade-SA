@@ -327,7 +327,16 @@ export default function Profile() {
 						{activeTab === "history" && (
 							<div className="space-y-4">
 								{trades.length > 0 ? (
-									trades.map((t) => <TradeHistoryCard key={t.id} {...t} />)
+									trades.map((t) => (
+										<TradeHistoryCard
+											key={t.id}
+											title={t.title}
+											buyer={t.buyer}
+											date={t.date}
+											price={t.price}
+											status={t.status}
+										/>
+									))
 								) : (
 									<p className="text-center text-slate-500 text-xs py-8">
 										No trade history found.
@@ -413,7 +422,7 @@ export default function Profile() {
 												"ENTER VIOLATION REASON:\n(e.g., Spam, Harassment, Fraudulent Feedback, False Information)",
 											);
 
-											if (reportReason === null) return; 
+											if (reportReason === null) return;
 											if (reportReason.trim() === "") {
 												alert(
 													"REPORT ABORTED: A valid reason string must be specified.",

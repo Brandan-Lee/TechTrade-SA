@@ -32,7 +32,7 @@ const ManageOffer = ({ openCounterModal }) => {
 				setError(null);
 
 				const response = await apiFetch(
-					`/marketplace/get_offer_details.php?offer_id=${offerId}`,
+					`/offers/get_offer_details.php?offer_id=${offerId}`,
 					{
 						method: "GET",
 					},
@@ -86,7 +86,7 @@ const ManageOffer = ({ openCounterModal }) => {
 			setIsProcessing(true);
 			setError(null);
 
-			const response = await apiFetch("/marketplace/accept_offer.php", {
+			const response = await apiFetch("/offers/accept_offer.php", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -103,7 +103,7 @@ const ManageOffer = ({ openCounterModal }) => {
 			}
 
 			alert("Offer has been accepted. Listing status is updated!");
-			navigate(`/whatsapp-ttl/${result.transactionId}`);
+			navigate(`/whatsapp-ttl/${result.transaction_id}`);
 		} catch (err) {
 			setError(
 				err.message ||
@@ -126,7 +126,7 @@ const ManageOffer = ({ openCounterModal }) => {
 			setIsProcessing(true);
 			setError(null);
 
-			const response = await apiFetch("/marketplace/decline_offer.php", {
+			const response = await apiFetch("/offers/decline_offer.php", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
