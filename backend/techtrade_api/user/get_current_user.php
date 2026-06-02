@@ -68,7 +68,7 @@ try {
                 "mobile" => $mobile,
                 "province" => $user['province'] ?? '',
                 "reg_type" => $user['reg_type'],
-                "avatar_url" => !empty($user['avatar_url']) ? publicMediaUrl($user['avatar_url']) : null
+                "avatar_url" => !empty($user['avatar_url']) ? getPublicMediaUrl($user['avatar_url']) : null
             ]
         ]
     );

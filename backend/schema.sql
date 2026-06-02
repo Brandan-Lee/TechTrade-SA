@@ -37,7 +37,7 @@ CREATE TABLE users (
     hardware_id VARCHAR(255) NULL,
     province VARCHAR(64) NULL,
     avatar_url VARCHAR(512) NULL,
-    reg_type ENUM ('buyer', 'seller', 'both') NOT NULL DEFAULT 'buyer',
+    reg_type ENUM ('buyer', 'seller', 'both', 'admin', 'moderator') NOT NULL DEFAULT 'buyer',
     member_since DATE NOT NULL DEFAULT (CURRENT_DATE),
     trust_score DECIMAL(3, 2) NOT NULL DEFAULT 0.00,
     trade_count INT UNSIGNED NOT NULL DEFAULT 0,

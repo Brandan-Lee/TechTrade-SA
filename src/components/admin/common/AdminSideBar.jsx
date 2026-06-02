@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../../assets/logo.png";
+import { useAuth } from "../../AuthContext";
 import {
 	LayoutDashboard,
 	ShieldCheck,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 
 export default function AdminSidebar({ closeSidebar }) {
+	const { user, logoutContext } = useAuth();
 	const linkClasses = ({ isActive }) =>
 		`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border ${
 			isActive
@@ -19,13 +21,24 @@ export default function AdminSidebar({ closeSidebar }) {
 				: "text-slate-400 border-transparent hover:text-white hover:bg-white/5"
 		}`;
 
+	const userRoleId =
+		user && user.roleId !== undefined && user.roleId !== null
+			? Number(user.roleId)
+			: null;
+
+	const showUserRoleManagement = userRoleId === 4;
+
 	const mainControls = [
 		{ name: "Main Dashboard", path: "/admin", icon: LayoutDashboard },
-		{
-			name: "User Role Management",
-			path: "/admin/user-roles",
-			icon: ShieldCheck,
-		},
+		...(showUserRoleManagement
+			? [
+					{
+						name: "User Role Management",
+						path: "/admin/user-roles",
+						icon: ShieldCheck,
+					},
+				]
+			: []),
 		{ name: "Escrow Vault", path: "/admin/escrow-vault", icon: DollarSign },
 		{
 			name: "Hardware Database",
