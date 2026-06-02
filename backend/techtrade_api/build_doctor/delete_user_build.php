@@ -16,14 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Unauthorized access."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
@@ -31,8 +31,9 @@ try {
     $data = json_decode($jsonInput, true);
 
     $build_id = !empty($data['build_id']) ? intval($data['build_id']) : null;
+
     if (!$build_id) {
-        throw new Exception("Missing target identification metrics.");
+        throw new Exception("Please specify which item you want to delete.");
     }
 
     $stmt = $db->prepare("UPDATE user_builds 
@@ -46,16 +47,14 @@ try {
     ]);
 
     if ($stmt->rowCount() === 0) {
-        throw new Exception("Build not found or permission denied.");
+        throw new Exception("This item could not be found or you do not have permission to delete it.");
     }
 
     echo json_encode(["success" => true]);
-
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Internal server error.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred on the server.", "debug" => $t->getMessage()]);
 }
-?>

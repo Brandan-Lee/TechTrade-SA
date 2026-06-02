@@ -74,7 +74,7 @@ const RegisterModalContent = ({
 	const [errorField, setErrorField] = useState("");
 	const [shakeTick, setShakeTick] = useState(0);
 	const scrollToTop = useAuthModalScroll();
-	const [hardwareId, setHardwareId] = useState("");
+	const [deviceIdentifier, setDeviceIdentifier] = useState("");
 
 	useEffect(() => {
 		if (mode !== "edit") return;
@@ -82,13 +82,10 @@ const RegisterModalContent = ({
 		const fetchUserData = async () => {
 			setIsLoading(true);
 			try {
-				const response = await apiFetch(
-					"/authentication/get_current_user.php",
-					{
-						method: "GET",
-						headers: { Accept: "application/json" },
-					},
-				);
+				const response = await apiFetch("/user/get_current_user.php", {
+					method: "GET",
+					headers: { Accept: "application/json" },
+				});
 				const data = await response.json();
 
 				if (response.ok && data.status === "success" && data.user) {
@@ -110,13 +107,15 @@ const RegisterModalContent = ({
 					}
 				} else {
 					triggerStatus(
-						data.message || "Failed to load profile data.",
+						data.message || "We could not load your profile information.",
 						"error",
 					);
 				}
 			} catch (error) {
-				console.error("Profile data retrieval error:", error);
-				triggerStatus("SYSTEM ERROR: CANNOT RETRIEVE DATA PROFILE.", "error");
+				triggerStatus(
+					"Unable to load profile data. Please try again.",
+					"error",
+				);
 			} finally {
 				setIsLoading(false);
 			}
@@ -126,18 +125,17 @@ const RegisterModalContent = ({
 	}, [mode]);
 
 	useEffect(() => {
-		const generateFingerprint = () => {
-			const keys = [
+		const generateId = () => {
+			const info = [
 				navigator.userAgent,
 				navigator.language,
 				screen.colorDepth,
 				navigator.deviceMemory || "unknown",
 				new Date().getTimezoneOffset(),
-				navigator.hardwareConcurrency || "unknown",
 			];
-			return btoa(keys.join("||")).substring(0, 32);
+			return btoa(info.join("||")).substring(0, 32);
 		};
-		setHardwareId(generateFingerprint());
+		setDeviceIdentifier(generateId());
 	}, []);
 
 	const triggerStatus = (message, type = "error", fieldName = "") => {
@@ -192,23 +190,23 @@ const RegisterModalContent = ({
 		const cleanPhone = formData.mobile.replace(/\s/g, "");
 
 		if (!formData.firstName.trim()) {
-			triggerStatus("First name field cannot be empty.", "error", "firstName");
+			triggerStatus("Please enter your first name.", "error", "firstName");
 			return;
 		}
 
 		if (!formData.lastName.trim()) {
-			triggerStatus("Last name field cannot be empty.", "error", "lastName");
+			triggerStatus("Please enter your last name.", "error", "lastName");
 			return;
 		}
 
 		if (!formData.email.trim()) {
-			triggerStatus("Email field cannot be empty.", "error", "email");
+			triggerStatus("Please enter your email address.", "error", "email");
 			return;
 		}
 
 		if (mode !== "edit") {
 			if (!formData.password) {
-				triggerStatus("Password field cannot be empty.", "error", "password");
+				triggerStatus("Please enter a password.", "error", "password");
 				return;
 			}
 
@@ -219,7 +217,7 @@ const RegisterModalContent = ({
 
 			if (calculateStrength(formData.password) < 4) {
 				triggerStatus(
-					"Password is too weak. Please meet all security requirements.",
+					"Password is too weak. Please ensure it meets security guidelines.",
 					"error",
 					"password",
 				);
@@ -229,7 +227,7 @@ const RegisterModalContent = ({
 
 		if (!saPhoneRegex.test(cleanPhone)) {
 			triggerStatus(
-				"Invalid South African mobile configuration.",
+				"Please enter a valid South African mobile number.",
 				"error",
 				"mobile",
 			);
@@ -237,13 +235,13 @@ const RegisterModalContent = ({
 		}
 
 		if (!formData.province) {
-			triggerStatus("Province selection required.", "error", "province");
+			triggerStatus("Please select your province.", "error", "province");
 			return;
 		}
 
 		if (!formData.agreedToTerms) {
 			triggerStatus(
-				"You have to agree to the terms and conditions to continue",
+				"You must agree to the terms and conditions to continue.",
 				"error",
 				"agreedToTerms",
 			);
@@ -260,7 +258,7 @@ const RegisterModalContent = ({
 			payload.append("mobile", cleanPhone);
 			payload.append("province", formData.province);
 			payload.append("regType", formData.regType);
-			payload.append("hardwareId", hardwareId);
+			payload.append("hardwareId", deviceIdentifier);
 
 			if (mode !== "edit") {
 				payload.append("password", formData.password);
@@ -272,7 +270,7 @@ const RegisterModalContent = ({
 
 			const targetEndpoint =
 				mode === "edit"
-					? "/authentication/update_profile.php"
+					? "/user/update_profile.php"
 					: "/authentication/register.php";
 
 			const response = await apiFetch(targetEndpoint, {
@@ -287,7 +285,7 @@ const RegisterModalContent = ({
 				throw new Error(
 					JSON.stringify({
 						field: fieldTarget,
-						message: data.message || "Failed to connect to the database",
+						message: data.message || "An error occurred. Please try again.",
 					}),
 				);
 			}
@@ -325,13 +323,9 @@ const RegisterModalContent = ({
 		} catch (err) {
 			try {
 				const parsedErr = JSON.parse(err.message);
-				triggerStatus(
-					`${parsedErr.message.toUpperCase()}`,
-					"error",
-					parsedErr.field,
-				);
+				triggerStatus(parsedErr.message, "error", parsedErr.field);
 			} catch {
-				triggerStatus(`${err.message.toUpperCase()}`, "error", "serverError");
+				triggerStatus(err.message, "error", "serverError");
 			}
 			setIsLoading(false);
 		}
@@ -436,7 +430,7 @@ const RegisterModalContent = ({
 							key={
 								errorField === "password" ? `shake-pw-${shakeTick}` : "norm-pw"
 							}
-							label="NEW PASSWORD"
+							label="PASSWORD"
 							type={showPassword ? "text" : "password"}
 							name="password"
 							isPassword={true}
@@ -509,55 +503,55 @@ const RegisterModalContent = ({
 							required
 						>
 							<option value="" disabled className="bg-[#0c0c0e] text-slate-600">
-								Select Province
+								Select your province
 							</option>
 							<option value="Gauteng" className="bg-[#0c0c0e] text-slate-300">
-								Gauteng [GP]
+								Gauteng
 							</option>
 							<option
 								value="Eastern Cape"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								Eastern Cape [EC]
+								Eastern Cape
 							</option>
 							<option
 								value="Free State"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								Free State [FS]
+								Free State
 							</option>
 							<option
 								value="KwaZulu-Natal"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								KwaZulu-Natal [KZN]
+								KwaZulu-Natal
 							</option>
 							<option value="Limpopo" className="bg-[#0c0c0e] text-slate-300">
-								Limpopo [LIM]
+								Limpopo
 							</option>
 							<option
 								value="Mpumalanga"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								Mpumalanga [MPU]
+								Mpumalanga
 							</option>
 							<option
 								value="North West"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								North West [NW]
+								North West
 							</option>
 							<option
 								value="Northern Cape"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								Northern Cape [NC]
+								Northern Cape
 							</option>
 							<option
 								value="Western Cape"
 								className="bg-[#0c0c0e] text-slate-300"
 							>
-								Western Cape [WC]
+								Western Cape
 							</option>
 						</select>
 						<ChevronDown
@@ -635,10 +629,10 @@ const RegisterModalContent = ({
 					<GradientButton
 						label={
 							isLoading
-								? "PROCESSING..."
+								? "Processing..."
 								: mode === "edit"
-									? "SAVE PROFILE CHANGES"
-									: "REGISTER ACCOUNT"
+									? "Save Changes"
+									: "Register Account"
 						}
 						type="submit"
 						isLoading={isLoading}
@@ -649,7 +643,7 @@ const RegisterModalContent = ({
 						<div className="flex justify-center items-center gap-1.5 text-sm md:text-base sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
 							<ShieldAlert size={11} className="text-slate-700" />
 							<AuthFooter
-								label="BACK TO LOGIN"
+								label="Back to Login"
 								onClick={onSwitchToLogin}
 								className="hover:text-fuchsia-400 transition-colors focus:outline-none focus:underline"
 							/>

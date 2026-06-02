@@ -16,26 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
     require_once __DIR__ . '/../models/authentication/user.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database connection channel could not be established.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Security Access Denied: Session unauthorized or expired."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
     $user = User::findById($db, $_SESSION['user_id']);
     if (!$user || $user->isBanned()) {
         http_response_code(403);
-        echo json_encode(["error" => "Security Access Denied: User context is suspended or missing."]);
+        echo json_encode(["error" => "Access denied: Your account is disabled or could not be found."]);
         exit();
     }
 
@@ -52,12 +52,12 @@ try {
     $locationProvince = !empty($_POST['location_province']) ? trim($_POST['location_province']) : $userProvince;
 
     if (empty($categorySlug) || empty($title) || empty($description) || empty($conditionGrade) || $priceCents <= 0) {
-        throw new Exception("Validation Error: Missing mandatory marketplace listing components.");
+        throw new Exception("Please fill in all the required details for your listing.");
     }
 
     $allowedConditions = ['New', 'Like New', 'Good', 'Fair'];
     if (!in_array($conditionGrade, $allowedConditions)) {
-        throw new Exception("Validation Error: Invalid condition grade format structural signature provided.");
+        throw new Exception("Please select a valid item condition.");
     }
 
     $catStmt = $db->prepare("SELECT id FROM categories WHERE slug = ? OR name = ? LIMIT 1");
@@ -65,7 +65,7 @@ try {
     $categoryRow = $catStmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$categoryRow) {
-        throw new Exception("Data Integrity Error: Category identifier tracking profile could not be matched.");
+        throw new Exception("The selected category could not be found.");
     }
     $categoryId = $categoryRow['id'];
 
@@ -115,7 +115,7 @@ try {
         $files = $_FILES['images'];
         $fileCount = count($files['name']);
 
-        $uploadDir = uploadsDiskPath('listings');
+        $uploadDir = getUploadFolderPath('listings');
 
         $sqlImages = "INSERT INTO listing_images (listing_id, url, sort_order, is_primary) VALUES (?, ?, ?, ?)";
         $stmtImg = $db->prepare($sqlImages);
@@ -127,7 +127,7 @@ try {
                 $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
 
                 if (!in_array($ext, $allowedExtensions)) {
-                    throw new Exception("Security Error: Unsupported media asset file extension format [." . $ext . "] detected.");
+                    throw new Exception("Unsupported file type. Please upload a JPG, PNG, or WEBP image.");
                 }
 
                 $uniqueFilename = "listing_" . $newListingId . "_" . bin2hex(random_bytes(8)) . "." . $ext;
@@ -140,14 +140,14 @@ try {
 
                     $stmtImg->execute([$newListingId, $publicUrl, $sortOrder, $isPrimary]);
                 } else {
-                    throw new Exception("Server Error: Local server storage pipeline relocation tracking failed.");
+                    throw new Exception("We couldn't save your uploaded images. Please try again.");
                 }
             } elseif ($files['error'][$i] !== UPLOAD_ERR_NO_FILE) {
-                throw new Exception("Upload Matrix Failure: System intercepted exceptions via execution code " . $files['error'][$i]);
+                throw new Exception("An error occurred while transferring your images.");
             }
         }
     } else {
-        throw new Exception("Validation Error: Market submission catalog files require at least one primary reference context snapshot.");
+        throw new Exception("Please upload at least one image for your listing.");
     }
 
     $db->commit();
@@ -165,5 +165,5 @@ try {
         $db->rollBack();
     }
     http_response_code(500);
-    echo json_encode(["error" => "Critical Server System Bootstrap Handshake Exception Encountered.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred on the server.", "debug" => $t->getMessage()]);
 }

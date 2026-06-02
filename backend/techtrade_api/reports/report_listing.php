@@ -16,12 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed: This endpoint requires a POST request.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
@@ -33,7 +33,7 @@ try {
 
     if (!$reporterId) {
         http_response_code(412);
-        throw new Exception("You must be logged in to report a listing.");
+        throw new Exception("Your session has expired. Please log in again to report this listing.");
     }
 
     $rawInput = file_get_contents('php://input');
@@ -41,7 +41,7 @@ try {
 
     if (!$data) {
         http_response_code(400);
-        throw new Exception("Invalid form data submission.");
+        throw new Exception("We couldn't read your request. Please check your submission and try again.");
     }
 
     $listingId = isset($data['listing_id']) ? intval($data['listing_id']) : 0;
@@ -49,7 +49,7 @@ try {
     $details = isset($data['details']) ? trim($data['details']) : '';
 
     if ($listingId <= 0) {
-        throw new Exception("The listing ID is missing or invalid.");
+        throw new Exception("Please specify a valid item listing to flag.");
     }
     if (empty($reason)) {
         throw new Exception("Please select a reason for reporting.");
@@ -64,7 +64,7 @@ try {
 
     if (!$stmtCheck->fetch()) {
         http_response_code(404);
-        throw new Exception("The listing you are trying to report does not exist or has been removed.");
+        throw new Exception("The listing you are trying to report could not be found.");
     }
 
     $sqlDuplicateCheck = "
@@ -76,8 +76,8 @@ try {
     $stmtDup->execute([$reporterId, $listingId]);
 
     if ($stmtDup->fetch()) {
-        http_response_code(409); 
-        throw new Exception("You have already submitted a report for this listing. Our team is currently reviewing it.");
+        http_response_code(409);
+        throw new Exception("You have already reported this listing. Our team is currently reviewing it.");
     }
 
     $sqlInsert = "
@@ -95,18 +95,18 @@ try {
     http_response_code(201);
     echo json_encode([
         "status" => "success",
-        "message" => "The report has been successfully recorded and sent to the administration team."
+        "message" => "Listing reported successfully. Our team will look into it."
     ]);
-
 } catch (Exception $e) {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
     echo json_encode([
-        "error" => "A server error occurred while processing your report.",
+        "status" => "error",
+        "error" => "An unexpected error occurred while processing your request.",
         "debug" => $t->getMessage()
     ]);
 }

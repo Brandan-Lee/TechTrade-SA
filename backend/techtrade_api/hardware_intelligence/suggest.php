@@ -21,6 +21,7 @@ if ($query === '' || mb_strlen($query) < 2) {
 
 try {
     $db = Database::getConnection();
+
     $stmt = $db->prepare("
         SELECT
             l.id,
@@ -32,20 +33,20 @@ try {
           AND l.status IN ('AVAILABLE', 'OFFERED')
           AND l.title LIKE ?
         ORDER BY
+            -- Prioritize items that START with the user's text over items that just contain it
             CASE WHEN l.title LIKE ? THEN 0 ELSE 1 END,
             l.published_at DESC,
             l.id DESC
         LIMIT 5
     ");
+
     $likeContains = '%' . $query . '%';
     $likePrefix = $query . '%';
     $stmt->execute([$likeContains, $likePrefix]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
     echo json_encode(["results" => $results]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Suggestion query failed.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred while loading suggestions.", "debug" => $t->getMessage()]);
 }
-
-?>
-

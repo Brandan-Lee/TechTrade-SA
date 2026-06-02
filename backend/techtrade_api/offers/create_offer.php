@@ -13,23 +13,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-function generatePublicTxId(): string {
+function generatePublicTxId(): string
+{
     return 'TX-' . str_pad((string)random_int(10000000, 99999999), 8, '0', STR_PAD_LEFT);
 }
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed: This endpoint exclusively processes POST requests.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database connection channel could not be established.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -39,7 +40,7 @@ try {
 
     if (!$buyerId) {
         http_response_code(412);
-        throw new Exception("Authentication Required: You must be logged in to create a marketplace offer.");
+        throw new Exception("Your session has expired. Please log in again to send an offer.");
     }
 
     $rawInput = file_get_contents('php://input');
@@ -47,7 +48,7 @@ try {
 
     if (!$data) {
         http_response_code(400);
-        throw new Exception("Malformed Payload: Unable to parse incoming marketplace offer data.");
+        throw new Exception("We couldn't read your request. Please check your submission and try again.");
     }
 
     $listingId = isset($data['listing_id']) ? intval($data['listing_id']) : 0;
@@ -55,10 +56,10 @@ try {
     $messageText = isset($data['message']) ? trim($data['message']) : '';
 
     if ($listingId <= 0) {
-        throw new Exception("Validation Error: Missing or invalid target listing reference.");
+        throw new Exception("Please specify a valid item to make an offer on.");
     }
     if ($offerAmountFloat <= 0) {
-        throw new Exception("Validation Error: Proposed trade bid must be greater than R0.00.");
+        throw new Exception("Your offer amount must be greater than R0.00.");
     }
 
     $priceCents = (int) round($offerAmountFloat * 100);
@@ -72,30 +73,30 @@ try {
 
     if (!$listing || (int) $listing['is_deleted'] === 1) {
         http_response_code(404);
-        throw new Exception("Marketplace Error: Target hardware listing is missing or offline.");
+        throw new Exception("This item listing is no longer available.");
     }
 
     $sellerId = isset($listing['seller_id']) ? intval($listing['seller_id']) : 0;
 
     if ($sellerId === 0) {
-        throw new Exception("Marketplace Error: Unable to determine valid listing owner properties.");
+        throw new Exception("We couldn't find the seller for this item.");
     }
 
     if ($sellerId === (int) $buyerId) {
-        throw new Exception("Forbidden Action: You cannot make an offer on your own hardware listing.");
+        throw new Exception("You cannot make an offer on your own item listing.");
     }
 
     if ($listing['status'] !== 'AVAILABLE' && $listing['status'] !== 'OFFERED') {
-        throw new Exception("Marketplace Error: This asset is currently locked inside a completed or pending transaction.");
+        throw new Exception("This item is currently locked in a pending or completed deal.");
     }
 
     $sqlDuplicateCheck = "SELECT id FROM offers WHERE listing_id = ? AND buyer_id = ? AND status = 'pending' LIMIT 1";
     $stmtDup = $db->prepare($sqlDuplicateCheck);
     $stmtDup->execute([$listingId, $buyerId]);
-    
+
     if ($stmtDup->fetch()) {
         http_response_code(409);
-        throw new Exception("Action Blocked: You already have an active pending offer submitted for this hardware item.");
+        throw new Exception("You already have a pending offer out on this item.");
     }
 
     $expirationDuration = defined('OFFER_LIFETIME_SECONDS') ? OFFER_LIFETIME_SECONDS : 172800;
@@ -134,7 +135,7 @@ try {
 
     $notifTitle = "New Trade Offer Received";
     $notifBody = "A buyer has submitted a trade bid of R" . number_format($offerAmountFloat, 2) . " for your listing: '" . $listing['title'] . "'.";
-    
+
     $sqlNotif = "
         INSERT INTO notifications (user_id, type, title, body, status, offer_id, transaction_id, listing_id, is_read, created_at)
         VALUES (?, 'offer', ?, ?, 'pending', ?, ?, ?, 0, NOW())
@@ -155,19 +156,18 @@ try {
 
     $db->commit();
 
-    http_response_code(201); 
+    http_response_code(201);
     echo json_encode([
         "status" => "success",
-        "message" => "Your trade offer has been successfully processed, a pending transaction initialized, and the seller notified."
+        "message" => "Your trade offer has been sent successfully and the seller has been notified."
     ]);
-
 } catch (PDOException $pdoEx) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
     }
     http_response_code(500);
     echo json_encode([
-        "error" => "Database level syntax or integrity constraint failure occurred.",
+        "error" => "An unexpected error occurred while saving your offer to the database.",
         "debug" => $pdoEx->getMessage()
     ]);
 } catch (Exception $e) {
@@ -185,7 +185,7 @@ try {
     }
     http_response_code(500);
     echo json_encode([
-        "error" => "A critical internal runtime engine error occurred.",
+        "error" => "An unexpected error occurred on the server.",
         "debug" => $t->getMessage()
     ]);
 }

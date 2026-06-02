@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-function normalizeListingImagePath(string $value): string
+function cleanImageLinkPath(string $value): string
 {
     $value = trim(str_replace('\\', '/', $value));
     if (preg_match('#(uploads/listings/[^?\\s]+)#i', $value, $matches)) {
@@ -25,26 +25,26 @@ function normalizeListingImagePath(string $value): string
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
     require_once __DIR__ . '/../models/authentication/user.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database connection channel could not be established.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Security Access Denied: Session unauthorized or expired."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
     $user = User::findById($db, $_SESSION['user_id']);
     if (!$user || $user->isBanned()) {
         http_response_code(403);
-        echo json_encode(["error" => "Security Access Denied: User context is suspended or missing."]);
+        echo json_encode(["error" => "Access denied: Your account is disabled or could not be found."]);
         exit();
     }
 
@@ -52,7 +52,7 @@ try {
 
     $listingId = intval($_POST['listing_id'] ?? 0);
     if ($listingId <= 0) {
-        throw new Exception("Validation Error: Missing listing ID.");
+        throw new Exception("Please specify a valid item to update.");
     }
 
     $stmtOwner = $db->prepare("
@@ -65,12 +65,12 @@ try {
     $existing = $stmtOwner->fetch(PDO::FETCH_ASSOC);
 
     if (!$existing || (int) $existing['is_deleted'] === 1) {
-        throw new Exception("Listing not found or has been removed.");
+        throw new Exception("This listing could not be found.");
     }
 
     if ((int) $existing['seller_id'] !== $currentUserId) {
         http_response_code(403);
-        echo json_encode(["error" => "You are not authorized to update this listing."]);
+        echo json_encode(["error" => "You do not have permission to update this listing."]);
         exit();
     }
 
@@ -79,18 +79,18 @@ try {
     $priceCents = intval($_POST['price_cents'] ?? 0);
 
     if (empty($description) || empty($conditionGrade) || $priceCents <= 0) {
-        throw new Exception("Validation Error: Price, condition, and description are required.");
+        throw new Exception("Please fill in the price, condition, and description.");
     }
 
     $allowedConditions = ['New', 'Like New', 'Good', 'Fair'];
     if (!in_array($conditionGrade, $allowedConditions)) {
-        throw new Exception("Validation Error: Invalid condition grade.");
+        throw new Exception("Please select a valid item condition.");
     }
 
     $keptImagePaths = [];
     if (!empty($_POST['existing_images']) && is_array($_POST['existing_images'])) {
         foreach ($_POST['existing_images'] as $rawPath) {
-            $normalized = normalizeListingImagePath((string) $rawPath);
+            $normalized = cleanImageLinkPath((string) $rawPath);
             if ($normalized !== '') {
                 $keptImagePaths[] = $normalized;
             }
@@ -99,7 +99,7 @@ try {
 
     $hasNewUploads = !empty($_FILES['images']);
     if (empty($keptImagePaths) && !$hasNewUploads) {
-        throw new Exception("Validation Error: At least one listing image is required.");
+        throw new Exception("Please upload at least one image for your listing.");
     }
 
     $db->beginTransaction();
@@ -129,7 +129,7 @@ try {
         $db->prepare("DELETE FROM listing_images WHERE listing_id = ?")->execute([$listingId]);
     }
 
-    $uploadDir = uploadsDiskPath('listings');
+    $uploadDir = getUploadFolderPath('listings');
     $sortOrder = count($keptImagePaths);
 
     if ($hasNewUploads) {
@@ -142,7 +142,7 @@ try {
         for ($i = 0; $i < $fileCount; $i++) {
             if ($files['error'][$i] !== UPLOAD_ERR_OK) {
                 if ($files['error'][$i] !== UPLOAD_ERR_NO_FILE) {
-                    throw new Exception("Upload failed with error code " . $files['error'][$i]);
+                    throw new Exception("An error occurred while transferring your images.");
                 }
                 continue;
             }
@@ -151,14 +151,14 @@ try {
             $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
 
             if (!in_array($ext, $allowedExtensions)) {
-                throw new Exception("Unsupported image format.");
+                throw new Exception("Unsupported file type. Please upload a JPG, PNG, or WEBP image.");
             }
 
             $uniqueFilename = "listing_" . $listingId . "_" . bin2hex(random_bytes(8)) . "." . $ext;
             $destinationPath = $uploadDir . $uniqueFilename;
 
             if (!move_uploaded_file($files['tmp_name'][$i], $destinationPath)) {
-                throw new Exception("Failed to save uploaded image.");
+                throw new Exception("We couldn't save your uploaded images. Please try again.");
             }
 
             $isPrimary = empty($keptImagePaths) && $i === 0 ? 1 : 0;
@@ -186,14 +186,13 @@ try {
     $countStmt = $db->prepare("SELECT COUNT(*) FROM listing_images WHERE listing_id = ?");
     $countStmt->execute([$listingId]);
     if ((int) $countStmt->fetchColumn() === 0) {
-        throw new Exception("Validation Error: At least one listing image is required.");
+        throw new Exception("Please upload at least one image for your listing.");
     }
 
     $db->commit();
 
     http_response_code(200);
     echo json_encode(["success" => true, "listing_id" => $listingId]);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
@@ -205,7 +204,5 @@ try {
         $db->rollBack();
     }
     http_response_code(500);
-    echo json_encode(["error" => "Failed to update listing.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred on the server.", "debug" => $t->getMessage()]);
 }
-
-?>

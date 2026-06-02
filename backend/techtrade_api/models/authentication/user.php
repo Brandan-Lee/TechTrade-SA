@@ -7,19 +7,18 @@ class User
     private PDO $db;
     private ?EncryptionEngine $crypto = null;
 
-    // Properties matching database columns
     private int $id;
     private int $roleId;
     private string $email;
     private string $passwordHash;
     private string $firstName;
     private string $lastName;
-    private ?string $encryptedMobile; // Nullable in schema
-    private ?string $hardwareId;      // Nullable in schema
-    private ?string $province;        // Nullable in schema
-    private ?string $avatarUrl;       // Nullable in schema
+    private ?string $encryptedMobile; 
+    private ?string $hardwareId;      
+    private ?string $province;        
+    private ?string $avatarUrl;       
     private string $regType;
-    private string $memberSince;      // Added from schema
+    private string $memberSince;      
     private float $trustScore;
     private int $tradeCount;
     private int $strikeCount;
@@ -31,12 +30,12 @@ class User
     private bool $isBanned;
     private ?string $bannedAt;
     private ?string $banReason;
-    private ?string $tosAcceptedAt;   // Added from schema
-    private ?string $lastLoginAt;     // Added from schema
-    private string $createdAt;        // Added from schema
-    private string $updatedAt;        // Added from schema
+    private ?string $tosAcceptedAt;   
+    private ?string $lastLoginAt;    
+    private string $createdAt;        
+    private string $updatedAt;        
     private bool $isDeleted;
-    private bool $isMFA;              // Maps to 'MFA' in schema
+    private bool $isMFA;              
     private ?string $deletedAt;
 
     public function __construct(PDO $db)
@@ -127,11 +126,9 @@ class User
         $this->createdAt = $row['created_at'];
         $this->updatedAt = $row['updated_at'];
         $this->isDeleted = (bool) $row['is_deleted'];
-        $this->isMFA = (bool) ($row['MFA'] ?? 1); // Exact uppercase database mapping fixed here
+        $this->isMFA = (bool) ($row['MFA'] ?? 1); 
         $this->deletedAt = $row['deleted_at'] ?? null;
     }
-
-    // --- GETTERS ---
 
     public function getId(): int
     {
@@ -280,7 +277,6 @@ class User
         return $this->isMFA;
     }
 
-    // --- WRITE OPERATIONS ---
 
     public function addStrike(int $count = 1, string $reason = ''): bool
     {

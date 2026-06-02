@@ -1,12 +1,13 @@
 <?php
 date_default_timezone_set('Africa/Johannesburg');
 
-// Password Policy
+// Password Rules
 define('MIN_PASSWORD_LENGTH', 8);
 define('REQUIRE_UPPERCASE', true);
 define('REQUIRE_NUMBER', true);
 define('REQUIRE_SYMBOL', true);
 
+// Profile Picture & Image Settings
 define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'webp']);
 define('MAX_IMAGE_SIZE', 2 * 1024 * 1024);
 
@@ -22,28 +23,28 @@ define('SOUTH_AFRICAN_PROVINCES', [
     'Western Cape'
 ]);
 
-// Penalty and Data Retention Rules ---
+// Account Strike & Account History Settings
 define('SUSPENSION_STRIKE_THRESHOLD', 3);
 define('SUSPENSION_DURATION_DAYS', 30);
 define('BAN_STRIKE_THRESHOLD', 4);
 define('DATA_RETENTION_YEARS', 7);
 
 // Cookie security settings
-define('SECURE_COOKIES_ONLY', false); //change later for hosting
+define('SECURE_COOKIES_ONLY', false); // Change later for live hosting
 define('COOKIE_SAMESITE', 'Lax');
 
-// Offer Expiration Configuration ---
+// Offer Expiration Settings
 define('OFFER_LIFETIME_HOURS', 48);
 define('OFFER_LIFETIME_SECONDS', OFFER_LIFETIME_HOURS * 60 * 60);
 
-// Email Configuration ---
+// Email Setup Details
 define('SMTP_HOST', getEnvVariable('SMTP_HOST', 'smtp.gmail.com'));
 define('SMTP_USER', getEnvVariable('SMTP_USER'));
 define('SMTP_PASS', getEnvVariable('SMTP_PASS'));
 define('FROM_EMAIL', getEnvVariable('FROM_EMAIL'));
 define('FROM_NAME', getEnvVariable('FROM_NAME', 'TechTrade Security'));
 
-// PayFast Vault Configuration Pipeline ---
+// PayFast Payment Integration Settings
 define('PAYFAST_MERCHANT_ID', getEnvVariable('PAYFAST_MERCHANT_ID'));
 define('PAYFAST_MERCHANT_KEY', getEnvVariable('PAYFAST_MERCHANT_KEY'));
 define('PAYFAST_PASSPHRASE', getEnvVariable('PAYFAST_PASSPHRASE'));
@@ -87,7 +88,7 @@ function getEnvVariable(string $key, string $fallback = ''): string
 $rawBase64Key = getEnvVariable('APP_ENCRYPTION_KEY');
 
 if (empty($rawBase64Key)) {
-    die(json_encode(["status" => "error", "message" => "Critical configuration error: Encryption key missing."]));
+    die(json_encode(["status" => "error", "message" => "Setup error: The system security key is missing."]));
 }
 
 define('ENCRYPTION_KEY', base64_decode($rawBase64Key));
@@ -95,7 +96,7 @@ define('ENCRYPTION_KEY', base64_decode($rawBase64Key));
 define('API_ROOT', dirname(__DIR__));
 define('UPLOADS_DIR', API_ROOT . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR);
 
-function uploadsDiskPath(string $subfolder): string
+function getUploadFolderPath(string $subfolder): string
 {
     $dir = UPLOADS_DIR . trim($subfolder, '/\\') . DIRECTORY_SEPARATOR;
 
@@ -106,7 +107,7 @@ function uploadsDiskPath(string $subfolder): string
     return $dir;
 }
 
-function publicMediaUrl(?string $storedPath): ?string
+function getPublicMediaUrl(?string $storedPath): ?string
 {
     if ($storedPath === null || trim($storedPath) === '') {
         return null;

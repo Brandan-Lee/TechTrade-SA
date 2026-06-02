@@ -16,23 +16,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     if (!isset($_GET['offer_id']) || empty($_GET['offer_id'])) {
         http_response_code(400);
-        throw new Exception("Missing required identification token (offer_id).");
+        throw new Exception("Please specify a valid offer.");
     }
     $offerId = intval($_GET['offer_id']);
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not establish a clean connection to the database.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $crypto = null;
@@ -45,11 +45,10 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
     $userIdValue = intval($activeUserId);
 
-    // Updated Query: Added LEFT JOIN transactions t on o.id = t.offer_id
     $sqlFetch = "
         SELECT 
             o.id AS offer_id,
@@ -84,12 +83,12 @@ try {
 
     if (!$row) {
         http_response_code(404);
-        throw new Exception("The requested offer could not be found or the listing has been removed.");
+        throw new Exception("The requested offer could not be found or the item listing has been removed.");
     }
 
     if (intval($row['listing_seller_id']) !== $userIdValue) {
         http_response_code(403);
-        throw new Exception("Access Denied. You do not own the parent listing asset.");
+        throw new Exception("Access Denied. Only the seller can view these offer details.");
     }
 
     $firstName = $row['buyer_fn'];
@@ -102,12 +101,12 @@ try {
 
     $fullName = trim($firstName . ' ' . $lastName);
     if (empty($fullName)) {
-        $fullName = "Anonymous Buyer";
+        $fullName = "Marketplace User";
     }
 
-    $formattedPayload = [
+    $offerDetails = [
         "offer_id" => intval($row['offer_id']),
-        "transaction_id" => $row['transaction_id'] ? intval($row['transaction_id']) : null, // Added transaction_id
+        "transaction_id" => $row['transaction_id'] ? intval($row['transaction_id']) : null,
         "itemTitle" => $row['item_title'],
         "originalPrice" => intval($row['listing_price_cents']),
         "offerPrice" => intval($row['offer_amount_cents']),
@@ -128,17 +127,18 @@ try {
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "data" => $formattedPayload
+        "data" => $offerDetails
     ]);
 } catch (Exception $e) {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
     echo json_encode([
-        "error" => "An internal database error occurred while parsing data parameters.",
+        "status" => "error",
+        "error" => "An unexpected error occurred on the server.",
         "debug" => $t->getMessage()
     ]);
 }

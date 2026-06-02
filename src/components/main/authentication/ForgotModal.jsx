@@ -67,7 +67,7 @@ export const ForgotModal = ({
 		setAlert({ show: false, message: "", type: "error" });
 
 		if (!email.trim()) {
-			triggerStatus("Email field cannot be empty.", "error", "email");
+			triggerStatus("Please enter your email address.", "error", "email");
 			return;
 		}
 
@@ -84,13 +84,14 @@ export const ForgotModal = ({
 
 			if (!response.ok || data.status === "error") {
 				throw new Error(
-					data.message || "Network gateway authentication recovery dropped.",
+					data.message ||
+						"We could not process your request. Please try again.",
 				);
 			}
 
 			if (data.status === "pending_otp") {
 				triggerStatus(
-					"MFA Protocol Triggered. Routing access key...",
+					"Security code sent. Please check your email.",
 					"success",
 				);
 
@@ -98,24 +99,22 @@ export const ForgotModal = ({
 					setIsLoading(false);
 					onSwitchToOTP(email.trim(), "reset");
 				}, 2000);
-
 			} else if (data.status === "success") {
 				triggerStatus(
-					data.message ||
-						"Bypass confirmation ready. Token successfully dispatched.",
+					data.message || "Email verified. Proceeding to reset.",
 					"success",
 				);
 
 				setTimeout(() => {
 					setIsLoading(false);
-					onSwitchTReset(email.trim());
+					onSwitchToReset(email.trim());
 					onClose();
 				}, 200);
 			}
 		} catch (error) {
 			triggerStatus(
-				error.message.toUpperCase() ||
-					"CONNECTION TO THE TECHTRADE NETWORK FAILED.",
+				error.message ||
+					"Unable to connect to the server. Please try again later.",
 				"error",
 				"email",
 			);
@@ -138,7 +137,8 @@ export const ForgotModal = ({
 						</span>
 					</h1>
 					<p className="text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider pt-1">
-						Please enter the email of the account that you would like to recover
+						Enter the email address associated with your account to reset your
+						password.
 					</p>
 				</div>
 
@@ -167,12 +167,12 @@ export const ForgotModal = ({
 									: "normal-email"
 							}
 							id="recovery-email"
-							label="Email"
+							label="Email Address"
 							type="email"
 							name="email"
 							value={email}
 							onChange={handleInputChange}
-							placeholder="user@network.com"
+							placeholder="name@example.com"
 							required
 							disabled={isLoading}
 							error={errorField === "email"}
@@ -182,7 +182,7 @@ export const ForgotModal = ({
 
 					<div className="space-y-4 pt-2 border-t border-white/5">
 						<CyberActionButton
-							label={isLoading ? "DISPATCHING GATEWAY KEY" : "REQUEST OTP"}
+							label={isLoading ? "Sending..." : "Send Verification Code"}
 							type="submit"
 							isLoading={isLoading}
 							className="w-full text-xs sm:text-sm tracking-widest font-black"
@@ -191,7 +191,7 @@ export const ForgotModal = ({
 						<div className="flex justify-center items-center gap-2 text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
 							<Cpu size={10} />
 							<AuthFooter
-								label="BACK TO LOGIN"
+								label="Back to Login"
 								onClick={onSwitchToLogin}
 								className="hover:text-fuchsia-400 transition-colors focus:outline-none focus:underline"
 							/>

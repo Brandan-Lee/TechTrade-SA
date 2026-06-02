@@ -16,17 +16,18 @@ $inputData = json_decode(file_get_contents("php://input"), true);
 
 $query = $inputData['q'] ?? '';
 $category = $inputData['category'] ?? '';
-    
+
 if (empty($query) || empty($category)) {
-    echo json_encode(['error' => 'Missing parameters']);
+    echo json_encode(['error' => 'Please enter a search term and select a category.']);
     exit;
 }
 
 try {
     $db = Database::getConnection();
     $controller = new SearchController($db);
+
+    // 2. Perform the search and send back the matching items
     echo json_encode($controller->search($query, $category));
 } catch (Exception $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
-?>

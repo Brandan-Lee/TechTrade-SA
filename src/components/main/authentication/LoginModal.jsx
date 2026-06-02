@@ -81,11 +81,11 @@ const LoginModal = ({
 		setAlert({ show: false, message: "", type: "error" });
 
 		if (!formData.email.trim()) {
-			triggerStatus("Email field cannot be empty.", "error", "email");
+			triggerStatus("Please enter your email address.", "error", "email");
 			return;
 		}
 		if (!formData.password) {
-			triggerStatus("Password field cannot be empty.", "error", "password");
+			triggerStatus("Please enter your password.", "error", "password");
 			return;
 		}
 
@@ -104,24 +104,21 @@ const LoginModal = ({
 			const data = await response.json();
 
 			if (!response.ok || data.status === "error") {
-				throw new Error(data.message || "Sign-in credentials rejected.");
+				throw new Error(data.message || "Invalid email or password.");
 			}
 
-			console.log("Login response data:", data.isFromAdmin);
-
 			if (data.status === "pending_otp") {
-				triggerStatus("Sign-in matching. Verifying access key...", "success");
+				triggerStatus("Verifying your identity...", "success");
 				setTimeout(() => {
 					setIsLoading(false);
 					onSwitchToOTP(formData.email.trim(), purpose);
 				}, 2000);
 			} else if (
 				data.status === "success" &&
-				data.user &&
-				data.user.roleId === 4 || data.user.roleId === 3
+				(data.user?.roleId === 4 || data.user?.roleId === 3)
 			) {
 				triggerStatus(
-					"Welcome back. Routing to control dashboard...",
+					"Login successful. Redirecting to your dashboard.",
 					"success",
 				);
 				setTimeout(() => {
@@ -132,14 +129,14 @@ const LoginModal = ({
 					}
 				}, 2000);
 			} else {
-				triggerStatus("Sign-in verified successfully!", "success");
+				triggerStatus("Login successful!", "success");
 				setTimeout(() => {
 					setIsLoading(false);
 					onClose();
 				}, 2000);
 			}
 		} catch (err) {
-			triggerStatus(err.message.toUpperCase(), "error", "credentials");
+			triggerStatus(err.message, "error", "credentials");
 			setIsLoading(false);
 		}
 	};
@@ -171,10 +168,10 @@ const LoginModal = ({
 								? `shake-email-${shakeTick}`
 								: "normal-email"
 						}
-						label="EMAIL"
+						label="EMAIL ADDRESS"
 						type="email"
 						name="email"
-						placeholder="user@network.com"
+						placeholder="user@example.com"
 						value={formData.email}
 						onChange={handleInputChange}
 						disabled={isLoading}
@@ -241,7 +238,7 @@ const LoginModal = ({
 					</div>
 
 					<CyberActionButton
-						label={isLoading ? "PROCESSING..." : "LOGIN"}
+						label={isLoading ? "Please wait..." : "LOGIN"}
 						type="submit"
 						isLoading={isLoading}
 					/>

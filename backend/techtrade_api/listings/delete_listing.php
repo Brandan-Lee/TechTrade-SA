@@ -16,32 +16,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
     require_once __DIR__ . '/../models/authentication/user.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database connection channel could not be established.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Security Access Denied: Session unauthorized or expired."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
     $user = User::findById($db, $_SESSION['user_id']);
     if (!$user || $user->isBanned()) {
         http_response_code(403);
-        echo json_encode(["error" => "Security Access Denied: User context is suspended or missing."]);
+        echo json_encode(["error" => "Access denied: Your account is disabled or could not be found."]);
         exit();
     }
 
     $listingId = isset($_GET['id']) ? intval($_GET['id']) : intval($_POST['listing_id'] ?? 0);
+
     if ($listingId <= 0) {
-        throw new Exception("Validation Error: Missing or invalid listing ID.");
+        throw new Exception("Please specify a valid item to delete.");
     }
 
     $currentUserId = (int) $user->getId();
@@ -57,19 +58,19 @@ try {
 
     if (!$listing) {
         http_response_code(404);
-        echo json_encode(["error" => "Listing not found."]);
+        echo json_encode(["error" => "This listing could not be found."]);
         exit();
     }
 
     if ((int) $listing['seller_id'] !== $currentUserId) {
         http_response_code(403);
-        echo json_encode(["error" => "You are not authorized to delete this listing."]);
+        echo json_encode(["error" => "You do not have permission to delete this listing."]);
         exit();
     }
 
     if ((int) $listing['is_deleted'] === 1) {
         http_response_code(200);
-        echo json_encode(["success" => true, "message" => "Listing is already removed."]);
+        echo json_encode(["success" => true, "message" => "This item has already been removed."]);
         exit();
     }
 
@@ -81,14 +82,11 @@ try {
     $update->execute([$listingId, $currentUserId]);
 
     http_response_code(200);
-    echo json_encode(["success" => true, "message" => "Listing removed successfully."]);
-
+    echo json_encode(["success" => true, "message" => "Your listing has been successfully removed."]);
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Failed to delete listing.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred on the server.", "debug" => $t->getMessage()]);
 }
-
-?>

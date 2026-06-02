@@ -85,7 +85,7 @@ export const OTPModal = ({
 
 		const codeString = otp.join("");
 		if (codeString.length < 4) {
-			triggerStatus("PLEASE ENTER THE FULL 4-DIGIT CODE.", "error", "otp");
+			triggerStatus("Please enter the full 4-digit code.", "error", "otp");
 			return;
 		}
 
@@ -115,17 +115,19 @@ export const OTPModal = ({
 
 			const data = await response.json();
 			if (!response.ok || data.status === "error") {
-				throw new Error(data.message || "Verification failed.");
+				throw new Error(
+					data.message || "Verification failed. Please try again.",
+				);
 			}
 
 			if (isResetFlow) {
-				triggerStatus("CODE VERIFIED!", "success");
+				triggerStatus("Code verified successfully!", "success");
 				setTimeout(() => {
 					setIsLoading(false);
 					onSwitchToReset(email.trim(), codeString.trim());
 				}, 2000);
 			} else if (purpose === "login" || purpose === "admin") {
-				triggerStatus("LOGIN VERIFIED!", "success");
+				triggerStatus("Login verified!", "success");
 				setTimeout(() => {
 					setIsLoading(false);
 					onClose();
@@ -133,7 +135,7 @@ export const OTPModal = ({
 				}, 2000);
 			}
 		} catch (error) {
-			triggerStatus(error.message.toUpperCase(), "error", "otp");
+			triggerStatus(error.message, "error", "otp");
 			setIsLoading(false);
 		}
 	};
@@ -149,12 +151,12 @@ export const OTPModal = ({
 					purpose: purpose === "admin" ? "login" : purpose,
 				}),
 			});
-			if (!response.ok) throw new Error("Failed to resend.");
+			if (!response.ok) throw new Error("Could not resend code.");
 			setOtp(["", "", "", ""]);
 			setTimer(60);
-			triggerStatus("CODE RETRANSMITTED.", "success");
+			triggerStatus("A new code has been sent.", "success");
 		} catch (error) {
-			triggerStatus(error.message.toUpperCase(), "error", "otp");
+			triggerStatus(error.message, "error", "otp");
 		}
 	};
 
@@ -173,9 +175,9 @@ export const OTPModal = ({
 			<div className="space-y-6 sm:space-y-8 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl">
 				<div className="space-y-1.5">
 					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
-						{isFromAdmin ? "Staff" : "OTP"}{" "}
+						{isFromAdmin ? "Staff" : "Verification"}{" "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-							Verification
+							Code
 						</span>
 					</h1>
 					<p className="text-slate-500 text-sm font-medium uppercase tracking-wider pt-1">
@@ -210,9 +212,9 @@ export const OTPModal = ({
 
 					<div className="flex justify-between items-center bg-black/30 p-4 rounded-lg border border-white/5">
 						<span className="text-slate-500 text-sm font-bold uppercase tracking-widest">
-							Expires:{" "}
+							Expires in:{" "}
 							<span className="text-fuchsia-400">
-								00:{timer < 10 ? `0${timer}` : timer}s
+								00:{timer < 10 ? `0${timer}` : timer}
 							</span>
 						</span>
 						<button
@@ -225,18 +227,18 @@ export const OTPModal = ({
 									: "text-fuchsia-400 hover:text-fuchsia-300 cursor-pointer"
 							}`}
 						>
-							RESEND
+							Resend Code
 						</button>
 					</div>
 
 					<CyberActionButton
-						label={isLoading ? "PROCESSING..." : "VERIFY CODE"}
+						label={isLoading ? "Processing..." : "Verify Code"}
 						type="submit"
 						isLoading={isLoading}
 					/>
 
 					<AuthFooter
-						label="CANCEL"
+						label="Cancel"
 						onClick={onSwitchToLogin}
 						className="hover:text-fuchsia-400 text-xs text-center block w-full transition-colors font-bold tracking-wider"
 					/>
@@ -244,13 +246,13 @@ export const OTPModal = ({
 
 				<div className="pt-2 flex justify-center items-center gap-1 sm:text-xs md:text-sm text-slate-600 font-bold uppercase tracking-wide">
 					<HelpCircle size={12} className="text-slate-700" />
-					<span>Wondering how we use this code for verification?</span>
+					<span>Need help with this code?</span>
 					<button
 						type="button"
 						onClick={onSwitchToData}
 						className="text-fuchsia-500/60 hover:text-fuchsia-400 transition-colors underline ml-0.5 focus:outline-none"
 					>
-						Know here
+						Learn more
 					</button>
 				</div>
 			</div>

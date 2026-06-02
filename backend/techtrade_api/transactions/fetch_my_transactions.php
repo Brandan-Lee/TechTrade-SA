@@ -16,17 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not establish a clean connection to the database.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $crypto = null;
@@ -37,9 +37,10 @@ try {
     SessionManager::init($db);
     $activeUserId = SessionManager::getActiveUserId();
 
+    // 2. Confirm the user is logged in
     if (!$activeUserId) {
-        http_response_code(401);
-        throw new Exception("Unauthorized Access.");
+        http_response_code(412);
+        throw new Exception("Your session has expired. Please log in again to view your history.");
     }
 
     $userIdValue = intval($activeUserId);
@@ -73,7 +74,7 @@ try {
     $stmt->execute([$userIdValue, $userIdValue]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $compiledTransactions = [];
+    $userOrderHistory = [];
     foreach ($rows as $row) {
         $firstName = $row['buyer_fn'];
         $lastName = $row['buyer_ln'];
@@ -89,15 +90,15 @@ try {
 
         $fullName = trim($firstName . ' ' . $lastName);
         if (empty($fullName)) {
-            $fullName = "Anonymous Operator";
+            $fullName = "Marketplace Member";
         }
 
         $imgUrl = $row['primary_image_url'];
-        if (!empty($imgUrl) && function_exists('publicMediaUrl')) {
-            $imgUrl = publicMediaUrl($imgUrl);
+        if (!empty($imgUrl) && function_exists('getPublicMediaUrl')) {
+            $imgUrl = getPublicMediaUrl($imgUrl);
         }
 
-        $compiledTransactions[] = [
+        $userOrderHistory[] = [
             "id" => intval($row['id']),
             "public_id" => $row['public_id'],
             "listing_id" => intval($row['listing_id']),
@@ -118,17 +119,18 @@ try {
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "transactions" => $compiledTransactions
+        "transactions" => $userOrderHistory
     ]);
 } catch (Exception $e) {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
     echo json_encode([
-        "error" => "Internal transactional ledger processing processing error.",
+        "status" => "error",
+        "error" => "An unexpected error occurred while processing your request.",
         "debug" => $t->getMessage()
     ]);
 }

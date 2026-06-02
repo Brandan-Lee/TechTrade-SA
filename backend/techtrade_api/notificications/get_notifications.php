@@ -16,13 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
@@ -39,13 +39,10 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access. Please log in.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
     $userIdValue = intval($activeUserId);
 
-    // -------------------------------------------------------------------------
-    // Clean, Simplified SQL Execution Block (Basic Joins Only)
-    // -------------------------------------------------------------------------
     $sql = "
         SELECT 
             n.id, n.type, n.title, n.body, n.status, n.offer_id, n.transaction_id, n.listing_id, 
@@ -78,7 +75,6 @@ try {
         $sellerFn = $row['seller_fn'] ?? '';
         $sellerLn = $row['seller_ln'] ?? '';
 
-        // Decrypt profile data if available
         if ($crypto) {
             if (!empty($buyerFn))  $buyerFn  = $crypto->decrypt($buyerFn) ?? $buyerFn;
             if (!empty($buyerLn))  $buyerLn  = $crypto->decrypt($buyerLn) ?? $buyerLn;
@@ -89,11 +85,9 @@ try {
         $buyerName = trim($buyerFn . ' ' . $buyerLn);
         $sellerName = trim($sellerFn . ' ' . $sellerLn);
 
-        // Handle offer amount formatting cleanly in native PHP arrays
         $rawCents = $row['offer_amount'] ?? $row['tx_amount'] ?? null;
         $formattedAmount = ($rawCents !== null) ? number_format(intval($rawCents) / 100, 2) : null;
 
-        // Verify context user role identity
         $sellerIdContext = $row['listing_seller_id'] ?? $row['tx_seller_id'] ?? null;
         $isSeller = ($sellerIdContext !== null && intval($sellerIdContext) === $userIdValue) ? 1 : 0;
 
@@ -126,5 +120,9 @@ try {
     echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["status" => "error", "error" => "An internal system error occurred.", "debug" => $t->getMessage()]);
+    echo json_encode([
+        "status" => "error",
+        "error" => "An unexpected error occurred on the server.",
+        "debug" => $t->getMessage()
+    ]);
 }

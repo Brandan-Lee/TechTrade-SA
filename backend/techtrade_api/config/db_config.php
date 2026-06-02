@@ -7,8 +7,8 @@ require_once __DIR__ . '/config.php';
 global $pdo;
 
 try {
+    // echo json_encode(["status" => "error", "message" => "The problem is here."]);
     if (!isset($pdo)) {
-        // Pull database credentials cleanly from environmental parameters
         $host = getEnvVariable('DB_HOST');
         $db   = getEnvVariable('DB_NAME');
         $user = getEnvVariable('DB_USER');
@@ -24,7 +24,6 @@ try {
     http_response_code(500);
     die(json_encode([
         "status" => "error",
-        "message" => "Database Connection Failed securely processing request parameters.",
-        "debug" => $e->getMessage() // Strip this specific debug field in live production!
+        "message" => "Could not connect to the database.",
     ]));
 }

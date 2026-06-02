@@ -19,6 +19,9 @@ try {
     require_once __DIR__ . '/../models/security/encryption_engine.php';
 
     $db = Database::getConnection();
+    if (!$db) {
+        throw new Exception("Could not connect to the database.");
+    }
 
     $crypto = null;
     if (defined('ENCRYPTION_KEY')) {
@@ -58,8 +61,8 @@ try {
 
     $formattedSellers = array_map(function ($seller) use ($crypto) {
         if ($crypto) {
-            $decryptedFirst = $crypto->decrypt($seller['first_name']) ?? 'Decryption Error';
-            $decryptedLast = $crypto->decrypt($seller['last_name']) ?? 'Decryption Error';
+            $decryptedFirst = $crypto->decrypt($seller['first_name']) ?? 'User';
+            $decryptedLast = $crypto->decrypt($seller['last_name']) ?? 'Profile';
             $fullName = $decryptedFirst . ' ' . $decryptedLast;
         } else {
             $fullName = $seller['first_name'] . ' ' . $seller['last_name'];
@@ -67,9 +70,9 @@ try {
 
         $ratingFloat = (float) $seller['rating'];
         if ($ratingFloat > 4.5) {
-            $tier = "Master Tier";
+            $badge = "Highly Recommended";
         } else {
-            $tier = "Elite Tier";
+            $badge = "Top Rated";
         }
 
         return [
@@ -78,21 +81,19 @@ try {
             "rating" => number_format($ratingFloat, 1, '.', ''),
             "reviews" => (int) $seller['review_count'],
             "sales" => (int) $seller['sales'],
-            "tier" => $tier,
-            "image" => !empty($seller['avatar_url']) ? publicMediaUrl($seller['avatar_url']) : null
+            "badge" => $badge,
+            "image" => !empty($seller['avatar_url']) ? getPublicMediaUrl($seller['avatar_url']) : null
         ];
     }, $sellers);
 
     echo json_encode($formattedSellers);
-
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
     echo json_encode([
-        "error" => "Internal server error Matrix failure.",
+        "error" => "An unexpected error occurred while loading the top sellers.",
         "debug" => $t->getMessage()
     ]);
 }
-?>

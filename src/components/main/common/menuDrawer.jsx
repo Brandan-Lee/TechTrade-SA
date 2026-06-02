@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { X, Terminal, ChevronRight } from "lucide-react";
+import { X, Menu, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../AuthContext";
 
@@ -18,9 +18,13 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 		};
 	}, [isOpen]);
 
-	const userRoleId = user && user.roleId !== undefined && user.roleId !== null ? Number(user.roleId) : null;
+	const userRoleId =
+		user && user.roleId !== undefined && user.roleId !== null
+			? Number(user.roleId)
+			: null;
 	const isAdmin = [3, 4].includes(userRoleId);
-	const showSellGear = userRoleId !== null && ![0, 1, 3, 4].includes(userRoleId);
+	const showSellGear =
+		userRoleId !== null && ![0, 1, 3, 4].includes(userRoleId);
 	const showBuildDoctor = !isAdmin;
 
 	const menuItems = [
@@ -45,41 +49,44 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 
 	return (
 		<>
+			{/* Dark background overlay */}
 			<div
 				className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 
-                ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+				${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
 				onClick={closeMenu}
 				aria-hidden="true"
 			/>
 
+			{/* Side menu panel */}
 			<aside
 				aria-modal="true"
 				role="dialog"
-				aria-label="System Navigation Menu"
-				className={`fixed top-0 left-0 w-80 max-w-[85vw] h-full z-[70] bg-[#09090b]/95 border-r border-white/10 shadow-[5px_0_40px_rgba(0,0,0,0.6)] backdrop-blur-md transition-transform duration-300 ease-in-out font-mono text-slate-300 ${
+				aria-label="Site Navigation Menu"
+				className={`fixed top-0 left-0 w-80 max-w-[85vw] h-full z-[70] bg-[#09090b]/95 border-r border-white/10 shadow-[5px_0_40px_rgba(0,0,0,0.6)] backdrop-blur-md transition-transform duration-300 ease-in-out text-slate-300 ${
 					isOpen ? "translate-x-0" : "-translate-x-full"
 				}`}
 			>
 				<div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-fuchsia-500/0 via-fuchsia-500/20 to-fuchsia-500/0" />
 
 				<div className="flex flex-col h-full p-5 sm:p-6 gap-8">
-					{/* DRAWER TOP BAR: CONSOLE HEAD */}
+					{/* Header section with title and close button */}
 					<div className="flex justify-between items-center w-full pb-4 border-b border-white/5">
 						<div className="flex items-center gap-2">
-							<Terminal size={14} className="text-fuchsia-500 animate-pulse" />
+							<Menu size={14} className="text-fuchsia-500" />
 							<h2 className="text-white text-xs font-black uppercase tracking-[0.25em]">
-								SITE NAVIGATION
+								Main Menu
 							</h2>
 						</div>
 						<button
 							onClick={closeMenu}
-							aria-label="Close Navigation Menu"
+							aria-label="Close Menu"
 							className="p-1.5 hover:bg-white/5 rounded-lg border border-white/0 hover:border-white/10 text-slate-400 hover:text-fuchsia-400 transition-all outline-none focus-visible:ring-1 focus-visible:ring-fuchsia-500"
 						>
 							<X size={16} />
 						</button>
 					</div>
 
+					{/* Navigation list */}
 					<nav className="flex flex-col gap-1.5 w-full items-start">
 						{menuItems.map((item, index) => {
 							if (item.name === "divider") {
@@ -112,13 +119,13 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 									key={item.name}
 									{...elementProps}
 									className={`w-full group flex flex-col justify-center px-4 py-3 rounded-lg relative overflow-hidden transition-all text-left outline-none border border-transparent
-                                        ${
-																					isActive
-																						? "bg-fuchsia-500/10 border-fuchsia-500/20 text-white shadow-[inset_0_0_15px_rgba(217,70,239,0.05)]"
-																						: "hover:bg-white/[0.02] hover:border-white/5 text-slate-400 hover:text-white"
-																				}
-                                        focus-visible:ring-1 focus-visible:ring-fuchsia-500 focus-visible:bg-fuchsia-500/5
-                                    `}
+										${
+											isActive
+												? "bg-fuchsia-500/10 border-fuchsia-500/20 text-white"
+												: "hover:bg-white/[0.02] hover:border-white/5 text-slate-400 hover:text-white"
+										}
+										focus-visible:ring-1 focus-visible:ring-fuchsia-500 focus-visible:bg-fuchsia-500/5
+									`}
 								>
 									{isActive && (
 										<div className="absolute left-0 top-2 bottom-2 w-[3px] bg-fuchsia-500 rounded-r" />

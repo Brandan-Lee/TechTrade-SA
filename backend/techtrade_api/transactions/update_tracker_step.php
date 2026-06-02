@@ -16,34 +16,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
-    if (!$db) throw new Exception("Database connection failure.");
+    if (!$db) throw new Exception("We are having trouble connecting. Please try again.");
 
     SessionManager::init($db);
     $activeUserId = SessionManager::getActiveUserId();
-    if (!$activeUserId) throw new Exception("Unauthorized Access.");
+    if (!$activeUserId) throw new Exception("Please log in to continue.");
 
     $userIdValue = intval($activeUserId);
     $input = json_decode(file_get_contents('php://input'), true);
     $transactionId = isset($input['transaction_id']) ? intval($input['transaction_id']) : null;
     $action = $input['action'] ?? null;
 
-    if (!$transactionId || !$action) throw new Exception("Invalid payload.");
+    if (!$transactionId || !$action) throw new Exception("Invalid request details.");
 
     $db->beginTransaction();
 
-    // Lock transaction for update
+    // Securely lock the order to prevent conflicts
     $stmtLock = $db->prepare("SELECT t.*, l.title FROM transactions t INNER JOIN listings l ON t.listing_id = l.id WHERE t.id = ? FOR UPDATE");
     $stmtLock->execute([$transactionId]);
     $tx = $stmtLock->fetch(PDO::FETCH_ASSOC);
-    if (!$tx) throw new Exception("Transaction not found.");
+    if (!$tx) throw new Exception("Order not found.");
 
     $fromStep = intval($tx['escrow_step']);
     $metadata = [];
@@ -57,67 +57,65 @@ try {
 
     switch ($action) {
         case 'cancel':
-            if ($tx['status'] === 'completed') throw new Exception("Cannot cancel a completed transaction.");
+            if ($tx['status'] === 'completed') throw new Exception("Cannot cancel a completed order.");
             $reason = $input['reason'] ?? 'No reason provided.';
 
-            // Update Transaction
             $db->prepare("UPDATE transactions SET status = 'cancelled', cancel_reason = ?, cancelled_at = NOW(), updated_at = NOW() WHERE id = ?")
                 ->execute([$reason, $transactionId]);
 
-            // Revert Listing
             $db->prepare("UPDATE listings SET status = 'AVAILABLE', updated_at = NOW() WHERE id = ?")
                 ->execute([$tx['listing_id']]);
 
             $metadata = ['reason' => $reason, 'cancelled_by' => ($isBuyer ? 'buyer' : 'seller')];
-            $notifyTitle = "Transaction Cancelled";
-            $notifyBody = "Transaction for '{$tx['title']}' was cancelled: {$reason}";
+            $notifyTitle = "Order Cancelled";
+            $notifyBody = "The order for '{$tx['title']}' was cancelled: {$reason}";
             $toStep = 0;
             break;
 
         case 'choose_handover':
-            if (!$isBuyer) throw new Exception("Buyer only.");
+            if (!$isBuyer) throw new Exception("Only the buyer can select this.");
             $toStep = 3;
             $metadata = ['route_type' => 'in_person_handover', 'notes' => 'Handover selected.'];
             $notifyTitle = "Handover Selected";
-            $notifyBody = "Buyer chose in-person handover for '{$tx['title']}'.";
+            $notifyBody = "The buyer chose in-person handover for '{$tx['title']}'.";
             break;
 
         case 'payment_escrow':
-            if (!$isBuyer) throw new Exception("Buyer only.");
+            if (!$isBuyer) throw new Exception("Only the buyer can select this.");
             $toStep = 2;
-            $metadata = ['route_type' => 'escrow_vault_deposit'];
+            $metadata = ['route_type' => 'secure_payment'];
             $notifyTitle = "Payment Secured";
-            $notifyBody = "Funds deposited for '{$tx['title']}'.";
+            $notifyBody = "Funds have been deposited for '{$tx['title']}'.";
             break;
 
         case 'mark_shipped':
-            if (!$isSeller) throw new Exception("Seller only.");
+            if (!$isSeller) throw new Exception("Only the seller can select this.");
             $toStep = 3;
-            $metadata = ['notes' => 'Asset dispatched.'];
-            $notifyTitle = "Asset Dispatched";
-            $notifyBody = "Seller has shipped '{$tx['title']}'.";
+            $metadata = ['notes' => 'Item dispatched.'];
+            $notifyTitle = "Item Dispatched";
+            $notifyBody = "The seller has shipped '{$tx['title']}'.";
             break;
 
         case 'confirm_delivery':
-            if (!$isBuyer) throw new Exception("Buyer only.");
+            if (!$isBuyer) throw new Exception("Only the buyer can select this.");
             $toStep = 4;
             $metadata = ['notes' => 'Arrival confirmed.'];
             $notifyTitle = "Delivery Confirmed";
-            $notifyBody = "Buyer confirmed delivery for '{$tx['title']}'.";
+            $notifyBody = "The buyer confirmed delivery for '{$tx['title']}'.";
             break;
 
         case 'release_funds':
-            if (!$isBuyer) throw new Exception("Buyer only.");
+            if (!$isBuyer) throw new Exception("Only the buyer can select this.");
             $toStep = 5;
             $metadata = ['notes' => 'Funds release triggered.'];
             if ($isHandover) {
                 $db->prepare("UPDATE listings SET status = 'SOLD', updated_at = NOW() WHERE id = ?")->execute([$tx['listing_id']]);
                 $db->prepare("UPDATE users SET trade_count = trade_count + 1 WHERE id = ?")->execute([$tx['seller_id']]);
                 $notifyTitle = "Handover Finalized";
-                $notifyBody = "Handover confirmed. Transaction completed.";
+                $notifyBody = "Handover confirmed. Order completed.";
             } else {
-                $notifyTitle = "Payout Pending Review";
-                $notifyBody = "Funds released. Please await manual admin payout review.";
+                $notifyTitle = "Payout Pending";
+                $notifyBody = "Funds released. Our team will review the payout shortly.";
             }
             break;
 

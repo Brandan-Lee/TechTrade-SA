@@ -16,15 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
-    require_once __DIR__ . '/../models/authentication/user.php'; 
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
+    require_once __DIR__ . '/../models/authentication/user.php';
 
     $db = Database::getConnection();
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Unauthorized access."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
@@ -32,7 +32,7 @@ try {
     $data = json_decode($jsonInput, true);
 
     if (!$data) {
-        throw new Exception("Invalid request payload.");
+        throw new Exception("We didn't receive any data to save.");
     }
 
     $name = trim($data['name'] ?? 'Untitled Build');
@@ -41,7 +41,7 @@ try {
     $psu_id = !empty($data['psu_id']) ? intval($data['psu_id']) : null;
 
     if (!$cpu_id && !$gpu_id && !$psu_id) {
-        throw new Exception("Build must contain at least one component.");
+        throw new Exception("Your setup must contain at least one component.");
     }
 
     $result_json = json_encode([
@@ -70,12 +70,10 @@ try {
     ]);
 
     echo json_encode(["success" => true, "build_id" => $db->lastInsertId()]);
-
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Internal server error.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred on the server.", "debug" => $t->getMessage()]);
 }
-?>

@@ -12,12 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/validation/database.php';
-require_once __DIR__ . '/../helpers/session_manager.php';
+require_once __DIR__ . '/../models/helpers/session_manager.php';
 
 try {
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database connection could not be established.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
@@ -43,12 +43,12 @@ try {
         session_destroy();
     }
 
-    echo json_encode(["status" => "success", "message" => "Session terminated."]);
+    echo json_encode(["status" => "success", "message" => "You have been logged out successfully."]);
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "message" => "Logout failed.",
+        "message" => "An error occurred while trying to log you out.",
         "debug" => $e->getMessage(),
     ]);
 }

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/validation/database.php';
 require_once __DIR__ . '/../models/security/otp_manager.php';
-require_once __DIR__ . '/../services/email_service.php';
+require_once __DIR__ . '/../models/services/email_service.php';
 
 $db = Database::getConnection();
 
@@ -23,7 +23,7 @@ $otpCode = isset($input['otp']) ? trim($input['otp']) : '';
 
 if (empty($email) || empty($otpCode)) {
     http_response_code(400);
-    echo json_encode(["status" => "error", "message" => "Missing recovery validation parameters."]);
+    echo json_encode(["status" => "error", "message" => "Email and verification code are required."]);
     exit();
 }
 
@@ -42,7 +42,7 @@ if ($otpRecord) {
         http_response_code(200);
         echo json_encode([
             "status" => "success",
-            "message" => "OTP code confirmed valid. Proceed to password change.",
+            "message" => "Code verified successfully. You can now choose a new password.",
             "email" => $email,
             "otp" => $otpCode
         ]);
@@ -53,6 +53,5 @@ if ($otpRecord) {
 http_response_code(401);
 echo json_encode([
     "status" => "error",
-    "message" => "Invalid or expired recovery verification code."
+    "message" => "The verification code is invalid or has expired."
 ]);
-?>

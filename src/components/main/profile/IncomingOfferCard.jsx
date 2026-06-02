@@ -16,13 +16,6 @@ export default function IncomingOfferCard({
 		parent_offer_id !== null && parent_offer_id !== undefined;
 
 	const handleManage = (e) => {
-		console.log(isCounterOffer);
-		if (!isCounterOffer) {
-			e.stopPropagation();
-			navigate(`/manage-offer/${id}`);
-		}
-
-		//testing purposes
 		e.stopPropagation();
 		navigate(`/manage-offer/${id}`);
 	};
@@ -32,18 +25,17 @@ export default function IncomingOfferCard({
 			onClick={handleManage}
 			className="w-full bg-[#09090b]/60 border border-white/5 rounded-xl p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-fuchsia-500/30 hover:bg-[#0c0c10] transition-all duration-300 relative overflow-hidden group cursor-pointer"
 		>
-			{/* Clean Accent Scanline */}
+			{/* Decorative Top Line */}
 			<div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-fuchsia-500/20 to-transparent opacity-70 group-hover:via-fuchsia-500/40 transition-all duration-300" />
 
-			{/* Responsive 12-Column Sub-Grid */}
 			<div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center relative z-10">
-				{/* 1. BUYER IDENTIFICATION SECTION (Spans 4 Columns) */}
+				{/* 1. Buyer Information */}
 				<div className="md:col-span-4 flex items-center gap-3">
 					<div className="relative shrink-0">
 						<img
-							src={buyer.avatar || "https://placehold.co/48"}
-							alt={`Operator ${buyer.name}`}
-							className="w-9 h-9 rounded-full border border-fuchsia-500/20 p-[1px] bg-black object-cover shadow-[0_0_10px_rgba(217,70,239,0.05)]"
+							src={buyer.avatar}
+							alt={`User ${buyer.name}`}
+							className="w-9 h-9 rounded-full border border-fuchsia-500/20 p-[1px] bg-black object-cover"
 						/>
 						<div className="absolute -bottom-0.5 -right-0.5 bg-[#09090b] rounded-full p-0.5 text-fuchsia-400">
 							<ShieldCheck size={8} />
@@ -72,18 +64,18 @@ export default function IncomingOfferCard({
 					</div>
 				</div>
 
-				{/* 2. MESSAGING TIMELINE CONTAINER (Spans 5 Columns) */}
+				{/* 2. Message Container */}
 				<div className="md:col-span-5 bg-black/20 rounded-lg p-2.5 border border-white/5">
 					<p className="text-slate-400 text-xs italic leading-relaxed pl-3 border-l-2 border-fuchsia-500/30 group-hover:border-fuchsia-500 transition-colors duration-300">
 						"{message}"
 					</p>
 				</div>
 
-				{/* 3. OFFER VALUATION & ACTION ACTIONS (Spans 3 Columns) */}
+				{/* 3. Price and Action Buttons */}
 				<div className="md:col-span-3 flex flex-row md:flex-col justify-between md:justify-center items-center md:items-end gap-4 pt-4 border-t border-white/5 md:pt-0 md:border-t-0 md:border-l md:border-white/5 md:pl-5">
 					<div className="text-left md:text-right space-y-0.5">
 						<div className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">
-							OFFERED VALUE
+							OFFER AMOUNT
 						</div>
 						<div className="text-fuchsia-400 text-lg md:text-xl lg:text-2xl font-black tracking-tight group-hover:text-fuchsia-300 transition-colors">
 							{offerAmount}

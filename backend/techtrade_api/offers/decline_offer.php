@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     $inputData = json_decode(file_get_contents("php://input"), true);
@@ -24,16 +24,16 @@ try {
 
     if ($offerId <= 0) {
         http_response_code(400);
-        throw new Exception("Invalid or missing offer ID reference.");
+        throw new Exception("Please specify a valid offer.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not connect to the database engine.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
@@ -41,11 +41,10 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access. Please sign in.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
     $userIdValue = intval($activeUserId);
 
-    // 1. Fetch offer details and listing status parameters using your structural columns
     $sqlVerify = "
         SELECT o.id, o.listing_id, o.buyer_id, o.status, l.seller_id, l.title AS listing_title
         FROM offers o
@@ -59,18 +58,17 @@ try {
 
     if (!$currentOffer) {
         http_response_code(404);
-        throw new Exception("The requested offer or active parent listing could not be found.");
+        throw new Exception("The requested offer or item listing could not be found.");
     }
 
-    // Safety check: Make sure the person declining is the actual seller
     if (intval($currentOffer['seller_id']) !== $userIdValue) {
         http_response_code(403);
-        throw new Exception("Access Denied. Only the listing owner can decline this offer.");
+        throw new Exception("Access Denied. Only the seller can decline this offer.");
     }
 
     if ($currentOffer['status'] !== 'pending') {
         http_response_code(400);
-        throw new Exception("This offer cannot be declined because its status is: " . $currentOffer['status']);
+        throw new Exception("This offer has already been processed.");
     }
 
     $listingId = intval($currentOffer['listing_id']);
@@ -112,7 +110,7 @@ try {
         INSERT INTO notifications (user_id, type, title, body, status, offer_id, listing_id)
         VALUES (?, 'offer', 'Offer Update: Declined', ?, 'declined', ?, ?)
     ";
-    $bodyMessage = "Your offer for item [{$listingTitle}] has been declined by the seller.";
+    $bodyMessage = "Your offer for [{$listingTitle}] has been declined by the seller.";
     $db->prepare($sqlNotifyBuyer)->execute([$buyerId, $bodyMessage, $offerId, $listingId]);
 
     $db->commit();
@@ -120,8 +118,7 @@ try {
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "message" => "Offer declined successfully. Notification sent and listing verified.",
-        "remaining_pending_offers" => $pendingOffersCount
+        "message" => "Offer declined successfully."
     ]);
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
@@ -138,7 +135,7 @@ try {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "error" => "Critical system runtime database exception caught on decline step processing.",
+        "error" => "An unexpected error occurred while processing your request.",
         "debug" => $t->getMessage()
     ]);
 }

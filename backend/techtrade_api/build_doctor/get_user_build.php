@@ -8,17 +8,22 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Unauthorized access."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
@@ -28,7 +33,7 @@ try {
         FROM user_builds 
         WHERE user_id = ? AND is_deleted = 0 
         ORDER BY id DESC LIMIT 1");
-        
+
     $stmt->execute([$_SESSION['user_id']]);
     $build = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -54,12 +59,10 @@ try {
     } else {
         echo json_encode(null);
     }
-
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Internal server error."]);
+    echo json_encode(["error" => "An unexpected error occurred on the server."]);
 }
-?>

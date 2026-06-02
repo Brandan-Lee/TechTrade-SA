@@ -14,13 +14,13 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/validation/database.php';
 require_once __DIR__ . '/../models/authentication/user.php';
 require_once __DIR__ . '/../models/security/otp_manager.php';
-require_once __DIR__ . '/../services/email_service.php';
-require_once __DIR__ . '/../helpers/session_manager.php';
+require_once __DIR__ . '/../models/services/email_service.php';
+require_once __DIR__ . '/../models/helpers/session_manager.php';
 
 try {
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database engine connection dropped.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
@@ -33,15 +33,15 @@ try {
 
     if (empty($email) || empty($password)) {
         http_response_code(400);
-        echo json_encode(["status" => "error", "message" => "Missing credentials."]);
+        echo json_encode(["status" => "error", "message" => "Email and password are required."]);
         exit();
     }
 
     $user = User::findByEmail($db, $email);
 
     if (!$user) {
-        http_response_code(404);
-        echo json_encode(["status" => "error", "message" => "Profile link verification dropped."]);
+        http_response_code(401);
+        echo json_encode(["status" => "error", "message" => "Incorrect email or password."]);
         exit();
     }
 
@@ -72,12 +72,10 @@ try {
             $duration = 30 * 24 * 60 * 60;
             $expiresAt = date('Y-m-d H:i:s', time() + $duration);
 
-            $clearOld = $db->prepare("DELETE FROM  user_tokens
-                WHERE        user_id = ?");
+            $clearOld = $db->prepare("DELETE FROM user_tokens WHERE user_id = ?");
             $clearOld->execute([$user->getId()]);
 
-            $insertToken = $db->prepare("INSERT INTO  user_tokens (user_id, selector, hashed_validator, expires_at)
-                VALUES (?, ?, ?, ?)");
+            $insertToken = $db->prepare("INSERT INTO user_tokens (user_id, selector, hashed_validator, expires_at) VALUES (?, ?, ?, ?)");
             $insertToken->execute([$user->getId(), $selector, $hashedValidator, $expiresAt]);
 
             $cookieValue = $selector . ':' . bin2hex($validator);
@@ -94,7 +92,7 @@ try {
             http_response_code(200);
             echo json_encode([
                 "status" => "success",
-                "message" => "Login successful (MFA bypassed).",
+                "message" => "Login successful.",
                 "user" => [
                     "id" => $user->getId(),
                     "email" => $user->getEmail(),
@@ -107,7 +105,7 @@ try {
             ]);
             exit();
         } else {
-            error_log("MFA Check: Initiating OTP generation sequence for user ID: " . $user->getId());
+            error_log("Security: Generating verification code for user ID: " . $user->getId());
             $emailService = new EmailService();
             $otpManager = new OTPManager($db, $emailService);
 
@@ -117,7 +115,7 @@ try {
                     "status" => "pending_otp",
                     "message" => "Verification code sent to your email.",
                     "rememberMe" => $rememberMe,
-                    "debug_status" => "SUCCESS: sendNewOTP returned true. Email handed off to PHPMailer successfully."
+                    "debug_status" => "SUCCESS: Verification email sent."
                 ]);
                 exit();
             } else {
@@ -125,20 +123,20 @@ try {
                 echo json_encode([
                     "status" => "error",
                     "message" => "Failed to send verification code.",
-                    "debug_status" => "FAILURE: sendNewOTP returned false. Check your .env credentials path or your mail server connection."
+                    "debug_status" => "FAILURE: Check mail server connection."
                 ]);
                 exit();
             }
         }
     } else {
         http_response_code(401);
-        echo json_encode(["status" => "error", "message" => "Invalid credentials."]);
+        echo json_encode(["status" => "error", "message" => "Incorrect email or password."]);
     }
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "message" => "Internal Server Error during credentials verification handshake.",
+        "message" => "An unexpected error occurred while checking your login details.",
         "debug" => $e->getMessage()
     ]);
     exit();

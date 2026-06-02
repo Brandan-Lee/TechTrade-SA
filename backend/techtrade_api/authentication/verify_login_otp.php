@@ -17,13 +17,13 @@ try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/otp_manager.php';
-    require_once __DIR__ . '/../services/email_service.php';
+    require_once __DIR__ . '/../models/services/email_service.php';
     require_once __DIR__ . '/../models/authentication/user.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database engine connection dropped.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $input = json_decode(file_get_contents('php://input'), true);
@@ -34,7 +34,7 @@ try {
 
     if (empty($email) || empty($otpCode)) {
         http_response_code(400);
-        echo json_encode(["status" => "error", "message" => "Missing authentication details."]);
+        echo json_encode(["status" => "error", "message" => "Email and verification code are required."]);
         exit();
     }
 
@@ -45,8 +45,8 @@ try {
         $userModel = User::findByEmail($db, $email);
 
         if (!$userModel) {
-            http_response_code(404);
-            echo json_encode(["status" => "error", "message" => "Profile link verification dropped."]);
+            http_response_code(401);
+            echo json_encode(["status" => "error", "message" => "Incorrect email or verification code."]);
             exit();
         }
 
@@ -57,12 +57,11 @@ try {
         }
 
         SessionManager::login($db, (int) $userModel->getId(), (int) $userModel->getRoleId());
-
         $userModel->updateLastLogin();
 
         if ($rememberMe) {
-            $selector = bin2hex(random_bytes(8));  
-            $validator = random_bytes(32);         
+            $selector = bin2hex(random_bytes(8));
+            $validator = random_bytes(32);
             $hashedValidator = hash('sha256', $validator);
 
             $duration = 30 * 24 * 60 * 60;
@@ -86,26 +85,24 @@ try {
 
         echo json_encode([
             "status" => "success",
-            "message" => "Login verified.",
+            "message" => "Login successful.",
             "user" => [
                 "id" => $userModel->getId(),
                 "email" => $userModel->getEmail(),
-                "fullName" => $userModel->getFullName(), 
+                "fullName" => $userModel->getFullName(),
                 "regType" => $userModel->getRegType(),
                 "roleId" => $userModel->getRoleId()
             ]
         ]);
     } else {
         http_response_code(401);
-        echo json_encode(["status" => "error", "message" => "Invalid or expired code."]);
+        echo json_encode(["status" => "error", "message" => "The code you entered is invalid or has expired."]);
     }
-
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "message" => "Internal processing exception occurred during verification.",
+        "message" => "An unexpected error occurred on the server.",
         "debug" => $e->getMessage()
     ]);
 }
-?>

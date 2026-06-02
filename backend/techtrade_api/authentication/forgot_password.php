@@ -14,12 +14,12 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/validation/database.php';
 require_once __DIR__ . '/../models/authentication/user.php';
 require_once __DIR__ . '/../models/security/otp_manager.php';
-require_once __DIR__ . '/../services/email_service.php';
+require_once __DIR__ . '/../models/services/email_service.php';
 
 try {
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database engine connection dropped.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $input = json_decode(file_get_contents('php://input'), true);
@@ -32,13 +32,13 @@ try {
     }
 
     $user = User::findByEmail($db, $email);
-    
+
     if (!$user) {
         password_verify("dummy_password", '$2y$10$abcdefghijklmnopqrstuv');
         http_response_code(200);
         echo json_encode([
             "status" => "success",
-            "message" => "If the profile node exists, an authentication token link has been dispatched."
+            "message" => "If the email matches an account, a link has been sent to your inbox."
         ]);
         exit();
     }
@@ -50,7 +50,7 @@ try {
         http_response_code(200);
         echo json_encode([
             "status" => "success",
-            "message" => "If the profile node exists, an authentication token link has been dispatched."
+            "message" => "If the email matches an account, a link has been sent to your inbox."
         ]);
         exit();
     }
@@ -64,7 +64,7 @@ try {
         http_response_code(200);
         echo json_encode([
             "status" => "success",
-            "message" => "If the profile node exists, an authentication token link has been dispatched."
+            "message" => "If the email matches an account, a link has been sent to your inbox."
         ]);
         exit();
     } else {
@@ -93,7 +93,7 @@ try {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "message" => "Internal server processing error caught during token execution state.",
+        "message" => "An unexpected error occurred on the server.",
         "debug" => $e->getMessage()
     ]);
     exit();

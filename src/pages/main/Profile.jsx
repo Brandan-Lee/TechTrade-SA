@@ -51,7 +51,7 @@ export default function Profile() {
 	const loadTrades = async () => {
 		try {
 			const response = await apiFetch(
-				`/marketplace/get_user_trades.php?id=${encodeURIComponent(profileUserId)}`,
+				`/user/get_user_trades.php?id=${encodeURIComponent(profileUserId)}`,
 			);
 			const data = await response.json();
 			if (response.ok) setTrades(data.trades || []);
@@ -75,7 +75,7 @@ export default function Profile() {
 			setError(null);
 			try {
 				const response = await apiFetch(
-					`/marketplace/get_user_profile.php?id=${encodeURIComponent(profileUserId)}`,
+					`/user/get_user_profile.php?id=${encodeURIComponent(profileUserId)}`,
 				);
 				const data = await response.json();
 				if (!response.ok)
@@ -144,7 +144,7 @@ export default function Profile() {
 
 		setIsDeleting(true);
 		try {
-			const response = await apiFetch("/authentication/delete_user.php", {
+			const response = await apiFetch("/user/delete_user.php", {
 				method: "POST",
 			});
 			const data = await response.json();

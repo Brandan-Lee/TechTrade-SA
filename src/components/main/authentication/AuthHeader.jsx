@@ -7,9 +7,9 @@ export default function AuthHeader() {
 	const [currentSlide, setCurrentSlide] = useState(0);
 
 	const messages = [
-		"Escrow Protocol Engaged. The Transactional State Machine is monitoring all active negotiations.",
-		"Hardware Intelligence Active. All local nodes are verified via the Managed Trust Hub.",
-		"Multi-point credential audit complete. Mitigating regional risk in the SA tech market.",
+		"Your payment is being held safely. We are tracking all the steps of your trade to make sure everything goes smoothly",
+		"Our systems are ready. We have confirmed that all users involved are verified and secure.",
+		"We have double-checked everyone's details to keep our local marketplace safe and secure.",
 	];
 
 	useEffect(() => {

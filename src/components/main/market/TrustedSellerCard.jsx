@@ -28,10 +28,10 @@ export default function TrustedSellerCard({
 			className={`
                 group relative min-w-[320px] p-[1px] rounded-2xl overflow-hidden cursor-pointer shrink-0 transition-all duration-300
                 ${
-					isMaster
-						? "bg-gradient-to-br from-fuchsia-500 via-fuchsia-500/20 to-transparent shadow-[0_0_20px_rgba(217,70,239,0.15)]"
-						: "bg-gradient-to-br from-violet-600/50 via-violet-600/10 to-transparent"
-				}
+									isMaster
+										? "bg-gradient-to-br from-fuchsia-500 via-fuchsia-500/20 to-transparent shadow-[0_0_20px_rgba(217,70,239,0.15)]"
+										: "bg-gradient-to-br from-violet-600/50 via-violet-600/10 to-transparent"
+								}
             `}
 		>
 			{/* Inner Content - The "Hardware Shell" */}

@@ -16,14 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     SessionManager::init($db);
 
     if (!isset($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Unauthorized access."]);
+        http_response_code(419);
+        echo json_encode(["error" => "Your session has expired. Please log in again."]);
         exit();
     }
 
@@ -31,8 +31,9 @@ try {
     $data = json_decode($jsonInput, true);
 
     $build_id = !empty($data['build_id']) ? intval($data['build_id']) : null;
+
     if (!$build_id) {
-        throw new Exception("Missing identification target parameters.");
+        throw new Exception("Please specify which item you want to update.");
     }
 
     $name = trim($data['name'] ?? 'Untitled Build');
@@ -41,10 +42,9 @@ try {
     $psu_id = !empty($data['psu_id']) ? intval($data['psu_id']) : null;
 
     if (!$cpu_id && !$gpu_id && !$psu_id) {
-        throw new Exception("Build must contain at least one component.");
+        throw new Exception("Your setup must contain at least one component.");
     }
 
-    // Repack specs into array payload layout
     $result_json = json_encode([
         'cpu_specs' => $data['cpu_specs'] ?? [],
         'gpu_specs' => $data['gpu_specs'] ?? [],
@@ -52,7 +52,6 @@ try {
         'updated_at' => date('Y-m-d H:i:s')
     ]);
 
-    // Safety constraint: Validate user ownership to prevent tampering
     $stmt = $db->prepare("UPDATE user_builds SET 
         name = ?, cpu_id = ?, gpu_id = ?, psu_id = ?, 
         cpu_display_name = ?, gpu_display_name = ?, psu_display_name = ?, 
@@ -60,7 +59,10 @@ try {
         WHERE id = ? AND user_id = ? AND is_deleted = 0");
 
     $stmt->execute([
-        $name, $cpu_id, $gpu_id, $psu_id,
+        $name,
+        $cpu_id,
+        $gpu_id,
+        $psu_id,
         $data['cpu_display_name'] ?? null,
         $data['gpu_display_name'] ?? null,
         $data['psu_display_name'] ?? null,
@@ -70,12 +72,10 @@ try {
     ]);
 
     echo json_encode(["success" => true]);
-
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Internal server error."]);
+    echo json_encode(["error" => "An unexpected error occurred on the server."]);
 }
-?>

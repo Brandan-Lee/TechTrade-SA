@@ -10,23 +10,14 @@ export default function TrustedSellers() {
 	useEffect(() => {
 		const fetchSellers = async () => {
 			try {
-				const response = await apiFetch(
-					"marketplace/get_trusted_sellers.php",
-					{
-						method: "GET",
-						headers: { Accept: "application/json" },
-					},
-				);
+				const response = await apiFetch("marketplace/get_trusted_sellers.php");
 
 				if (response.ok) {
 					const data = await response.json();
 					setSellers(Array.isArray(data) ? data : []);
 				}
 			} catch (err) {
-				console.error(
-					"Network terminal error pulling dynamic trusted sellers:",
-					err,
-				);
+				console.error("Error loading trusted sellers:", err);
 			} finally {
 				setIsLoading(false);
 			}
@@ -38,7 +29,6 @@ export default function TrustedSellers() {
 	return (
 		<section className="w-full bg-[#050505] relative py-16 px-4 overflow-hidden">
 			<div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-
 			<div className="absolute -top-24 -left-24 w-96 h-96 bg-fuchsia-600/10 blur-[120px] rounded-full"></div>
 
 			<div className="max-w-[1440px] mx-auto relative z-10">
@@ -52,7 +42,7 @@ export default function TrustedSellers() {
 						</h2>
 
 						<p className="text-slate-400 text-sm md:text-base font-medium max-w-md uppercase tracking-tight">
-							<span className="text-white">Trusted Traders</span>
+							<span className="text-white">Our Verified Traders</span>
 						</p>
 					</div>
 
@@ -73,9 +63,9 @@ export default function TrustedSellers() {
 					<div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none hidden md:block"></div>
 
 					{isLoading ? (
-						<div className="w-full flex py-20 flex-col items-center justify-center gap-3 text-slate-500 font-mono text-xs uppercase tracking-widest">
+						<div className="w-full flex py-20 flex-col items-center justify-center gap-3 text-slate-500 text-xs uppercase tracking-widest">
 							<Loader2 className="animate-spin text-fuchsia-500" size={24} />
-							Retrieving Secure Seller Metrics...
+							Loading our top sellers...
 						</div>
 					) : (
 						<div className="flex overflow-x-auto gap-6 pb-12 no-scrollbar snap-x snap-mandatory touch-pan-x">
@@ -92,13 +82,11 @@ export default function TrustedSellers() {
 									</div>
 								))
 							) : (
-								<div className="text-slate-600 font-mono text-xs uppercase p-6 border border-white/5 rounded-2xl w-full text-center">
-									No verified sellers matching minimum trust criteria are
-									currently active online.
+								<div className="text-slate-600 text-xs uppercase p-6 border border-white/5 rounded-2xl w-full text-center">
+									No verified sellers are currently active.
 								</div>
 							)}
 
-							{/* Final "View All" Card for UX completion */}
 							<div className="snap-center md:snap-start min-w-[200px] flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/10 bg-white/5 group hover:border-fuchsia-500/50 transition-all cursor-pointer">
 								<div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
 									<Zap
@@ -107,7 +95,7 @@ export default function TrustedSellers() {
 									/>
 								</div>
 								<span className="text-slate-500 font-black uppercase text-[10px] tracking-widest">
-									Full Registry
+									View All Sellers
 								</span>
 							</div>
 						</div>
@@ -115,9 +103,8 @@ export default function TrustedSellers() {
 				</div>
 			</div>
 
-			<style
-				dangerouslySetInnerHTML={{
-					__html: `
+			<style>
+				{`
 				.no-scrollbar::-webkit-scrollbar {
 					display: none;
 				}
@@ -125,9 +112,8 @@ export default function TrustedSellers() {
 					-ms-overflow-style: none;
 					scrollbar-width: none;
 				}
-			`,
-				}}
-			/>
+				`}
+			</style>
 		</section>
 	);
 }

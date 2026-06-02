@@ -115,7 +115,6 @@ export default function FilterBar() {
 		(filters.priceMin || "") !== (appliedFilters.priceMin || "") ||
 		(filters.priceMax || "") !== (appliedFilters.priceMax || "");
 
-	// --- LOGIC: The "Portal" Positioning Fix ---
 	const updatePosition = useCallback((el) => {
 		if (el) {
 			const rect = el.getBoundingClientRect();
@@ -136,7 +135,6 @@ export default function FilterBar() {
 		}
 	};
 
-	// Close on outside click
 	useEffect(() => {
 		const handleClickOutside = (event) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -177,15 +175,13 @@ export default function FilterBar() {
 			className="w-full sticky top-0 z-40 bg-[#050505]/90 backdrop-blur-xl border-b border-white/10"
 		>
 			<nav className="max-w-[1440px] mx-auto h-16 px-4 flex items-center gap-4">
-				{/* Branding Icon */}
 				<div className="flex items-center gap-2 pr-4 border-r border-white/10 shrink-0">
 					<SlidersHorizontal className="w-4 h-4 text-fuchsia-500" />
 					<span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] hidden md:block">
-						FILTER
+						Filters
 					</span>
 				</div>
 
-				{/* Scrollable Nav Area */}
 				<div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 grow">
 					<button
 						onClick={clearFilters}
@@ -195,7 +191,7 @@ export default function FilterBar() {
 								: "bg-white/5 text-slate-400 border-white/10 hover:border-fuchsia-500/50"
 						}`}
 					>
-						[ ALL HARDWARE ]
+						All Products
 					</button>
 
 					{navConfig.map((dropdown) => {
@@ -229,7 +225,6 @@ export default function FilterBar() {
 				</div>
 			</nav>
 
-			{/* Active Filters Bar */}
 			<AnimatePresence>
 				{isAnyFilterActive && (
 					<motion.div
@@ -239,7 +234,6 @@ export default function FilterBar() {
 						className="bg-fuchsia-500/5 border-t border-white/5"
 					>
 						<div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center justify-between gap-3">
-							{/* Active Parameters List */}
 							<div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
 								<span className="text-fuchsia-500/50 text-[9px] font-black uppercase tracking-widest shrink-0">
 									Active Filters:
@@ -256,7 +250,6 @@ export default function FilterBar() {
 								</div>
 							</div>
 
-							{/* Control Actions Container */}
 							<div className="flex items-center gap-2 shrink-0">
 								<button
 									type="button"
@@ -272,7 +265,7 @@ export default function FilterBar() {
 										size={10}
 										className="transition-transform group-hover:scale-110"
 									/>
-									<span>APPLY_FILTERS</span>
+									<span>Apply</span>
 								</button>
 
 								<button
@@ -284,7 +277,7 @@ export default function FilterBar() {
 										size={10}
 										className="transition-transform group-hover:rotate-90"
 									/>
-									<span>CLEAR_ALL</span>
+									<span>Clear All</span>
 								</button>
 							</div>
 						</div>
@@ -292,7 +285,6 @@ export default function FilterBar() {
 				)}
 			</AnimatePresence>
 
-			{/* THE PORTAL: Dropdown Overlay */}
 			{openDropdown &&
 				activeConfig &&
 				createPortal(
@@ -348,7 +340,7 @@ export default function FilterBar() {
 														min: e.target.value.replace(/\D/g, ""),
 													}))
 												}
-												placeholder="MIN_ZAR"
+												placeholder="Min Price"
 												className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
 											/>
 											<input
@@ -360,7 +352,7 @@ export default function FilterBar() {
 														max: e.target.value.replace(/\D/g, ""),
 													}))
 												}
-												placeholder="MAX_ZAR"
+												placeholder="Max Price"
 												className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
 											/>
 										</div>
@@ -373,7 +365,7 @@ export default function FilterBar() {
 											}
 											className="w-full h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded text-[10px] font-black uppercase tracking-widest transition-colors"
 										>
-											EXECUTE_FILTER
+											Update Results
 										</button>
 									</div>
 								)}

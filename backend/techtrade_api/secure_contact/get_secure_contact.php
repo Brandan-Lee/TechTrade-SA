@@ -14,12 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 try {
-    // 1. Capture the numeric ID
     $idParam = $_GET['public_id'] ?? null;
 
     if (!$idParam || !is_numeric($idParam)) {
         http_response_code(400);
-        throw new Exception("Invalid or missing numeric transaction ID.");
+        throw new Exception("Please specify a valid order.");
     }
 
     $transactionId = (int)$idParam;
@@ -27,7 +26,7 @@ try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     SessionManager::init($db);
@@ -35,10 +34,9 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
 
-    // 2. Query using the BIGINT primary key 'id'
     $sqlFetch = "
         SELECT 
             t.public_id, t.buyer_id, t.seller_id,
@@ -59,13 +57,12 @@ try {
 
     if (!$row) {
         http_response_code(404);
-        throw new Exception("Transaction #{$transactionId} not found.");
+        throw new Exception("The requested order could not be found.");
     }
 
-    // 3. Permission Check
     if ((int)$row['buyer_id'] !== (int)$activeUserId && (int)$row['seller_id'] !== (int)$activeUserId) {
         http_response_code(403);
-        throw new Exception("Access denied.");
+        throw new Exception("Access Denied. You do not have permission to view this order.");
     }
 
     $crypto = defined('ENCRYPTION_KEY') ? new EncryptionEngine(ENCRYPTION_KEY) : null;

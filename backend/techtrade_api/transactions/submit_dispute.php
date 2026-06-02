@@ -16,35 +16,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
-    if (!$db) throw new Exception("Database connection failure.");
+    if (!$db) {
+        throw new Exception("We are currently having trouble connecting. Please try again in a moment.");
+    }
 
     SessionManager::init($db);
     $activeUserId = SessionManager::getActiveUserId();
-    if (!$activeUserId) throw new Exception("Unauthorized access.");
+    if (!$activeUserId) {
+        throw new Exception("Your session has expired. Please log in again to continue.");
+    }
 
     $transactionId = intval($_POST['transaction_id'] ?? 0);
     $reason = trim($_POST['reason'] ?? '');
     $details = trim($_POST['details'] ?? '');
 
     if (!$transactionId || empty($reason) || empty($details)) {
-        throw new Exception("Missing required dispute information.");
+        throw new Exception("Please make sure you have filled out all the details for your request.");
     }
 
     $db->beginTransaction();
 
-    // 1. Insert Dispute Record
     $sqlDispute = "INSERT INTO disputes (transaction_id, opened_by_id, reason_code, details, status) VALUES (?, ?, ?, ?, 'open')";
     $db->prepare($sqlDispute)->execute([$transactionId, $activeUserId, $reason, $details]);
     $disputeId = $db->lastInsertId();
 
-    // 2. Update Transaction Status
     $db->prepare("UPDATE transactions SET status = 'disputed' WHERE id = ?")->execute([$transactionId]);
 
-    // 3. Handle Evidence Uploads
-    $uploadDir = uploadsDiskPath('disputes'); // Ensure this helper exists
+    $uploadDir = getUploadFolderPath('disputes');
     $sqlEvidence = "INSERT INTO dispute_evidence (dispute_id, file_url, file_name, sort_order) VALUES (?, ?, ?, ?)";
     $stmtEvidence = $db->prepare($sqlEvidence);
 
@@ -66,7 +67,9 @@ try {
     $db->commit();
     echo json_encode(["status" => "success", "dispute_id" => $disputeId]);
 } catch (Exception $e) {
-    if (isset($db) && $db->inTransaction()) $db->rollBack();
+    if (isset($db) && $db->inTransaction()) {
+        $db->rollBack();
+    }
     http_response_code(400);
     echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }

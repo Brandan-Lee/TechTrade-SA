@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
 
 			const data = await response.json();
 
-			if (response.ok && data.status === "authenticated" && data.user) {
+			if (response.ok && data.status === "logged_in" && data.user) {
 				setUser(data.user);
 				writeStoredUser(data.user);
 			} else {
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 				writeStoredUser(null);
 			}
 		} catch (error) {
-			console.error("System configuration verification failed:", error);
+			console.error("There was an error retrieving the users logged in status", error);
 			setUser(null);
 			writeStoredUser(null);
 		} finally {

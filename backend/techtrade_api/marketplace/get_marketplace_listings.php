@@ -19,6 +19,9 @@ try {
     require_once __DIR__ . '/../models/security/encryption_engine.php';
 
     $db = Database::getConnection();
+    if (!$db) {
+        throw new Exception("Could not connect to the database.");
+    }
 
     $crypto = null;
     if (defined('ENCRYPTION_KEY')) {
@@ -29,7 +32,7 @@ try {
     if ($limit <= 0)
         $limit = 10;
     if ($limit > 25)
-        $limit = 25; // safety cap
+        $limit = 25; 
 
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     if ($page <= 0)
@@ -38,14 +41,13 @@ try {
 
     $category = isset($_GET['category']) ? trim((string) $_GET['category']) : '';
     $condition = isset($_GET['condition']) ? trim((string) $_GET['condition']) : '';
-    $priceMin = isset($_GET['priceMin']) ? intval($_GET['priceMin']) : 0; // ZAR
-    $priceMax = isset($_GET['priceMax']) ? intval($_GET['priceMax']) : 0; // ZAR
+    $priceMin = isset($_GET['priceMin']) ? intval($_GET['priceMin']) : 0; 
+    $priceMax = isset($_GET['priceMax']) ? intval($_GET['priceMax']) : 0; 
     $q = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
 
     $where = [];
     $params = [];
 
-    // Only show active marketplace listings
     $where[] = "l.is_deleted = 0";
     $where[] = "u.is_deleted = 0";
     $where[] = "l.status IN ('AVAILABLE', 'OFFERED')";
@@ -157,7 +159,7 @@ try {
             "status" => $statusLabel,
             "condition" => $item['condition'],
             "category" => $item['category_name'],
-            "image" => !empty($item['primary_image']) ? publicMediaUrl($item['primary_image']) : null,
+            "image" => !empty($item['primary_image']) ? getPublicMediaUrl($item['primary_image']) : null,
         ];
     }, $rawListings);
 
@@ -171,9 +173,7 @@ try {
 } catch (Throwable $t) {
     http_response_code(500);
     echo json_encode([
-        "error" => "Marketplace listings retrieval failed.",
+        "error" => "An unexpected error occurred while loading the marketplace items.",
         "debug" => $t->getMessage(),
     ]);
 }
-
-?>

@@ -39,7 +39,7 @@ export default function AdminLayout() {
             <div className="flex flex-col flex-grow h-full overflow-hidden">
                 <WelcomeBanner />
                 {/* Responsive Header Row */}
-                <header className="h-16 border-b border-neutral-800 bg-[#0d0a1f] flex items-center justify-between px-4 sm:px-8 shrink-0">
+                <header className="lg:hidden h-16 border-b border-neutral-800 bg-[#0d0a1f] flex items-center justify-between px-4 sm:px-8 shrink-0">
                     <div className="flex items-center gap-4">
                         {/* Mobile & Tablet Hamburger Toggle Menu Trigger Button */}
                         <button 
@@ -49,18 +49,7 @@ export default function AdminLayout() {
                         >
                             <Menu className="w-5 h-5" />
                         </button>
-
-                        
-
-                        <div className="text-sm font-medium text-neutral-400 hidden sm:block">
-                            Operational Environment: <span className="text-emerald-400 font-semibold">Live</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                        <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs font-mono text-neutral-300 bg-[#171233] px-2 py-1 rounded">Root Admin</span>
-                    </div>
+                    </div>              
                 </header>
 
                 {/* Core Routed Workspace Pages Frame Frame View */}

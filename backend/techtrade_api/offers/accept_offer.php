@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     $inputData = json_decode(file_get_contents("php://input"), true);
@@ -24,16 +24,16 @@ try {
 
     if ($offerId <= 0) {
         http_response_code(400);
-        throw new Exception("Invalid or missing offer ID reference.");
+        throw new Exception("Please specify a valid offer.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not connect to the database engine.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
@@ -41,7 +41,7 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access. Please sign in.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
     $userIdValue = intval($activeUserId);
 
@@ -58,17 +58,17 @@ try {
 
     if (!$currentOffer) {
         http_response_code(404);
-        throw new Exception("The requested offer or active parent listing could not be found.");
+        throw new Exception("The requested offer or item listing could not be found.");
     }
 
     if (intval($currentOffer['seller_id']) !== $userIdValue) {
         http_response_code(403);
-        throw new Exception("Access Denied. Only the listing owner can accept this offer.");
+        throw new Exception("Access Denied. Only the seller can accept this offer.");
     }
 
     if ($currentOffer['status'] !== 'pending') {
         http_response_code(400);
-        throw new Exception("This offer cannot be accepted because its status is currently: " . $currentOffer['status']);
+        throw new Exception("This offer has already been processed.");
     }
 
     $listingId = intval($currentOffer['listing_id']);
@@ -91,14 +91,13 @@ try {
     $sqlUpdateListing = "UPDATE listings SET status = 'COMMITED' WHERE id = ?";
     $db->prepare($sqlUpdateListing)->execute([$listingId]);
 
-    // Find the existing pending transaction and update it
     $sqlFetchTx = "SELECT id FROM transactions WHERE offer_id = ? AND status = 'pending' LIMIT 1";
     $stmtFetchTx = $db->prepare($sqlFetchTx);
     $stmtFetchTx->execute([$offerId]);
     $existingTx = $stmtFetchTx->fetch(PDO::FETCH_ASSOC);
 
     if (!$existingTx) {
-        throw new Exception("No pending transaction found for this offer.");
+        throw new Exception("No pending order was found for this offer.");
     }
 
     $transactionId = intval($existingTx['id']);
@@ -115,7 +114,7 @@ try {
         INSERT INTO notifications (user_id, type, title, body, status, offer_id, transaction_id, listing_id)
         VALUES (?, 'offer', 'Offer Accepted!', ?, 'accepted', ?, ?, ?)
     ";
-    $bodyWinner = "Great news! Your offer for tracking item [{$listingTitle}] was accepted.";
+    $bodyWinner = "Great news! Your offer for [{$listingTitle}] was accepted.";
     $db->prepare($sqlNotifyWinner)->execute([$buyerId, $bodyWinner, $offerId, $transactionId, $listingId]);
 
     $sqlFindDeclinedBuyers = "
@@ -132,7 +131,7 @@ try {
     $stmtNotifyLosers = $db->prepare($sqlNotifyLosers);
 
     foreach ($declinedOffers as $declinedRow) {
-        $bodyLoser = "The listing for [{$listingTitle}] has been committed to another user. Your offer has been declined.";
+        $bodyLoser = "The listing for [{$listingTitle}] has been sold to another user. Your offer has been declined.";
         $stmtNotifyLosers->execute([
             intval($declinedRow['buyer_id']),
             $bodyLoser,
@@ -146,7 +145,7 @@ try {
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "message" => "Offer accepted successfully. Transaction status updated to committed.",
+        "message" => "Offer accepted successfully.",
         "transaction_id" => $transactionId
     ]);
 } catch (Exception $e) {
@@ -162,7 +161,7 @@ try {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "error" => "Critical system runtime database exception caught.",
+        "error" => "An unexpected error occurred while processing your transaction.",
         "debug" => $t->getMessage()
     ]);
 }

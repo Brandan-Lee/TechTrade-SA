@@ -16,13 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed: This endpoint requires a POST request.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
@@ -43,7 +43,7 @@ try {
 
     if (!$data) {
         http_response_code(400);
-        throw new Exception("Invalid data submission payload.");
+        throw new Exception("We couldn't read your request. Please check your submission and try again.");
     }
 
     $firstName = isset($data['firstName']) ? trim($data['firstName']) : '';
@@ -66,13 +66,13 @@ try {
     }
 
     if (empty($fullName)) {
-        throw new Exception("Please provide a valid first and last name configuration.");
+        throw new Exception("Please provide your first and last name.");
     }
     if (empty($inquiryType)) {
-        throw new Exception("Please select an inquiry type classification category.");
+        throw new Exception("Please select a reason for contacting us.");
     }
     if (empty($messageText)) {
-        throw new Exception("Please provide a descriptive message containing your support requirements.");
+        throw new Exception("Please type a message explaining how we can help you.");
     }
 
     if (!in_array($contactPreference, ['Email', 'WhatsApp'])) {
@@ -85,14 +85,14 @@ try {
     }
 
     $subjectMapping = [
-        "marketplace" => "Marketplace Support Inquiry",
-        "escrow" => "Escrow Dispute Escalation Request",
-        "technical" => "Technical Desk Assistance",
-        "general" => "General Inquiry",
-        "feedback" => "User Feedback & Feature Suggestions"
+        "marketplace" => "Marketplace Support",
+        "escrow"      => "Escrow & Payment Assistance",
+        "technical"   => "Technical Help",
+        "general"     => "General Question",
+        "feedback"    => "Feedback & Suggestions"
     ];
 
-    $resolvedSubject = isset($subjectMapping[$inquiryType]) ? $subjectMapping[$inquiryType] : "General Platform Inquiry";
+    $resolvedSubject = isset($subjectMapping[$inquiryType]) ? $subjectMapping[$inquiryType] : "General Inquiry";
 
     $db->beginTransaction();
 
@@ -116,7 +116,7 @@ try {
     http_response_code(201);
     echo json_encode([
         "status" => "success",
-        "message" => "Your support message has been securely submitted. A consultant will review your ticket within 24 hours."
+        "message" => "Your message has been sent successfully! Our team will get back to you within 24 hours."
     ]);
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
@@ -125,14 +125,15 @@ try {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
     }
     http_response_code(500);
     echo json_encode([
-        "error" => "An internal system fault occurred while trying to file your tracking ticket.",
+        "status" => "error",
+        "error" => "An unexpected error occurred while sending your message.",
         "debug" => $t->getMessage()
     ]);
 }

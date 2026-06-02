@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     $inputData = json_decode(file_get_contents("php://input"), true);
@@ -24,16 +24,16 @@ try {
 
     if ($incomingId <= 0) {
         http_response_code(400);
-        throw new Exception("Invalid or missing entity identification reference.");
+        throw new Exception("Please specify a valid offer.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not connect to the database engine.");
+        throw new Exception("Could not connect to the database.");
     }
 
     SessionManager::init($db);
@@ -41,7 +41,7 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access. Please sign in.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
     $userIdValue = intval($activeUserId);
 
@@ -61,7 +61,7 @@ try {
 
     if (!$resolvedNotification || intval($resolvedNotification['offer_id']) <= 0) {
         http_response_code(404);
-        throw new Exception("Could not resolve an active counter offer notification for this user.");
+        throw new Exception("Could not find an active counter-offer notification.");
     }
 
     $notificationIdToClear = intval($resolvedNotification['id']);
@@ -81,17 +81,17 @@ try {
 
     if (!$currentOffer) {
         http_response_code(404);
-        throw new Exception("The underlying counter offer context record was not found.");
+        throw new Exception("The requested counter-offer could not be found.");
     }
 
     if (intval($currentOffer['buyer_id']) !== $userIdValue) {
         http_response_code(403);
-        throw new Exception("Access Denied. Identity validation mismatch.");
+        throw new Exception("Access Denied. You do not have permission to view this offer.");
     }
 
     if ($currentOffer['status'] !== 'countered') {
         http_response_code(400);
-        throw new Exception("This offer is already processed. Current status: " . $currentOffer['status']);
+        throw new Exception("This offer has already been processed.");
     }
 
     $listingId = intval($currentOffer['listing_id']);
@@ -121,8 +121,8 @@ try {
 
     $sqlCreateTx = "
         INSERT INTO transactions (
-            public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status, escrow_step
-        ) VALUES (?, ?, ?, ?, ?, ?, 'committed', 3)
+            public_id, listing_id, offer_id, buyer_id, seller_id, agreed_price_cents, status
+        ) VALUES (?, ?, ?, ?, ?, ?, 'committed')
     ";
     $db->prepare($sqlCreateTx)->execute([$publicTxId, $listingId, $offerId, $userIdValue, $sellerId, $agreedPriceCents]);
     $newTransactionId = $db->lastInsertId();
@@ -148,7 +148,7 @@ try {
         ";
         $stmtNotifyLosers = $db->prepare($sqlNotifyLosers);
         foreach ($declinedOffers as $declinedRow) {
-            $bodyLoser = "The listing for [{$listingTitle}] has been committed to another user. Your offer has been declined.";
+            $bodyLoser = "The listing for [{$listingTitle}] has been sold to another user. Your offer has been declined.";
             $stmtNotifyLosers->execute([intval($declinedRow['buyer_id']), $bodyLoser, intval($declinedRow['id']), $listingId]);
         }
     }
@@ -158,7 +158,7 @@ try {
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "message" => "Counter offer accepted successfully, processing state matching updated.",
+        "message" => "Counter offer accepted successfully.",
         "transaction_id" => $newTransactionId
     ]);
 } catch (Exception $e) {
@@ -172,5 +172,9 @@ try {
         $db->rollBack();
     }
     http_response_code(500);
-    echo json_encode(["status" => "error", "error" => "Runtime database engine transaction error.", "debug" => $t->getMessage()]);
+    echo json_encode([
+        "status" => "error",
+        "error" => "An unexpected error occurred while processing your transaction.",
+        "debug" => $t->getMessage()
+    ]);
 }

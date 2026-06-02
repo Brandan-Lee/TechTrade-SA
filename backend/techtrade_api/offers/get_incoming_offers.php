@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -16,17 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not establish a clean connection to the database.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $crypto = null;
@@ -39,15 +39,13 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
 
     $userIdValue = intval($activeUserId);
 
-    // Check for an optional listing_id query parameter
     $listingIdParam = isset($_GET['listing_id']) && !empty($_GET['listing_id']) ? intval($_GET['listing_id']) : null;
 
-    // Base query framework (Fixed to include all alias fields matching your loop)
     $sqlFetch = "
     SELECT 
         o.id,
@@ -60,7 +58,7 @@ try {
         o.created_at,
         l.title AS listing_title,
         l.price_cents AS listing_price_cents,
-        img.url AS primary_image_url, -- Dynamically pulled from your listing_images table
+        img.url AS primary_image_url, 
         u.first_name AS buyer_fn,
         u.last_name AS buyer_ln,
         u.avatar_url AS buyer_avatar
@@ -103,7 +101,7 @@ try {
 
         $fullName = trim($firstName . ' ' . $lastName);
         if (empty($fullName)) {
-            $fullName = "Anonymous Operator";
+            $fullName = "Marketplace User";
         }
 
         $compiledOffers[] = [
@@ -132,11 +130,12 @@ try {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
     echo json_encode([
-        "error" => "Internal database processing error caught.",
+        "status" => "error",
+        "error" => "An unexpected error occurred on the server.",
         "debug" => $t->getMessage()
     ]);
 }

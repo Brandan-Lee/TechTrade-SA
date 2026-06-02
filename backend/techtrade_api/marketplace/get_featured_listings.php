@@ -19,6 +19,9 @@ try {
     require_once __DIR__ . '/../models/security/encryption_engine.php';
 
     $db = Database::getConnection();
+    if (!$db) {
+        throw new Exception("Could not connect to the database.");
+    }
 
     $crypto = null;
     if (defined('ENCRYPTION_KEY')) {
@@ -28,7 +31,7 @@ try {
     $provinceInput = isset($_GET['province']) ? trim($_GET['province']) : '';
 
     if (empty($provinceInput)) {
-        throw new Exception("Targeted terminal geo-coordinates missing.");
+        throw new Exception("Please select a location to browse listings.");
     }
 
     $targetProvince = $provinceInput;
@@ -73,7 +76,7 @@ try {
 
         $randValue = $item['price_cents'] / 100;
         $formattedPrice = "R" . number_format($randValue, 0, '.', ',');
-        
+
         $statusLabel = "Available Now";
         if ($item['status'] === 'OFFERED') $statusLabel = "Offer Received";
         if ($item['status'] === 'PENDING') $statusLabel = "Pending Transaction";
@@ -87,17 +90,15 @@ try {
             "location" => !empty($item['location']) ? $item['location'] : 'Unknown',
             "status" => $statusLabel,
             "condition" => $item['condition'],
-            "image" => !empty($item['primary_image']) ? publicMediaUrl($item['primary_image']) : null
+            "image" => !empty($item['primary_image']) ? getPublicMediaUrl($item['primary_image']) : null
         ];
     }, $rawListings);
 
     echo json_encode($formattedListings);
-
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["error" => "Featured hardware stream extraction matrix dropped.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred while loading the listings.", "debug" => $t->getMessage()]);
 }
-?>

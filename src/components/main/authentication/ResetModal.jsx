@@ -61,23 +61,19 @@ export const ResetModal = ({
 		setAlert({ show: false, message: "", type: "error" });
 
 		if (!password) {
-			triggerStatus("NEW PASSWORD FIELD CANNOT BE EMPTY.", "error", "password");
+			triggerStatus("Please enter a new password.", "error", "password");
 			return;
 		}
 		if (password.length < 8) {
 			triggerStatus(
-				"PASSWORD MUST BE AT LEAST 8 CHARACTERS.",
+				"Password must be at least 8 characters long.",
 				"error",
 				"password",
 			);
 			return;
 		}
 		if (password !== confirmPassword) {
-			triggerStatus(
-				"PASSWORDS DO NOT MATCH EACH OTHER.",
-				"error",
-				"confirmPassword",
-			);
+			triggerStatus("Passwords do not match.", "error", "confirmPassword");
 			return;
 		}
 
@@ -97,13 +93,11 @@ export const ResetModal = ({
 			const data = await response.json();
 
 			if (!response.ok || data.status === "error") {
-				throw new Error(
-					data.message || "Password modification protocol rejected.",
-				);
+				throw new Error(data.message || "Failed to update your password.");
 			}
 
 			triggerStatus(
-				"PASSWORD MODIFIED SUCCESSFULLY! ROUTING TO GATEWAY...",
+				"Password updated successfully! Returning to login...",
 				"success",
 			);
 
@@ -112,7 +106,7 @@ export const ResetModal = ({
 				onSwitchToLogin();
 			}, 2500);
 		} catch (error) {
-			triggerStatus(error.message.toUpperCase(), "error", "password");
+			triggerStatus(error.message, "error", "password");
 			setIsLoading(false);
 		}
 	};
@@ -132,7 +126,7 @@ export const ResetModal = ({
 						</span>
 					</h1>
 					<p className="text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider pt-1">
-						Establish your fresh authorization network access key for{" "}
+						Set a new password for your account:{" "}
 						<span className="text-slate-400 font-bold">{email}</span>
 					</p>
 				</div>
@@ -198,9 +192,7 @@ export const ResetModal = ({
 
 					<div className="space-y-4 pt-2 border-t border-white/5">
 						<CyberActionButton
-							label={
-								isLoading ? "CHANGING AUTH CREDENTIALS..." : "RESET PASSWORD"
-							}
+							label={isLoading ? "Updating..." : "Reset Password"}
 							type="submit"
 							isLoading={isLoading}
 						/>
@@ -208,7 +200,7 @@ export const ResetModal = ({
 						<div className="flex justify-center items-center gap-2 text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
 							<ShieldAlert size={11} />
 							<AuthFooter
-								label="ABORT AMENDMENT"
+								label="Cancel"
 								onClick={onSwitchToLogin}
 								className="hover:text-fuchsia-400 transition-colors focus:outline-none"
 							/>

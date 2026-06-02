@@ -1,5 +1,5 @@
 <?php
-ini_set('display_errors', 1); // Kept on for sandbox debugging; flip to 0 in production
+ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 header("Access-Control-Allow-Origin: http://localhost:5173");
@@ -31,16 +31,16 @@ function generateSignature($data, $passPhrase = null)
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed. This endpoint requires an explicit POST request configuration payload.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not connect to the database engine.");
+        throw new Exception("Could not connect to the database.");
     }
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -49,7 +49,7 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access. Please sign in to authorize escrow payments.");
+        throw new Exception("Your session has expired. Please log in again to pay.");
     }
 
     $input = json_decode(file_get_contents('php://input'), true);
@@ -57,10 +57,9 @@ try {
 
     if (!$transactionId) {
         http_response_code(400);
-        throw new Exception("Transaction ID tracking node parameter is required.");
+        throw new Exception("Please specify a valid transaction.");
     }
 
-    // 1. Fetch transaction record tracking entry securely
     $stmt = $db->prepare("
         SELECT t.*, l.title, u.email, u.first_name, u.last_name
         FROM transactions t 
@@ -71,18 +70,16 @@ try {
     $stmt->execute([$transactionId]);
     $tx = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // 2. Clear descriptive safety checkpoints
     if (!$tx) {
         http_response_code(404);
-        throw new Exception("Transaction ID tracking record entry [{$transactionId}] was not found in the database logs.");
+        throw new Exception("The requested transaction could not be found.");
     }
 
     if (intval($tx['buyer_id']) !== intval($activeUserId)) {
         http_response_code(403);
-        throw new Exception("Security Block: You are currently signed in as User ID (" . $activeUserId . "), but this transaction row belongs to Buyer User ID (" . $tx['buyer_id'] . "). Switch account profiles to clear processing vaults.");
+        throw new Exception("Access Denied. You do not have permission to pay for this item.");
     }
 
-    // Assign profile fallbacks for the PayFast dashboard layout tracking details mapping
     $firstName = $tx['first_name'] ?? 'TechTrade';
     $lastName = $tx['last_name'] ?? 'Buyer';
 
@@ -92,13 +89,12 @@ try {
         $lastName = !empty($lastName) ? ($crypto->decrypt($lastName) ?? $lastName) : 'Buyer';
     }
 
-    // 3. Compile the PayFast outbound request array packet map data structure
     $payfastData = [
         'merchant_id'    => PAYFAST_MERCHANT_ID,
         'merchant_key'   => PAYFAST_MERCHANT_KEY,
         'return_url'     => "http://localhost:5173/payments/success?transaction_id=" . $tx['id'],
         'cancel_url'     => "http://localhost:5173/payments/cancel?transaction_id=" . $tx['id'],
-        'notify_url'     => "https://yourdomain.com/api/v1/payments/payfast-webhook.php", // Swap with deployment ngrok or domain
+        'notify_url'     => "https://yourdomain.com/api/v1/payments/payfast-webhook.php",
         'name_first'     => trim($firstName),
         'name_last'      => trim($lastName),
         'email_address'  => $tx['email'],
@@ -111,7 +107,6 @@ try {
     $signature = generateSignature($payfastData, PAYFAST_PASSPHRASE);
     $payfastData['signature'] = $signature;
 
-    // 4. Synchronize payment tables tracking with database row constraints
     $checkStmt = $db->prepare("SELECT id, status FROM payments WHERE transaction_id = ? LIMIT 1");
     $checkStmt->execute([$tx['id']]);
     $existingPayment = $checkStmt->fetch(PDO::FETCH_ASSOC);
@@ -145,7 +140,6 @@ try {
             $payfastData['cancel_url']
         ]);
     } else {
-        // Aligned directly with your ENUM constraint schema rule ('complete' array status validation tracking fixes)
         if (in_array($existingPayment['status'], ['initiated', 'failed', 'cancelled'])) {
             $updateStmt = $db->prepare("
                 UPDATE payments 
@@ -161,12 +155,12 @@ try {
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "form_action" => "https://" . $pfHost . "/eng/process",
-        "payload" => $payfastData
+        "redirect_url" => "https://" . $pfHost . "/eng/process",
+        "checkout_details" => $payfastData
     ]);
 } catch (Exception $e) {
     if (http_response_code() === 200) {
         http_response_code(500);
     }
-    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 }

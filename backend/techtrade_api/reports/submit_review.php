@@ -16,12 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed: This endpoint requires a POST request.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
@@ -33,7 +33,7 @@ try {
 
     if (!$reviewerId) {
         http_response_code(412);
-        throw new Exception("You must be logged in to submit a review.");
+        throw new Exception("Your session has expired. Please log in again to leave a review.");
     }
 
     $rawInput = file_get_contents('php://input');
@@ -41,7 +41,7 @@ try {
 
     if (!$data) {
         http_response_code(400);
-        throw new Exception("Invalid form data submission.");
+        throw new Exception("We couldn't read your request. Please check your submission and try again.");
     }
 
     $revieweeId = isset($data['reviewed_user_id']) ? intval($data['reviewed_user_id']) : 0;
@@ -50,17 +50,18 @@ try {
     $transactionId = isset($data['transaction_id']) ? intval($data['transaction_id']) : 0;
 
     if ($revieweeId <= 0) {
-        throw new Exception("The reviewee user ID is missing or invalid.");
+        throw new Exception("Please specify a valid user to review.");
     }
     if ($rating < 1 || $rating > 5) {
-        throw new Exception("Rating must be a whole number value between 1 and 5.");
+        throw new Exception("Rating must be between 1 and 5 stars.");
     }
     if (empty($comment)) {
-        throw new Exception("Please provide a written comment summary of your experience.");
+        throw new Exception("Please share a comment about your experience.");
     }
+
     if ($revieweeId === intval($reviewerId)) {
         http_response_code(422);
-        throw new Exception("You cannot submit an experience review for your own account.");
+        throw new Exception("Access Denied. You cannot review your own account.");
     }
 
     if ($transactionId <= 0) {
@@ -73,7 +74,7 @@ try {
 
         if (!$txRow) {
             http_response_code(403);
-            throw new Exception("No valid marketplace transaction record found between you and this user.");
+            throw new Exception("You can only review someone you have completed a transaction with.");
         }
         $transactionId = intval($txRow['id']);
     }
@@ -89,7 +90,7 @@ try {
     if ($stmtDup->fetch()) {
         $db->rollBack();
         http_response_code(409);
-        throw new Exception("You have already submitted a review log for this specific transaction.");
+        throw new Exception("You have already submitted a review for this transaction.");
     }
 
     $sqlUserLock = "SELECT trust_score, is_deleted FROM users WHERE id = ? FOR UPDATE";
@@ -100,7 +101,7 @@ try {
     if (!$userRow || intval($userRow['is_deleted']) === 1) {
         $db->rollBack();
         http_response_code(404);
-        throw new Exception("The user you are trying to review does not exist or has been removed.");
+        throw new Exception("The user you are trying to review could not be found.");
     }
 
     $currentTrustScore = floatval($userRow['trust_score']);
@@ -145,15 +146,13 @@ try {
         $transactionId
     ]);
 
-    // Save changes to database ledger
     $db->commit();
 
     http_response_code(201);
     echo json_encode([
         "status" => "success",
-        "message" => "Your review has been securely logged and successfully published."
+        "message" => "Your review has been successfully posted."
     ]);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
@@ -161,15 +160,15 @@ try {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
     }
     http_response_code(500);
     echo json_encode([
-        "error" => "A serious database system failure occurred while recording metrics parameters.",
+        "status" => "error",
+        "error" => "An unexpected error occurred while processing your request.",
         "debug" => $t->getMessage()
     ]);
 }
-?>

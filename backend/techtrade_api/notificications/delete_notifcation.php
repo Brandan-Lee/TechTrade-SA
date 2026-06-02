@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     $inputData = json_decode(file_get_contents("php://input"), true);
@@ -24,12 +24,12 @@ try {
 
     if ($notificationId <= 0) {
         http_response_code(400);
-        throw new Exception("Missing or invalid notification target identifier.");
+        throw new Exception("Please specify a valid notification to remove.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
@@ -41,7 +41,7 @@ try {
 
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access. Please log in.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
     $userIdValue = intval($activeUserId);
 
@@ -59,5 +59,5 @@ try {
     echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(["status" => "error", "error" => "An internal system error occurred."]);
+    echo json_encode(["status" => "error", "error" => "An unexpected error occurred on the server."]);
 }

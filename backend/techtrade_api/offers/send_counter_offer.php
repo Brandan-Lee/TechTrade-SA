@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed: This endpoint requires a POST request.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
@@ -32,7 +32,7 @@ try {
 
     if (!$data) {
         http_response_code(400);
-        throw new Exception("Invalid data submission payload.");
+        throw new Exception("We couldn't read your request. Please check your submission and try again.");
     }
 
     $incomingOfferId = isset($data['offer_id']) ? intval($data['offer_id']) : 0;
@@ -40,7 +40,7 @@ try {
 
     if ($incomingOfferId <= 0 || $counterAmount <= 0) {
         http_response_code(400);
-        throw new Exception("Invalid offer data or price amount provided.");
+        throw new Exception("Please specify a valid offer and counter price.");
     }
 
     $counterAmountCents = intval($counterAmount * 100);
@@ -140,12 +140,13 @@ try {
         $listingId
     ]);
 
+    // Lock in all changes securely
     $db->commit();
 
     http_response_code(200);
     echo json_encode([
         "status" => "success",
-        "message" => "Counter offer sent and notification delivered successfully."
+        "message" => "Counter offer sent successfully."
     ]);
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
@@ -154,14 +155,15 @@ try {
     if (http_response_code() === 200) {
         http_response_code(400);
     }
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["status" => "error", "error" => $e->getMessage()]);
 } catch (Throwable $t) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
     }
     http_response_code(500);
     echo json_encode([
-        "error" => "An internal system fault occurred while trying to process your counter offer.",
+        "status" => "error",
+        "error" => "An unexpected error occurred while processing your counter offer.",
         "debug" => $t->getMessage()
     ]);
 }

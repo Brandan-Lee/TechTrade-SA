@@ -45,7 +45,7 @@ $hardwareChecker = new HardwareChecker($db);
 
 if ($hardwareChecker->isBanned($inputData['hardwareId'])) {
     http_response_code(403);
-    echo json_encode(["status" => "error", "message" => "REG_EXCEPTION: Device registration access blocked."]);
+    echo json_encode(["status" => "error", "message" => "This device is blocked from creating new accounts."]);
     exit();
 }
 
@@ -113,10 +113,8 @@ try {
     ]);
 
     http_response_code(201);
-    echo json_encode(["status" => "success", "message" => "Registration completed successfully."]);
-
+    echo json_encode(["status" => "success", "message" => "Your account has been created successfully."]);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(["status" => "error", "message" => "Internal processing error: " . $e->getMessage()]);
+    echo json_encode(["status" => "error", "message" => "Something went wrong on our end while creating your account."]);
 }
-?>

@@ -16,13 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
     require_once __DIR__ . '/../models/authentication/user.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Database connection channel could not be established.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $crypto = null;
@@ -34,7 +34,7 @@ try {
 
     $listingId = isset($_GET['id']) ? intval($_GET['id']) : 0;
     if ($listingId <= 0) {
-        throw new Exception("Validation Error: Missing or invalid listing ID.");
+        throw new Exception("Please specify a valid item to view.");
     }
 
     $db->beginTransaction();
@@ -113,8 +113,8 @@ try {
     }
 
     if ($crypto) {
-        $decryptedFirst = $crypto->decrypt($listingRow['first_name']) ?? 'Decryption Error';
-        $decryptedLast = $crypto->decrypt($listingRow['last_name']) ?? 'Decryption Error';
+        $decryptedFirst = $crypto->decrypt($listingRow['first_name']) ?? 'Unavailable';
+        $decryptedLast = $crypto->decrypt($listingRow['last_name']) ?? 'Unavailable';
         $sellerFullName = $decryptedFirst . ' ' . $decryptedLast;
     } else {
         $sellerFullName = $listingRow['first_name'] . ' ' . $listingRow['last_name'];
@@ -129,7 +129,7 @@ try {
     $imagePaths = [];
     foreach ($imageRows as $img) {
         $imagePaths[] = $img['url'];
-        $imagesArray[] = publicMediaUrl($img['url']);
+        $imagesArray[] = getPublicMediaUrl($img['url']);
     }
 
     $sqlSpecs = "SELECT spec_key AS label, spec_value AS value FROM listing_specs WHERE listing_id = ? ORDER BY sort_order ASC, id ASC";
@@ -155,7 +155,7 @@ try {
         $stmtImgFallback->execute([$item['id']]);
         $thumb = $stmtImgFallback->fetch(PDO::FETCH_ASSOC);
         $item['image'] = $thumb
-            ? publicMediaUrl($thumb['url'])
+            ? getPublicMediaUrl($thumb['url'])
             : null;
         $item['condition_grade'] = ucfirst(strtolower($item['condition_grade']));
     }
@@ -182,16 +182,15 @@ try {
         ],
         "seller" => [
             "name" => $sellerFullName,
-            "avatar" => !empty($listingRow['avatar_url']) ? publicMediaUrl($listingRow['avatar_url']) : null,
+            "avatar" => !empty($listingRow['avatar_url']) ? getPublicMediaUrl($listingRow['avatar_url']) : null,
             "trust_score" => number_format((float) $listingRow['trust_score'], 1, '.', ''),
             "trade_count" => (int) $listingRow['trade_count']
         ],
-        "matching_assets" => $relatedRows
+        "related_listings" => $relatedRows
     ];
 
     http_response_code(200);
     echo json_encode($payload);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();
@@ -203,5 +202,5 @@ try {
         $db->rollBack();
     }
     http_response_code(500);
-    echo json_encode(["error" => "An internal processing error occurred while fetching the listing.", "debug" => $t->getMessage()]);
+    echo json_encode(["error" => "An unexpected error occurred while looking up this item.", "debug" => $t->getMessage()]);
 }

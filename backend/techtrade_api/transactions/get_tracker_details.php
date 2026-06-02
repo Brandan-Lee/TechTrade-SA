@@ -16,17 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         http_response_code(405);
-        throw new Exception("Method Not Allowed.");
+        throw new Exception("This action is not supported.");
     }
 
     require_once __DIR__ . '/../config/config.php';
     require_once __DIR__ . '/../models/validation/database.php';
     require_once __DIR__ . '/../models/security/encryption_engine.php';
-    require_once __DIR__ . '/../helpers/session_manager.php';
+    require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();
     if (!$db) {
-        throw new Exception("Could not establish a clean connection to the database.");
+        throw new Exception("Could not connect to the database.");
     }
 
     $crypto = null;
@@ -37,9 +37,10 @@ try {
     SessionManager::init($db);
     $activeUserId = SessionManager::getActiveUserId();
 
+    // 2. Confirm the user is logged in
     if (!$activeUserId) {
         http_response_code(401);
-        throw new Exception("Unauthorized Access.");
+        throw new Exception("Your session has expired. Please log in again.");
     }
 
     $userIdValue = intval($activeUserId);
@@ -47,10 +48,9 @@ try {
 
     if ($transactionId <= 0) {
         http_response_code(400);
-        throw new Exception("Required parameter 'transaction_id' is missing or malformed.");
+        throw new Exception("Please specify a valid order.");
     }
 
-    // 1. Fetch main transaction details
     $sqlFetch = "
         SELECT 
             t.id,
@@ -79,10 +79,9 @@ try {
 
     if (!$row) {
         http_response_code(404);
-        throw new Exception("Transaction records matching that specific ID could not be found.");
+        throw new Exception("The requested order could not be found.");
     }
 
-    // 2. Fetch transaction events for the history log
     $sqlEvents = "
         SELECT event_type, created_at 
         FROM transaction_events 
@@ -93,7 +92,6 @@ try {
     $stmtEvents->execute([$transactionId]);
     $events = $stmtEvents->fetchAll(PDO::FETCH_ASSOC);
 
-    // Role verification
     $assignedRole = "";
     $buyerId = intval($row['buyer_id']);
     $sellerId = intval($row['seller_id']);
@@ -104,10 +102,9 @@ try {
         $assignedRole = "seller";
     } else {
         http_response_code(403);
-        throw new Exception("Access Denied: You are not an authorized participant in this agreement.");
+        throw new Exception("Access Denied. You do not have permission to view this order.");
     }
 
-    // Decryption logic
     $buyerFN = $row['buyer_fn'];
     $buyerLN = $row['buyer_ln'];
     $sellerFN = $row['seller_fn'];
@@ -134,10 +131,10 @@ try {
             "escrow_step" => intval($row['escrow_step']),
             "status" => $row['status'],
             "assigned_role" => $assignedRole,
-            "buyer_id" => $buyerId,   
+            "buyer_id" => $buyerId,
             "seller_id" => $sellerId,
-            "buyer_name" => !empty($buyerName) ? $buyerName : "Anonymous Buyer",
-            "seller_name" => !empty($sellerName) ? $sellerName : "Anonymous Seller",
+            "buyer_name" => !empty($buyerName) ? $buyerName : "Marketplace Buyer",
+            "seller_name" => !empty($sellerName) ? $sellerName : "Marketplace Seller",
             "events" => $events
         ]
     ]);
@@ -150,7 +147,7 @@ try {
     http_response_code(500);
     echo json_encode([
         "status" => "error",
-        "message" => "Internal transactional ledger processing error.",
+        "message" => "An unexpected error occurred while processing your request.",
         "debug" => $t->getMessage()
     ]);
 }
