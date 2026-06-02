@@ -199,19 +199,9 @@ export default function DashBoard() {
 						</span>
 					</h1>
 				</div>
-				<div>
-					<Link
-						to="/"
-						className="lg:hidden btn btn-sm btn-outline border-purple-500/40 hover:border-purple-400 hover:bg-purple-900/20 text-purple-400 text-xs sm:text-sm normal-case transition-all duration-300"
-					>
-						&larr; Return to Front
-					</Link>
-				</div>
 			</header>
 
-			{/* Main Dashboard Layout */}
 			<main className="space-y-10">
-				{/* SECTION 1: MARKETPLACE OPERATIONS */}
 				<section aria-labelledby="sec-marketplace">
 					<h2
 						id="sec-marketplace"
@@ -247,7 +237,6 @@ export default function DashBoard() {
 					</div>
 				</section>
 
-				{/* SECTION 2: IDENTITY & SECURITY */}
 				<section aria-labelledby="sec-community">
 					<h2
 						id="sec-community"
@@ -283,13 +272,12 @@ export default function DashBoard() {
 					</div>
 				</section>
 
-				{/* SECTION 3: REVIEWS & MODERATION INCIDENTS */}
 				<section aria-labelledby="sec-moderation">
 					<h2
 						id="sec-moderation"
 						className="text-sm sm:text-base font-bold text-pink-500 mb-4 tracking-widest uppercase border-l-2 border-pink-500 pl-2"
 					>
-						Complaints & Help Desk Desk
+						Complaints & Help Desk
 					</h2>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
 						<DashBoardCard
@@ -401,19 +389,19 @@ export default function DashBoard() {
 							colorClass="text-teal-300"
 						/>
 						<DashBoardCard
-							label="Fast Micro Storage Drives"
+							label="Solid State Drives"
 							value={data.totalSSDs}
 							icon={HardDrive}
 							colorClass="text-emerald-400"
 						/>
 						<DashBoardCard
-							label="Standard Mechanical Disk Drives"
+							label="Hard Disk Drives"
 							value={data.totalHDDs}
 							icon={HardDrive}
 							colorClass="text-green-500"
 						/>
 						<DashBoardCard
-							label="Computer Outer Cases"
+							label="Computer PC Cases"
 							value={data.totalPCCases}
 							icon={Box}
 							colorClass="text-amber-600"

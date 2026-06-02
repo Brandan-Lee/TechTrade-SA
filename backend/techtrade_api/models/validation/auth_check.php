@@ -42,7 +42,8 @@ try {
                         "fullName" => $user->getFullName(),
                         "regType" => $user->getRegType(),
                         "roleId" => $roleId,
-                        "province" => $user->getProvince()
+                        "province" => $user->getProvince(),
+                        "logged_in" => true
                     ]
                 ]);
                 exit;

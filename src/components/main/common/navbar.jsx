@@ -21,7 +21,6 @@ export default function NavBar({
 		alert("You have been successfully logged out.");
 	};
 
-	// Determine what to show based on user access
 	const userRoleId =
 		user && user.roleId !== undefined && user.roleId !== null
 			? Number(user.roleId)

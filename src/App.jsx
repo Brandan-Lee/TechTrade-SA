@@ -37,36 +37,6 @@ import WhatsAppTTLPage from "./pages/main/WhatsAppTTLPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
-const UserRoleManagement = () => (
-	<div className="text-neutral-100">
-		<h1 className="text-2xl font-bold">👥 User Role Management</h1>
-	</div>
-);
-const TechDatabase = () => (
-	<div className="text-neutral-100">
-		<h1 className="text-2xl font-bold">💻 Tech Database</h1>
-	</div>
-);
-const AdminMessages = () => (
-	<div className="text-neutral-100">
-		<h1 className="text-2xl font-bold">💬 Support Messages</h1>
-	</div>
-);
-const ReportedUsers = () => (
-	<div className="text-neutral-100">
-		<h1 className="text-2xl font-bold">🚫 Reported Users Queue</h1>
-	</div>
-);
-const ReportedListings = () => (
-	<div className="text-neutral-100">
-		<h1 className="text-2xl font-bold">⚠️ Reported Listings Queue</h1>
-	</div>
-);
-const NukeSuite = () => (
-	<div className="p-6 bg-error/10 border border-error/20 rounded-2xl text-error">
-		<h1 className="text-2xl font-black">☢️ High Command Nuke Suite</h1>
-	</div>
-);
 
 // Auth Modals
 import LoginModal from "./components/main/authentication/LoginModal";
@@ -78,6 +48,11 @@ import NotificationModal from "./components/main/Notifications/NotificationModal
 import CounterOfferModal from "./components/main/Notifications/CounterOfferModal";
 import TOSModal from "./components/main/tos/TOSModal";
 import PrivacyModal from "./components/main/privacy/PrivacyModal";
+import UserRoleManagement from "./pages/admin/UserRoleManagement";
+import EscrowVault from "./pages/admin/EscrowVault";
+import HardwareDatabase from "./pages/admin/HardwareDatabase";
+import UserSupport from "./pages/admin/UserSupport";
+import NukeSuite from "./pages/admin/NukeSuite";
 
 function App() {
 	const navigate = useNavigate();
@@ -134,6 +109,7 @@ function App() {
 		}
 	};
 
+	// Profile Guard Effect
 	useEffect(() => {
 		if (location.pathname !== "/profile/edit") return;
 		if (isLoading) return;
@@ -143,6 +119,15 @@ function App() {
 		}
 		switchToEditProfile();
 	}, [location.pathname, user, isLoading]);
+
+	useEffect(() => {
+		if (location.state?.fromAdmin) {
+			setAuthPurpose("admin");
+			setIsLoginOpen(true);
+
+			navigate(location.pathname, { replace: true, state: {} });
+		}
+	}, [location.pathname, location.state, navigate]);
 
 	const switchToLogin = () => {
 		closeAllModals();
@@ -160,7 +145,6 @@ function App() {
 	};
 	const switchToReset = (emailValue = "", otpValue = "") => {
 		closeAllModals();
-		// Automatically purge any stale OTP state text codes if bypassed via non-MFA route track
 		setAuthOTP(otpValue);
 		if (emailValue) setAuthEmail(emailValue);
 		setIsResetOpen(true);
@@ -185,7 +169,10 @@ function App() {
 					path="/"
 					element={
 						<MainLayout
-							openLogin={() => setIsLoginOpen(true)}
+							openLogin={() => {
+								setAuthPurpose("login");
+								setIsLoginOpen(true);
+							}}
 							isMenuOpen={isMenuOpen}
 							setIsMenuOpen={setIsMenuOpen}
 							openNotifications={() => setIsNotificationOpen(true)}
@@ -227,32 +214,34 @@ function App() {
 					/>
 					<Route path="review/:userId" element={<ReviewPage />} />
 					<Route path="report-user/:userId" element={<ReportUser />} />
-					<Route path="dispute/:transactionId" element={<LaunchDisputePage />} />
+					<Route
+						path="dispute/:transactionId"
+						element={<LaunchDisputePage />}
+					/>
 					<Route
 						path="whatsapp-ttl/:transactionId"
 						element={<WhatsAppTTLPage />}
 					/>
 				</Route>
 
-				<Route
-					path="/admin"
-					element={<AdminInterceptors openLogin={() => setIsLoginOpen(true)} />}
-				>
+				<Route path="/admin" element={<AdminInterceptors />}>
 					<Route element={<AdminLayout />}>
 						<Route index element={<AdminDashboard />} />
-						<Route path="roles" element={<UserRoleManagement />} />
-						<Route path="database" element={<TechDatabase />} />
-						<Route path="messages" element={<AdminMessages />} />
-						<Route path="reported-users" element={<ReportedUsers />} />
-						<Route path="reported-listings" element={<ReportedListings />} />
-						<Route path="nuke" element={<NukeSuite />} />
+						<Route path="user-roles" element={<UserRoleManagement />} />
+						<Route path="escrow-vault" element={<EscrowVault />} />
+						<Route path="hardware-database" element={<HardwareDatabase />} />
+						<Route path="user-support" element={<UserSupport />} />
+						<Route path="nuke-suite" element={<NukeSuite />} />
 					</Route>
 				</Route>
 			</Routes>
 
 			<LoginModal
 				isOpen={isLoginOpen}
-				onClose={() => setIsLoginOpen(false)}
+				onClose={() => {
+					setIsLoginOpen(false);
+					setAuthPurpose("login");
+				}}
 				onSwitchToRegister={switchToRegister}
 				onSwitchToForgot={switchToForgot}
 				onSwitchToOTP={switchToOTP}
@@ -260,9 +249,17 @@ function App() {
 				onLoginSuccess={(data) => {
 					loginContext(data.user);
 					closeAllModals();
+
 					const isAdmin = ["3", "4"].includes(String(data.user.roleId));
-					navigate(isAdmin ? "/admin" : "/", { replace: true });
-					window.location.reload();
+
+					if (isAdmin) {
+						navigate("/admin", {
+							replace: true,
+							state: { standardLogin: true },
+						});
+					} else {
+						navigate("/", { replace: true });
+					}
 				}}
 			/>
 
