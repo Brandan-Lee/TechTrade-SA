@@ -116,6 +116,8 @@ try {
             } else {
                 $notifyTitle = "Payout Pending";
                 $notifyBody = "Funds released. Our team will review the payout shortly.";
+                $db->prepare("UPDATE listings SET status = 'SOLD', updated_at = NOW() WHERE id = ?")->execute([$tx['listing_id']]);
+                $db->prepare("UPDATE users SET trade_count = trade_count + 1 WHERE id = ?")->execute([$tx['seller_id']]);
             }
             break;
 

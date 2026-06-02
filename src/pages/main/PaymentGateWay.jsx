@@ -9,7 +9,6 @@ export default function PaymentGateWay({
 	onSuccess,
 }) {
 	const [isProcessing, setIsProcessing] = useState(false);
-	const [checkoutPayload, setCheckoutPayload] = useState(null);
 
 	const triggerSecureRedirect = async (e) => {
 		e.preventDefault();
@@ -25,17 +24,20 @@ export default function PaymentGateWay({
 
 			const data = await response.json();
 
+			// 🚀 FIX: Read the backend error signature format ('data.error' instead of 'data.message')
 			if (!response.ok || data.status === "error") {
-				throw new Error(data.message || "Payment authorization failed.");
+				throw new Error(data.error || "Payment authorization failed.");
 			}
 
 			// 1. Create form dynamically
 			const form = document.createElement("form");
 			form.method = "POST";
-			form.action = data.form_action; // Use the URL returned by the backend
+			// 🚀 FIX: Match your PHP key 'redirect_url' instead of 'form_action'
+			form.action = data.redirect_url;
 
 			// 2. Append fields
-			Object.entries(data.payload).forEach(([key, value]) => {
+			// 🚀 FIX: Match your PHP key 'checkout_details' instead of 'payload'
+			Object.entries(data.checkout_details).forEach(([key, value]) => {
 				const input = document.createElement("input");
 				input.type = "hidden";
 				input.name = key;
@@ -47,11 +49,12 @@ export default function PaymentGateWay({
 			document.body.appendChild(form);
 			form.submit();
 
-			// Clean up
+			// Clean up form reference from document flow
 			document.body.removeChild(form);
 
 			if (onSuccess) onSuccess();
 		} catch (err) {
+			// Informative client alert handling
 			alert(`TRANSACTION PROCESS REFUSED: ${err.message.toUpperCase()}`);
 			setIsProcessing(false);
 		}
@@ -61,25 +64,6 @@ export default function PaymentGateWay({
 
 	return (
 		<div className="w-full max-w-lg mx-auto bg-[#090614] border border-purple-500/20 rounded-xl p-5 sm:p-8 text-slate-300 font-mono">
-			{/* Hidden Redirect Gateway Routing Map Wrapper Form */}
-			{checkoutPayload && (
-				<form
-					id="payfast-checkout-redirect-form"
-					action="https://sandbox.payfast.co.za/eng/process"
-					method="POST"
-					className="hidden"
-				>
-					{Object.keys(checkoutPayload).map((key) => (
-						<input
-							key={key}
-							type="hidden"
-							name={key}
-							value={checkoutPayload[key]}
-						/>
-					))}
-				</form>
-			)}
-
 			<div className="bg-[#0e0a1f] border border-purple-500/10 rounded-lg p-4 mb-6">
 				<span className="text-slate-500 text-[10px] uppercase font-bold block mb-1">
 					Contract Target

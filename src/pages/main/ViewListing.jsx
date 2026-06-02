@@ -116,7 +116,7 @@ export default function ViewListing() {
 		setOfferFeedback({ type: "", message: "" });
 
 		try {
-			const response = await apiFetch("/listings/create_offer.php", {
+			const response = await apiFetch("/offers/create_offer.php", {
 				method: "POST",
 				body: JSON.stringify({
 					listing_id: parseInt(id, 10),

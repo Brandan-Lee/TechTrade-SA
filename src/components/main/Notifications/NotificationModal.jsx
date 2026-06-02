@@ -19,7 +19,7 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 				setError(null);
 
 				const response = await apiFetch(
-					"/notifications/get_notifications.php",
+					"/notificications/get_notifications.php",
 					{
 						method: "GET",
 					},
