@@ -114,7 +114,7 @@ export default function MyTransactions() {
 					</div>
 
 					<div className="flex flex-wrap gap-2">
-						{["all", "pending", "committed", "cancelled"].map((status) => (
+						{["all", "pending", "committed", "cancelled", "sold"].map((status) => (
 							<button
 								key={status}
 								onClick={() => setFilter(status)}

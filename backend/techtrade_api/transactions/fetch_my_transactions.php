@@ -37,7 +37,6 @@ try {
     SessionManager::init($db);
     $activeUserId = SessionManager::getActiveUserId();
 
-    // 2. Confirm the user is logged in
     if (!$activeUserId) {
         http_response_code(412);
         throw new Exception("Your session has expired. Please log in again to view your history.");

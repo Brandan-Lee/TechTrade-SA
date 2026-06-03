@@ -92,7 +92,7 @@ export default function ContactUs() {
 
 		try {
 			const response = await apiFetch(
-				"/marketplace/submit_support_message.php",
+				"/support/submit_support_message.php",
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
