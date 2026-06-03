@@ -40,17 +40,14 @@ export default function UserRoleCard({ userObj, onUpdateRole }) {
 		<li className="bg-black/40 border border-white/5 rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4 hover:border-white/10 transition-all">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
 				<div className="flex items-center gap-3 sm:gap-4">
-					{/* Responsive Avatar Dimensions */}
 					<div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-neutral-800 to-neutral-900 border border-white/10 flex items-center justify-center font-black text-xs sm:text-sm text-white shrink-0">
 						{userObj.firstName?.[0] || "U"}
 						{userObj.lastName?.[0] || "N"}
 					</div>
 					<div>
-						{/* Scaled User Fullname Heading */}
 						<h3 className="text-xs sm:text-sm md:text-base font-black uppercase text-white tracking-wide">
 							{userObj.firstName} {userObj.lastName}
 						</h3>
-						{/* Scaled Province Text */}
 						<div className="flex items-center gap-1 text-slate-500 text-[10px] sm:text-xs mt-0.5">
 							<MapPin size={12} className="text-slate-600 shrink-0" />
 							<span className="uppercase tracking-wider">
@@ -60,7 +57,6 @@ export default function UserRoleCard({ userObj, onUpdateRole }) {
 					</div>
 				</div>
 
-				{/* Scaled Badge Indicator */}
 				<span
 					className={`self-start sm:self-center px-2.5 py-1 rounded-lg border text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-1.5 ${role.style}`}
 				>
@@ -69,7 +65,6 @@ export default function UserRoleCard({ userObj, onUpdateRole }) {
 				</span>
 			</div>
 
-			{/* Middle Grid Row: Database Fields Metrics Breakdown with Scaled Layouts */}
 			<div className="grid grid-cols-4 gap-1 sm:gap-2 py-3 border-y border-white/5 text-center bg-black/20 rounded-xl">
 				<div>
 					<p className="text-[8px] sm:text-[9px] md:text-xs uppercase tracking-wider text-slate-500">
@@ -112,7 +107,6 @@ export default function UserRoleCard({ userObj, onUpdateRole }) {
 				</div>
 			</div>
 
-			{/* Bottom Action Footer - Scaled button typography mappings */}
 			<div className="flex flex-wrap items-center justify-end gap-2 pt-1">
 				{Number(userObj.roleId) === 1 && (
 					<>

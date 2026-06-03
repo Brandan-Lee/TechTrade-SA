@@ -53,6 +53,8 @@ import EscrowVault from "./pages/admin/EscrowVault";
 import HardwareDatabase from "./pages/admin/HardwareDatabase";
 import UserSupport from "./pages/admin/UserSupport";
 import NukeSuite from "./pages/admin/NukeSuite";
+import HardwareEditForm from "./pages/admin/HardwareEditForm";
+import HardwareCreateForm from "./pages/admin/HardwareCreateForm";
 
 function App() {
 	const navigate = useNavigate();
@@ -229,7 +231,17 @@ function App() {
 						<Route index element={<AdminDashboard />} />
 						<Route path="user-roles" element={<UserRoleManagement />} />
 						<Route path="escrow-vault" element={<EscrowVault />} />
+
 						<Route path="hardware-database" element={<HardwareDatabase />} />
+						<Route
+							path="hardware-database/edit/:category/:id"
+							element={<HardwareEditForm />}
+						/>
+						<Route
+							path="hardware-database/create"
+							element={<HardwareCreateForm />}
+						/>
+
 						<Route path="user-support" element={<UserSupport />} />
 						<Route path="nuke-suite" element={<NukeSuite />} />
 					</Route>

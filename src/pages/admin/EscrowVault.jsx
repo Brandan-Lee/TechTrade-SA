@@ -62,7 +62,6 @@ export default function EscrowVault() {
 			const result = await response.json();
 
 			if (result.success) {
-				// Instantly clear the paid element out of our view listing dashboard
 				setVaultItems((prevItems) =>
 					prevItems.filter((item) => item.transaction.id !== transactionId),
 				);
