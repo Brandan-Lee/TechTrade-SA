@@ -10,12 +10,14 @@ import {
 	LogOut,
 	DollarSign,
 	Cpu as CpuIcon,
+	Menu,
 } from "lucide-react";
 
 export default function AdminSidebar({ closeSidebar }) {
 	const { user, logoutContext } = useAuth();
+
 	const linkClasses = ({ isActive }) =>
-		`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border ${
+		`flex items-center gap-3 px-4 py-3 rounded-xl text-xs xl:text-sm font-black uppercase tracking-widest transition-all border ${
 			isActive
 				? "text-fuchsia-400 border-fuchsia-500/30 bg-fuchsia-500/5"
 				: "text-slate-400 border-transparent hover:text-white hover:bg-white/5"
@@ -66,7 +68,7 @@ export default function AdminSidebar({ closeSidebar }) {
 							alt="TechTrade Logo"
 							className="w-10 h-10 object-cover group-hover:rotate-6 transition-transform duration-300"
 						/>
-						<h1 className="text-white text-base font-black italic tracking-tighter uppercase">
+						<h1 className="text-white text-sm md:text-base xl:text-lg font-black italic tracking-tighter uppercase">
 							TechTrade <span className="text-fuchsia-500">Admin</span>
 						</h1>
 					</Link>
@@ -76,20 +78,7 @@ export default function AdminSidebar({ closeSidebar }) {
 						className="p-2 bg-white/5 rounded-lg border border-white/10 text-white lg:hidden hover:bg-white/10 transition-all"
 						aria-label="Close Sidebar"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={2.5}
-							stroke="currentColor"
-							className="w-4 h-4"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<Menu size={16} />
 					</button>
 				</header>
 
@@ -97,11 +86,10 @@ export default function AdminSidebar({ closeSidebar }) {
 					<section aria-labelledby="main-controls-heading">
 						<h2
 							id="main-controls-heading"
-							className="text-xs font-black text-fuchsia-500 uppercase tracking-[0.25em] px-4 mb-3"
+							className="text-[10px] xl:text-xs font-black text-fuchsia-500 uppercase tracking-[0.25em] px-4 mb-3"
 						>
 							Main Controls
 						</h2>
-						{/* 🛠️ SEMANTIC HTML: Structured links inside list loops for accessibility screenreaders */}
 						<ul className="space-y-2">
 							{mainControls.map((link) => {
 								const IconComponent = link.icon;
@@ -128,7 +116,7 @@ export default function AdminSidebar({ closeSidebar }) {
 					<section aria-labelledby="safety-controls-heading">
 						<h2
 							id="safety-controls-heading"
-							className="text-xs font-black text-red-500 uppercase tracking-[0.25em] px-4 mb-3"
+							className="text-[10px] xl:text-xs font-black text-red-500 uppercase tracking-[0.25em] px-4 mb-3"
 						>
 							Reports & Flags
 						</h2>
@@ -138,7 +126,7 @@ export default function AdminSidebar({ closeSidebar }) {
 									to="/admin/nuke-suite"
 									onClick={closeSidebar}
 									className={({ isActive }) =>
-										`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border ${
+										`flex items-center gap-3 px-4 py-3 rounded-xl text-xs xl:text-sm font-black uppercase tracking-widest transition-all border ${
 											isActive
 												? "bg-red-500/10 text-red-400 border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.15)]"
 												: "bg-red-500/5 border-red-500/10 text-red-400/80 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
@@ -157,7 +145,7 @@ export default function AdminSidebar({ closeSidebar }) {
 			<footer className="p-4 border-t border-white/5 bg-black/40 shrink-0">
 				<Link
 					to="/"
-					className="w-full h-10 px-4 rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+					className="w-full h-10 px-4 rounded-xl text-xs xl:text-sm font-black uppercase tracking-widest border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center gap-2"
 				>
 					<LogOut size={14} />
 					<span>Exit to Marketplace</span>

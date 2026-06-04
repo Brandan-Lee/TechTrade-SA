@@ -71,7 +71,7 @@ try {
 
     echo json_encode([
         "status" => "success",
-        "message" => "Your account profile has been successfully closed and data paths unlinked."
+        "message" => "Your account profile has been successfully closed"
     ]);
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {

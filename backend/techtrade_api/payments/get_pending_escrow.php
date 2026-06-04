@@ -29,7 +29,6 @@ try {
         throw new Exception("Unsupported request method.");
     }
 
-    // Join payments to transactions, filtering strictly for 'pending' transaction statuses
     $sql = "
         SELECT 
             p.id AS payment_id,

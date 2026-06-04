@@ -26,7 +26,6 @@ try {
     $db = Database::getConnection();
     $controller = new SearchController($db);
 
-    // 2. Perform the search and send back the matching items
     echo json_encode($controller->search($query, $category));
 } catch (Exception $e) {
     echo json_encode(['error' => $e->getMessage()]);

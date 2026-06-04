@@ -33,7 +33,7 @@ export default function EscrowVault() {
 				setAlertConfig({
 					show: true,
 					type: "error",
-					message: "Failed to connect to the payment gateway server.",
+					message: "Failed to connect to the payment server.",
 				});
 			} finally {
 				setIsLoading(false);
@@ -75,15 +75,14 @@ export default function EscrowVault() {
 				setAlertConfig({
 					show: true,
 					type: "error",
-					message: result.error || "Could not complete request processing.",
+					message: result.error || "Could not complete the request.",
 				});
 			}
 		} catch (err) {
 			setAlertConfig({
 				show: true,
 				type: "error",
-				message:
-					"Communication connection lost during processing execution steps.",
+				message: "The connection was lost while trying to process the request.",
 			});
 		}
 	};
@@ -129,7 +128,7 @@ export default function EscrowVault() {
 						placeholder="FILTER BY ORDER OR BUYER..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
-						className="w-full h-10 pl-10 pr-4 rounded-xl bg-black/40 border border-white/10 text-[10px] sm:text-xs tracking-wide uppercase text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-all"
+						className="w-full h-10 pl-10 pr-4 rounded-xl bg-black/40 border border-white/10 text-[10px] sm:text-xs md:text-sm tracking-wide uppercase text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-all"
 					/>
 				</div>
 			</header>
@@ -148,9 +147,9 @@ export default function EscrowVault() {
 				className="grid grid-cols-1 md:grid-cols-2 gap-4"
 				aria-label="Vault Overview"
 			>
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-amber-500/10 rounded-xl text-amber-400 shrink-0">
-						<Landmark size={20} />
+						<Landmark className="w-5 h-5 sm:w-6 sm:h-6" />
 					</div>
 					<div>
 						<p className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm uppercase tracking-widest text-slate-500">
@@ -160,10 +159,10 @@ export default function EscrowVault() {
 							{vaultItems.length} Active Orders
 						</p>
 					</div>
-				</div>
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+				</article>
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-fuchsia-500/10 rounded-xl text-fuchsia-400 shrink-0">
-						<ShieldAlert size={20} />
+						<ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6" />
 					</div>
 					<div>
 						<p className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm uppercase tracking-widest text-slate-500">
@@ -176,25 +175,26 @@ export default function EscrowVault() {
 								.toFixed(2)}
 						</p>
 					</div>
-				</div>
+				</article>
 			</section>
 
 			<main>
 				{filteredVault.length === 0 ? (
 					<div className="text-center py-12 border border-dashed border-white/10 rounded-2xl bg-black/20">
 						<p className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest flex items-center justify-center gap-2 text-slate-500">
-							<HelpCircle size={16} /> No pending escrow orders found matching
-							your search.
+							<HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" /> No pending escrow
+							orders found matching your search.
 						</p>
 					</div>
 				) : (
 					<ul className="grid grid-cols-1 xl:grid-cols-2 gap-4">
 						{filteredVault.map((item) => (
-							<EscrowPaymentCard
-								key={item.id}
-								item={item}
-								onReleaseFunds={handleReleaseFunds}
-							/>
+							<li key={item.id}>
+								<EscrowPaymentCard
+									item={item}
+									onReleaseFunds={handleReleaseFunds}
+								/>
+							</li>
 						))}
 					</ul>
 				)}

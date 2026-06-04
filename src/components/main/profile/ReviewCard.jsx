@@ -16,9 +16,8 @@ const ReviewCard = ({ id, reviewer, rating, comment, date, onReport }) => {
 	return (
 		<Link
 			to={`/profile/${reviewer?.id}`}
-			className="w-full block bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-4 md:p-5 shadow-lg hover:border-fuchsia-500/30 transition-all duration-300 relative overflow-hidden group"
+			className="w-full block bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-4 md:p-5 shadow-lg hover:border-fuchsia-500/30 transition-all duration-300 relative overflow-hidden group text-xs sm:text-sm md:text-base lg:text-lg"
 		>
-			{/* Decorative accent lines */}
 			<div className="absolute top-0 right-0 w-8 h-[1px] bg-fuchsia-500/40" />
 			<div className="absolute top-0 right-0 w-[1px] h-2 bg-fuchsia-500/40" />
 
@@ -37,10 +36,10 @@ const ReviewCard = ({ id, reviewer, rating, comment, date, onReport }) => {
 					)}
 
 					<div className="min-w-0">
-						<p className="text-white text-xs md:text-sm font-bold uppercase tracking-wide truncate">
+						<h1 className="text-white text-xs sm:text-sm font-bold uppercase tracking-wide truncate">
 							{userName}
-						</p>
-						<div className="flex items-center gap-1.5 text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">
+						</h1>
+						<div className="flex items-center gap-1.5 text-[8px] sm:text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">
 							<Clock size={10} className="text-fuchsia-500/40" />
 							<span>{date}</span>
 						</div>
@@ -65,14 +64,16 @@ const ReviewCard = ({ id, reviewer, rating, comment, date, onReport }) => {
 
 					<div className="flex items-center gap-1 bg-amber-500/5 border border-amber-500/20 px-2 py-0.5 rounded">
 						<Star size={12} className="text-amber-500 fill-amber-500" />
-						<span className="text-amber-400 text-xs font-bold">{rating}.0</span>
+						<span className="text-amber-400 text-xs sm:text-sm font-bold">
+							{rating}.0
+						</span>
 					</div>
 				</div>
 			</div>
 
 			<div className="relative mt-2">
 				<Quote className="absolute -top-1 -left-1 w-3.5 h-3.5 text-fuchsia-500/20" />
-				<p className="text-slate-300 text-xs md:text-sm leading-relaxed pl-4 relative">
+				<p className="text-slate-300 text-[11px] sm:text-xs md:text-sm leading-relaxed pl-4 relative">
 					"{comment}"
 				</p>
 			</div>

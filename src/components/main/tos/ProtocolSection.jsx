@@ -2,10 +2,9 @@ import React from "react";
 
 export const ProtocolSection = ({ title, icon, children }) => (
 	<section
-		className="flex flex-col gap-3.5 w-full font-mono select-none selection:bg-fuchsia-500/30"
+		className="flex flex-col gap-3.5 w-full font-mono select-none selection:bg-fuchsia-500/30 text-xs sm:text-sm md:text-base lg:text-lg"
 		aria-labelledby={`protocol-header-${title?.replace(/\s+/g, "-").toLowerCase()}`}
 	>
-		{/* Header Telemetry Bar */}
 		<div className="flex items-center gap-2.5 pb-2 border-b border-purple-500/10">
 			{icon && (
 				<div
@@ -16,16 +15,15 @@ export const ProtocolSection = ({ title, icon, children }) => (
 				</div>
 			)}
 
-			<h3
+			<h1
 				id={`protocol-header-${title?.replace(/\s+/g, "-").toLowerCase()}`}
-				className="text-white text-sm sm:text-base md:text-lg font-black uppercase tracking-[0.2em]"
+				className="text-white text-xs sm:text-sm md:text-base font-black uppercase tracking-[0.2em]"
 			>
 				{title}
-			</h3>
+			</h1>
 		</div>
 
-		{/* Core Child Payload Grid Viewport */}
-		<div className="space-y-3 sm:space-y-4 text-slate-300 text-[11px] sm:text-xs md:text-sm leading-relaxed tracking-wide font-medium">
+		<div className="space-y-3 sm:space-y-4 text-slate-300 text-[10px] sm:text-xs md:text-sm leading-relaxed tracking-wide font-medium">
 			{children}
 		</div>
 	</section>

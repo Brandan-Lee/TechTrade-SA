@@ -17,7 +17,6 @@ export default function MarketPlace() {
 	});
 	const [message, setMessage] = useState(null);
 
-	// Collect search settings from the page link
 	const settings = useMemo(
 		() => new URLSearchParams(location.search),
 		[location.search],
@@ -99,18 +98,17 @@ export default function MarketPlace() {
 	}, [pageData.currentPage, pageData.totalPageCount]);
 
 	return (
-		<section className="w-full bg-[#050505] py-12 px-6 pb-16 relative">
+		<section className="w-full bg-[#050505] py-12 px-6 pb-16 relative text-xs sm:text-sm md:text-base lg:text-lg">
 			<div className="max-w-7xl mx-auto relative z-10">
-				{/* Title Section */}
 				<header className="mb-12 space-y-4">
 					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
 						<div>
-							<h1 className="text-white text-5xl md:text-6xl font-black uppercase italic tracking-tighter leading-none">
+							<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
 								{pageTitle}
 							</h1>
 							<div className="flex items-center gap-4 mt-4">
 								<div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-md">
-									<p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+									<p className="text-[9px] sm:text-[10px] font-bold text-slate-300 uppercase tracking-widest">
 										{isLoading
 											? "Loading..."
 											: `Items Found: ${pageData.totalItemCount}`}
@@ -122,7 +120,6 @@ export default function MarketPlace() {
 					<div className="h-px w-full bg-gradient-to-r from-fuchsia-500/50 via-white/10 to-transparent" />
 				</header>
 
-				{/* Grid of Items */}
 				<motion.div
 					layout
 					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
@@ -144,13 +141,12 @@ export default function MarketPlace() {
 					</AnimatePresence>
 				</motion.div>
 
-				{/* Page Numbers */}
 				{!isLoading && pageData.totalPageCount > 1 && (
-					<div className="mt-10 flex items-center justify-center gap-2 flex-wrap">
+					<nav className="mt-10 flex items-center justify-center gap-2 flex-wrap">
 						<button
 							onClick={() => goToPage(Math.max(1, pageData.currentPage - 1))}
 							disabled={pageData.currentPage <= 1}
-							className="h-10 px-4 rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:border-fuchsia-500/40 transition-all text-xs font-black uppercase"
+							className="h-10 px-4 rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:border-fuchsia-500/40 transition-all text-[10px] sm:text-xs font-black uppercase"
 						>
 							Previous
 						</button>
@@ -161,13 +157,13 @@ export default function MarketPlace() {
 							return (
 								<React.Fragment key={p}>
 									{showDots && (
-										<span className="h-10 px-2 flex items-center text-slate-600 font-black">
+										<span className="h-10 px-2 flex items-center text-slate-600 font-black text-[10px] sm:text-xs">
 											...
 										</span>
 									)}
 									<button
 										onClick={() => goToPage(p)}
-										className={`h-10 w-10 rounded-lg border text-xs font-black uppercase transition-all ${
+										className={`h-10 w-10 rounded-lg border text-[10px] sm:text-xs font-black uppercase transition-all ${
 											p === pageData.currentPage
 												? "border-fuchsia-500 bg-fuchsia-500/15 text-fuchsia-400"
 												: "border-white/10 bg-white/5 text-slate-400 hover:border-fuchsia-500/40"
@@ -186,29 +182,24 @@ export default function MarketPlace() {
 								)
 							}
 							disabled={pageData.currentPage >= pageData.totalPageCount}
-							className="h-10 px-4 rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:border-fuchsia-500/40 transition-all text-xs font-black uppercase"
+							className="h-10 px-4 rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:border-fuchsia-500/40 transition-all text-[10px] sm:text-xs font-black uppercase"
 						>
 							Next
 						</button>
-					</div>
+					</nav>
 				)}
 
-				{/* No Items Found Message */}
 				<AnimatePresence>
 					{!isLoading && (message || items.length === 0) && (
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							className="w-full py-16 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-white/[0.02]"
-						>
+						<div className="w-full py-16 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-white/[0.02]">
 							<FilterX size={48} className="text-slate-700 mb-4" />
-							<h2 className="text-slate-400 font-black uppercase tracking-widest text-xl">
+							<h2 className="text-slate-400 font-black uppercase tracking-widest text-lg sm:text-xl">
 								{message ? "Error Loading" : "No Items Found"}
 							</h2>
-							<p className="text-slate-600 text-xs uppercase tracking-widest mt-2">
+							<p className="text-slate-600 text-[10px] sm:text-xs uppercase tracking-widest mt-2">
 								{message || "Try changing your search or filters."}
 							</p>
-						</motion.div>
+						</div>
 					)}
 				</AnimatePresence>
 			</div>

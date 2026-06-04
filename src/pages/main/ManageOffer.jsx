@@ -187,9 +187,9 @@ const ManageOffer = ({ openCounterModal }) => {
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen bg-[#07050e] flex flex-col items-center justify-center gap-3 font-mono">
+			<div className="min-h-screen bg-[#07050e] flex flex-col items-center justify-center gap-3 font-mono text-xs sm:text-sm">
 				<Loader2 className="w-8 h-8 text-fuchsia-500 animate-spin" />
-				<p className="text-xs uppercase tracking-widest text-slate-500 font-bold animate-pulse">
+				<p className="text-[10px] sm:text-xs uppercase tracking-widest text-slate-500 font-bold animate-pulse">
 					Retrieving Offer Summary...
 				</p>
 			</div>
@@ -198,14 +198,14 @@ const ManageOffer = ({ openCounterModal }) => {
 
 	if (error || !offerData) {
 		return (
-			<div className="min-h-screen bg-[#07050e] flex flex-col items-center justify-center p-6 font-mono">
+			<div className="min-h-screen bg-[#07050e] flex flex-col items-center justify-center p-6 font-mono text-xs sm:text-sm">
 				<div className="py-8 border border-red-500/20 bg-red-950/10 rounded-2xl text-center max-w-xl w-full p-6 font-bold">
-					<p className="text-red-400 text-xs uppercase tracking-wider mb-4">
+					<p className="text-red-400 text-[11px] sm:text-xs uppercase tracking-wider mb-4">
 						Error: {error || "No data available"}
 					</p>
 					<button
 						onClick={() => navigate(-1)}
-						className="text-xs text-purple-400 underline hover:text-purple-300"
+						className="text-[11px] sm:text-xs text-purple-400 underline hover:text-purple-300"
 					>
 						Return back
 					</button>
@@ -223,27 +223,29 @@ const ManageOffer = ({ openCounterModal }) => {
 		: `https://ui-avatars.com/api/?name=${encodeURIComponent(offerData.buyer.name || "Buyer")}&background=581c87&color=fff`;
 
 	return (
-		<div className="bg-[#07050e] text-slate-300 font-mono pb-16 selection:bg-fuchsia-500/30 select-none">
+		<div className="bg-[#07050e] text-slate-300 font-mono pb-16 selection:bg-fuchsia-500/30 select-none text-xs sm:text-sm md:text-base">
 			<div className="w-full max-w-5xl mx-auto pt-6 sm:pt-10 px-4 sm:px-6 lg:px-8">
 				<button
 					onClick={() => navigate(-1)}
-					className="group flex items-center gap-2 text-purple-400 hover:text-fuchsia-400 transition-colors duration-200 mb-6 text-xs sm:text-sm font-bold tracking-wider uppercase"
+					className="group flex items-center gap-2 text-purple-400 hover:text-fuchsia-400 transition-colors duration-200 mb-6 text-[11px] sm:text-xs font-bold tracking-wider uppercase"
 				>
 					<ArrowLeft className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" />
 					<span>Back to Offers</span>
 				</button>
 
-				<h1 className="text-white text-2xl sm:text-3xl lg:text-4xl font-black tracking-wider uppercase mb-8 border-b border-purple-500/10 pb-4 flex items-center gap-3">
-					<span
-						className="w-2 h-6 bg-fuchsia-500 rounded-sm"
-						aria-hidden="true"
-					/>
-					Review Offer
-				</h1>
+				<header>
+					<h1 className="text-white text-xl sm:text-2xl lg:text-3xl font-black tracking-wider uppercase mb-8 border-b border-purple-500/10 pb-4 flex items-center gap-3">
+						<span
+							className="w-2 h-6 bg-fuchsia-500 rounded-sm"
+							aria-hidden="true"
+						/>
+						Review Offer
+					</h1>
+				</header>
 
-				<div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+				<main className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
 					<div className="md:col-span-5 flex flex-col gap-6">
-						<div className="p-4 sm:p-5 bg-[#0d091a] border border-purple-500/20 rounded-xl shadow-lg relative overflow-hidden group">
+						<section className="p-4 sm:p-5 bg-[#0d091a] border border-purple-500/20 rounded-xl shadow-lg relative overflow-hidden group">
 							<div
 								className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl pointer-events-none"
 								aria-hidden="true"
@@ -255,22 +257,22 @@ const ManageOffer = ({ openCounterModal }) => {
 									className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-purple-500/30 group-hover:border-fuchsia-500/50 transition-colors duration-300"
 								/>
 								<div className="min-w-0">
-									<h2 className="text-white text-sm sm:text-base lg:text-lg font-black tracking-wide truncate">
+									<h2 className="text-white text-xs sm:text-sm md:text-base font-black tracking-wide truncate">
 										{offerData.itemTitle}
 									</h2>
 									<div className="flex items-center flex-wrap gap-2.5 mt-1.5">
-										<span className="text-slate-500 text-xs line-through font-medium">
+										<span className="text-slate-500 text-[11px] sm:text-xs line-through font-medium">
 											{formatCurrency(offerData.originalPrice)}
 										</span>
-										<span className="bg-purple-950/50 border border-purple-500/30 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold text-purple-400 uppercase tracking-widest">
+										<span className="bg-purple-950/50 border border-purple-500/30 px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold text-purple-400 uppercase tracking-widest">
 											New Offer
 										</span>
 									</div>
 								</div>
 							</div>
-						</div>
+						</section>
 
-						<div className="p-6 bg-[#0d091a] border border-purple-500/20 rounded-xl shadow-lg flex flex-col items-center text-center relative group">
+						<section className="p-6 bg-[#0d091a] border border-purple-500/20 rounded-xl shadow-lg flex flex-col items-center text-center relative group">
 							<div className="relative mb-4">
 								<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-0.5 bg-gradient-to-b from-purple-500 to-fuchsia-500 shadow-md shadow-fuchsia-500/10">
 									<img
@@ -287,7 +289,7 @@ const ManageOffer = ({ openCounterModal }) => {
 								</div>
 							</div>
 
-							<h3 className="text-white text-base sm:text-lg font-black tracking-wide mb-1">
+							<h3 className="text-white text-sm sm:text-base font-black tracking-wide mb-1">
 								{offerData.buyer.name}
 							</h3>
 
@@ -301,12 +303,12 @@ const ManageOffer = ({ openCounterModal }) => {
 										aria-hidden="true"
 									/>
 								</div>
-								<span className="text-slate-400 text-xs font-semibold">
+								<span className="text-slate-400 text-[11px] sm:text-xs font-semibold">
 									{offerData.buyer.rating} ({offerData.buyer.reviews} reviews)
 								</span>
 							</div>
 
-							<div className="mb-5 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/40 border border-emerald-500/30 rounded-full text-emerald-400 text-[10px] sm:text-xs font-black tracking-widest uppercase">
+							<div className="mb-5 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/40 border border-emerald-500/30 rounded-full text-emerald-400 text-[9px] sm:text-[10px] font-black tracking-widest uppercase">
 								<span
 									className="w-1 h-1 rounded-full bg-emerald-400 animate-ping"
 									aria-hidden="true"
@@ -314,7 +316,7 @@ const ManageOffer = ({ openCounterModal }) => {
 								Verified Buyer
 							</div>
 
-							<div className="w-full pt-4 border-t border-purple-500/10 flex items-center justify-between text-xs text-slate-400 px-2">
+							<div className="w-full pt-4 border-t border-purple-500/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-400 px-2">
 								<div className="flex items-center gap-1">
 									<MapPin
 										size={12}
@@ -326,39 +328,39 @@ const ManageOffer = ({ openCounterModal }) => {
 									</span>
 								</div>
 								<div className="text-right">
-									<span className="opacity-60 text-[11px]">
+									<span className="opacity-60 text-[10px] sm:text-[11px]">
 										Joined {offerData.buyer.memberSince}
 									</span>
 								</div>
 							</div>
-						</div>
+						</section>
 					</div>
 
 					<div className="md:col-span-7 flex flex-col gap-6">
-						<div className="p-6 sm:p-8 bg-[#0a0615] border-2 border-purple-500/30 rounded-xl shadow-xl flex flex-col items-center justify-center relative overflow-hidden group">
+						<section className="p-6 sm:p-8 bg-[#0a0615] border-2 border-purple-500/30 rounded-xl shadow-xl flex flex-col items-center justify-center relative overflow-hidden group">
 							<div
 								className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none"
 								aria-hidden="true"
 							/>
 
-							<span className="text-purple-400 text-xs font-black uppercase tracking-[0.2em] mb-2 opacity-80">
+							<span className="text-purple-400 text-[11px] sm:text-xs font-black uppercase tracking-[0.2em] mb-2 opacity-80">
 								Offered Amount
 							</span>
 
-							<div className="text-fuchsia-400 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight my-1 drop-shadow-[0_0_12px_rgba(217,70,239,0.2)]">
+							<div className="text-fuchsia-400 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight my-1 drop-shadow-[0_0_12px_rgba(217,70,239,0.2)]">
 								{formatCurrency(offerData.offerPrice)}
 							</div>
 
-							<div className="flex items-center gap-1.5 text-slate-500 text-[11px] sm:text-xs mt-2">
+							<div className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] mt-2">
 								<Clock
 									className="w-3 h-3 text-purple-500/60"
 									aria-hidden="true"
 								/>
 								<span>Received {getTimeAgo(offerData.timeReceived)}</span>
 							</div>
-						</div>
+						</section>
 
-						<div className="w-full p-4 bg-[#0d091a] border border-purple-500/10 rounded-xl flex gap-3.5 shadow-md">
+						<section className="w-full p-4 bg-[#0d091a] border border-purple-500/10 rounded-xl flex gap-3.5 shadow-md">
 							<div
 								className="w-8 h-8 rounded bg-purple-950/40 border border-purple-500/20 flex items-center justify-center shrink-0 text-purple-400"
 								aria-hidden="true"
@@ -366,14 +368,14 @@ const ManageOffer = ({ openCounterModal }) => {
 								<MessageSquare size={14} />
 							</div>
 							<div className="min-w-0">
-								<span className="text-slate-500 text-[10px] sm:text-xs font-black uppercase tracking-widest block mb-1">
+								<span className="text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest block mb-1">
 									Message from Buyer
 								</span>
 								<p className="text-slate-300 text-xs sm:text-sm font-medium italic leading-relaxed">
 									&ldquo;{offerData.buyer.note}&rdquo;
 								</p>
 							</div>
-						</div>
+						</section>
 
 						<div className="flex flex-col gap-4 mt-2">
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -381,13 +383,13 @@ const ManageOffer = ({ openCounterModal }) => {
 									label={isProcessing ? "PROCESSING..." : "ACCEPT OFFER"}
 									disabled={isProcessing}
 									onClick={handleAcceptOffer}
-									className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/20 disabled:opacity-50 disabled:cursor-not-allowed"
+									className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/20 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
 								/>
 								<AlternateButton
 									label="SEND COUNTER OFFER"
 									disabled={isProcessing}
 									onClick={() => !isProcessing && openCounterModal(offerId)}
-									className="border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/10 disabled:opacity-40"
+									className="border-fuchsia-500/30 text-fuchsia-400 hover:bg-fuchsia-500/10 disabled:opacity-40 text-xs sm:text-sm"
 								/>
 							</div>
 
@@ -396,33 +398,28 @@ const ManageOffer = ({ openCounterModal }) => {
 									onClick={handleViewListing}
 									disabled={isProcessing}
 									label="VIEW ORIGINAL LISTING"
-									className="border-purple-500/20 text-slate-400 hover:text-white disabled:opacity-40"
+									className="border-purple-500/20 text-slate-400 hover:text-white disabled:opacity-40 text-xs sm:text-sm"
 								/>
 								<CyberActionButton
 									label={isProcessing ? "PROCESSING..." : "DECLINE OFFER"}
 									disabled={isProcessing}
 									onClick={handleDeclineOffer}
-									className="bg-[#170a11] border border-rose-500/30 text-rose-400 hover:bg-rose-950/30 disabled:opacity-40"
+									className="bg-[#170a11] border border-rose-500/30 text-rose-400 hover:bg-rose-950/30 disabled:opacity-40 text-xs sm:text-sm"
 								/>
 							</div>
 
-							<div className="p-4 bg-[#140b18] rounded-xl border border-fuchsia-500/20 flex gap-3.5 shadow-inner mt-4">
+							<section className="p-4 bg-[#140b18] rounded-xl border border-fuchsia-500/20 flex gap-3.5 shadow-inner mt-4">
 								<AlertCircle
 									className="w-5 h-5 text-fuchsia-400 shrink-0 mt-0.5 animate-pulse"
 									aria-hidden="true"
 								/>
-								<p className="text-slate-400 text-[11px] sm:text-xs leading-relaxed font-medium">
-									Accepting this offer will secure the item for this transaction
-									and safely move the funds into our{" "}
-									<strong className="text-fuchsia-400 font-bold">
-										Secure Escrow System
-									</strong>{" "}
-									while a protected chat window is opened.
+								<p className="text-slate-400 text-[10px] sm:text-xs leading-relaxed font-medium">
+									Accepting this offer will secure the item for this transaction.
 								</p>
-							</div>
+							</section>
 						</div>
 					</div>
-				</div>
+				</main>
 			</div>
 		</div>
 	);

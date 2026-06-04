@@ -81,7 +81,7 @@ export default function HardwareDatabase() {
 					setError(result.error || "Could not load items.");
 				}
 			} catch (err) {
-				setError("Failed to communicate with the hardware database server.");
+				setError("Failed to connect to the database.");
 			} finally {
 				setIsLoading(false);
 			}
@@ -91,7 +91,7 @@ export default function HardwareDatabase() {
 	}, [activeCategory, appliedSearch, currentPage]);
 
 	const formatPrice = (cents) => {
-		if (!cents) return "MSRP Unavailable";
+		if (!cents) return "Price Unavailable";
 		return new Intl.NumberFormat("en-ZA", {
 			style: "currency",
 			currency: "ZAR",
@@ -108,7 +108,7 @@ export default function HardwareDatabase() {
 	};
 
 	return (
-		<div className="space-y-6 font-mono text-slate-300 p-4">
+		<div className="space-y-6 text-slate-300 p-4">
 			<header className="border-b border-white/5 pb-4 space-y-4">
 				<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 					<div>
@@ -122,18 +122,19 @@ export default function HardwareDatabase() {
 
 					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
 						<div className="relative w-full sm:w-64 md:w-72 lg:w-80">
-							<Search
-								size={16}
-								className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-							/>
+							<label htmlFor="search-input" className="sr-only">
+								Search Inventory
+							</label>
+							<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
 
 							<input
+								id="search-input"
 								type="text"
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								onKeyDown={handleKeyDown}
 								placeholder="Type query and hit Enter..."
-								className="w-full bg-black/40 border border-white/5 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all font-mono"
+								className="w-full bg-black/40 border border-white/5 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-all"
 							/>
 
 							{searchQuery.length > 0 && (
@@ -141,36 +142,39 @@ export default function HardwareDatabase() {
 									onClick={handleClearSearch}
 									className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer transition-colors"
 								>
-									<X size={14} />
+									<X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
 								</button>
 							)}
 						</div>
 
 						<button
 							onClick={handleAddComponent}
-							className="h-8 sm:h-9 px-2.5 sm:px-3 bg-amber-500/5 hover:bg-amber-500/10 text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl border border-amber-500/20 transition-all flex items-center gap-1.5"
+							className="h-8 sm:h-9 md:h-10 px-3 sm:px-4 bg-amber-500/5 hover:bg-amber-500/10 text-xs sm:text-sm font-black uppercase tracking-widest rounded-xl border border-amber-500/20 transition-all flex items-center justify-center gap-1.5"
 						>
-							<Plus size={14} />
+							<Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
 							Add Component
 						</button>
 					</div>
 				</div>
 
-				<div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-2 bg-black/20 p-1.5 rounded-xl border border-white/5 content-start">
-					{categories.map((cat) => (
-						<button
-							key={cat.slug}
-							onClick={() => handleCategoryChange(cat.slug)}
-							className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer truncate text-center md:text-left ${
-								activeCategory === cat.slug
-									? "bg-purple-600 text-white shadow-md"
-									: "text-slate-400 hover:bg-white/5 hover:text-white"
-							}`}
-						>
-							{cat.name}
-						</button>
-					))}
-				</div>
+				<nav aria-label="Inventory Categories">
+					<ul className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-2 bg-black/20 p-1.5 rounded-xl border border-white/5 content-start">
+						{categories.map((cat) => (
+							<li key={cat.slug} className="flex-1 sm:flex-initial">
+								<button
+									onClick={() => handleCategoryChange(cat.slug)}
+									className={`w-full px-3 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer truncate text-center md:text-left ${
+										activeCategory === cat.slug
+											? "bg-purple-600 text-white shadow-md"
+											: "text-slate-400 hover:bg-white/5 hover:text-white"
+									}`}
+								>
+									{cat.name}
+								</button>
+							</li>
+						))}
+					</ul>
+				</nav>
 			</header>
 
 			<main className="space-y-6 min-h-[400px] relative">
@@ -181,8 +185,8 @@ export default function HardwareDatabase() {
 				)}
 
 				{isLoading && items.length === 0 ? (
-					<div className="flex items-center justify-center py-24 text-xs sm:text-sm font-bold tracking-widest uppercase text-slate-500 animate-pulse">
-						Reading catalog records...
+					<div className="flex items-center justify-center py-24 text-xs sm:text-sm md:text-base font-bold tracking-widest uppercase text-slate-500 animate-pulse">
+						Loading items...
 					</div>
 				) : error ? (
 					<div className="text-center py-12 text-rose-400 text-xs sm:text-sm md:text-base border border-rose-500/10 bg-rose-500/5 rounded-xl">
@@ -190,13 +194,13 @@ export default function HardwareDatabase() {
 					</div>
 				) : items.length === 0 ? (
 					<div className="text-center py-12 text-slate-500 text-xs sm:text-sm md:text-base">
-						No components found matching your layout targets.
+						No items found.
 					</div>
 				) : (
 					<div
 						className={`transition-opacity duration-150 ${isLoading ? "opacity-40 pointer-events-none" : "opacity-100"}`}
 					>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 							{items.map((item) => (
 								<HardwareSpecCard
 									key={item.id}
@@ -209,7 +213,7 @@ export default function HardwareDatabase() {
 							))}
 						</div>
 
-						<div className="flex items-center justify-between border-t border-white/5 pt-4 text-xs sm:text-sm text-slate-500 mt-6">
+						<footer className="flex items-center justify-between border-t border-white/5 pt-4 text-xs sm:text-sm text-slate-500 mt-6">
 							<span>
 								Page <strong className="text-white">{currentPage}</strong> of{" "}
 								<strong className="text-white">{totalPages}</strong>
@@ -218,19 +222,21 @@ export default function HardwareDatabase() {
 								<button
 									disabled={currentPage === 1 || isLoading}
 									onClick={() => setCurrentPage((prev) => prev - 1)}
+									aria-label="Previous Page"
 									className="p-2 rounded-lg bg-white/5 border border-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-colors cursor-pointer"
 								>
-									<ChevronLeft size={16} />
+									<ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
 								</button>
 								<button
 									disabled={currentPage === totalPages || isLoading}
 									onClick={() => setCurrentPage((prev) => prev + 1)}
+									aria-label="Next Page"
 									className="p-2 rounded-lg bg-white/5 border border-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-colors cursor-pointer"
 								>
-									<ChevronRight size={16} />
+									<ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
 								</button>
 							</div>
-						</div>
+						</footer>
 					</div>
 				)}
 			</main>

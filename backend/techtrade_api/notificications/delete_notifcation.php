@@ -28,7 +28,7 @@ try {
     }
 
     require_once __DIR__ . '/../config/config.php';
-    require_once __DIR__ . '/../models/validation/database.php';
+    require_once __DIR__ . '/../models/validation/database.php/';
     require_once __DIR__ . '/../models/helpers/session_manager.php';
 
     $db = Database::getConnection();

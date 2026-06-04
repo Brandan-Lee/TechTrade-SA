@@ -128,19 +128,19 @@ export const ForgotModal = ({
 			onClose={onClose}
 			onBack={onSwitchToLogin}
 		>
-			<div className="space-y-6 sm:space-y-8 p-1 selection:bg-fuchsia-500/30 selection:text-white font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl">
-				<div className="space-y-1.5">
-					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+			<div className="space-y-6 sm:space-y-8 p-1 selection:bg-fuchsia-500/30 selection:text-white font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl text-xs sm:text-sm md:text-base lg:text-lg">
+				<header className="space-y-1.5">
+					<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
 						Forgot{" "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 							Password
 						</span>
 					</h1>
-					<p className="text-slate-500 text-[11px] sm:text-xs font-medium uppercase tracking-wider pt-1">
+					<p className="text-slate-500 text-[10px] sm:text-xs md:text-sm font-medium uppercase tracking-wider pt-1">
 						Enter the email address associated with your account to reset your
 						password.
 					</p>
-				</div>
+				</header>
 
 				{alert.show && (
 					<CyberAlert
@@ -180,15 +180,15 @@ export const ForgotModal = ({
 						/>
 					</div>
 
-					<div className="space-y-4 pt-2 border-t border-white/5">
+					<footer className="space-y-4 pt-2 border-t border-white/5">
 						<CyberActionButton
 							label={isLoading ? "Sending..." : "Send Verification Code"}
 							type="submit"
 							isLoading={isLoading}
-							className="w-full text-xs sm:text-sm tracking-widest font-black"
+							className="w-full text-[10px] sm:text-xs md:text-sm tracking-widest font-black"
 						/>
 
-						<div className="flex justify-center items-center gap-2 text-[10px] sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
+						<div className="flex justify-center items-center gap-2 text-[10px] sm:text-xs md:text-sm text-slate-600 font-bold uppercase tracking-wide">
 							<Cpu size={10} />
 							<AuthFooter
 								label="Back to Login"
@@ -196,7 +196,7 @@ export const ForgotModal = ({
 								className="hover:text-fuchsia-400 transition-colors focus:outline-none focus:underline"
 							/>
 						</div>
-					</div>
+					</footer>
 				</form>
 			</div>
 		</AuthModalWrapper>

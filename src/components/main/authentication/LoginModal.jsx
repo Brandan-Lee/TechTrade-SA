@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthModalWrapper from "./AuthModalWrapper";
@@ -143,15 +143,15 @@ const LoginModal = ({
 
 	return (
 		<AuthModalWrapper isOpen={isOpen} onClose={onClose} onBack={onClose}>
-			<div className="space-y-10 py-4 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl">
-				<div className="space-y-2">
-					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+			<div className="space-y-10 py-4 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl text-xs sm:text-sm md:text-base lg:text-lg">
+				<header className="space-y-2">
+					<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
 						{isFromAdmin ? "Staff" : "User"}{" "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 							Login
 						</span>
 					</h1>
-				</div>
+				</header>
 
 				{alert.show && (
 					<CyberAlert
@@ -221,7 +221,7 @@ const LoginModal = ({
 											setFormData({ ...formData, rememberMe: e.target.checked })
 										}
 									/>
-									<span className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest group-hover:text-fuchsia-400 transition-colors">
+									<span className="text-[10px] sm:text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest group-hover:text-fuchsia-400 transition-colors">
 										Remember Me
 									</span>
 								</label>
@@ -229,7 +229,7 @@ const LoginModal = ({
 								<button
 									type="button"
 									onClick={onSwitchToForgot}
-									className="text-slate-500 text-xs md:text-sm font-black uppercase tracking-widest hover:text-fuchsia-400 transition-all flex items-center gap-2"
+									className="text-slate-500 text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest hover:text-fuchsia-400 transition-all flex items-center gap-2"
 								>
 									<Lock size={10} /> FORGOT PASSWORD?
 								</button>
@@ -245,9 +245,9 @@ const LoginModal = ({
 				</form>
 
 				{!isFromAdmin && (
-					<div className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
+					<footer className="pt-8 border-t border-white/5 flex flex-col items-center gap-6">
 						<div className="flex flex-col items-center gap-2">
-							<span className="text-slate-600 text-sm md:text-base font-black uppercase tracking-widest">
+							<span className="text-slate-600 text-xs sm:text-sm md:text-base font-black uppercase tracking-widest">
 								New to TechTrade?
 							</span>
 							<button
@@ -255,12 +255,12 @@ const LoginModal = ({
 								onClick={onSwitchToRegister}
 								className="group relative px-6 py-2"
 							>
-								<span className="relative z-10 text-violet-400 font-black uppercase text-xs md:text-sm tracking-[0.3em] group-hover:text-fuchsia-400 transition-colors">
+								<span className="relative z-10 text-violet-400 font-black uppercase text-[10px] sm:text-xs md:text-sm tracking-[0.3em] group-hover:text-fuchsia-400 transition-colors">
 									REGISTER NOW
 								</span>
 							</button>
 						</div>
-					</div>
+					</footer>
 				)}
 			</div>
 		</AuthModalWrapper>

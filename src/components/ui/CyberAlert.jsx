@@ -14,7 +14,8 @@ const CyberAlert = ({ type = "error", message, onClose }) => {
 
 	return (
 		<div
-			className={`w-full px-4 py-3 rounded-lg outline outline-1 outline-offset-[-1px] flex items-center justify-between gap-3 ${styles.container} transition-all duration-300 animate-in fade-in slide-in-from-top-2`}
+			role="alert"
+			className={`w-full px-4 py-3 rounded-lg outline outline-1 outline-offset-[-1px] flex items-center justify-between gap-3 ${styles.container} transition-all duration-300 animate-in fade-in slide-in-from-top-2 text-xs sm:text-sm md:text-base lg:text-lg`}
 		>
 			<div className="flex items-center gap-3">
 				{isError ? (
@@ -23,7 +24,7 @@ const CyberAlert = ({ type = "error", message, onClose }) => {
 					<CheckCircle2 className={styles.icon} size={20} />
 				)}
 				<p
-					className={`text-xs md:text-sm font-bold uppercase tracking-wider ${styles.text}`}
+					className={`text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wider ${styles.text}`}
 				>
 					{message}
 				</p>
@@ -33,6 +34,7 @@ const CyberAlert = ({ type = "error", message, onClose }) => {
 				<button
 					onClick={onClose}
 					className="opacity-50 hover:opacity-100 transition-opacity"
+					aria-label="Close message"
 				>
 					<X size={14} className={styles.text} />
 				</button>

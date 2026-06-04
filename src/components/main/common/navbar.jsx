@@ -79,7 +79,6 @@ export default function NavBar({
 		{ name: "Log In / Register", isModal: true },
 	];
 
-	// Close menu if clicking outside
 	useEffect(() => {
 		const handleClickOutside = (event) => {
 			if (
@@ -124,10 +123,10 @@ export default function NavBar({
 						className="absolute right-0 top-[130%] w-64 z-[100] p-1.5 bg-[#0a0a0c] rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
 					>
 						<div className="px-4 py-3 border-b border-white/5 mb-1 bg-white/5 rounded-t-xl">
-							<p className="text-xs font-black text-fuchsia-500 uppercase tracking-[0.3em]">
+							<p className="text-[10px] sm:text-xs font-black text-fuchsia-500 uppercase tracking-[0.3em]">
 								Current User:
 							</p>
-							<p className="text-white font-bold text-sm truncate mt-1">
+							<p className="text-white font-bold text-xs sm:text-sm truncate mt-1">
 								{user.fullName}
 							</p>
 						</div>
@@ -140,7 +139,7 @@ export default function NavBar({
 										setIsUserMenuOpen(false);
 										if (item.action) item.action();
 									}}
-									className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all ${
+									className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-widest transition-all ${
 										item.isDestructive
 											? "text-red-400 hover:bg-red-500/10"
 											: "text-slate-300 hover:bg-fuchsia-500/10 hover:text-white"
@@ -164,7 +163,7 @@ export default function NavBar({
 	);
 
 	return (
-		<header className="w-full sticky top-0 z-50 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5">
+		<header className="w-full sticky top-0 z-50 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 text-xs sm:text-sm md:text-base lg:text-lg">
 			<div className="max-w-7xl mx-auto px-4 lg:px-8 h-20 flex items-center justify-between gap-8">
 				<div className="flex items-center gap-4 shrink-0">
 					<button
@@ -179,7 +178,7 @@ export default function NavBar({
 							alt="TechTrade"
 							className="w-12 h-12 object-cover"
 						/>
-						<h1 className="text-white text-xl font-black italic tracking-tighter uppercase">
+						<h1 className="text-white text-lg sm:text-xl font-black italic tracking-tighter uppercase">
 							TechTrade <span className="text-fuchsia-500">ZA</span>
 						</h1>
 					</Link>
@@ -188,7 +187,7 @@ export default function NavBar({
 				<nav className="hidden lg:flex items-center gap-2">
 					{mainNavLinks.map((link) => {
 						const isActive = location.pathname === link.path;
-						const styles = `px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all border ${
+						const styles = `px-4 py-2 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all border ${
 							isActive
 								? "text-fuchsia-400 border-fuchsia-500/30 bg-fuchsia-500/5"
 								: "text-slate-400 border-transparent hover:text-white hover:bg-white/5"
@@ -223,7 +222,7 @@ export default function NavBar({
 
 			<div className="w-full border-t border-white/5 bg-black/40 py-2">
 				<div className="max-w-4xl mx-auto px-4">
-					<SearchBar className="bg-transparent border-none text-fuchsia-400 uppercase tracking-widest" />
+					<SearchBar className="bg-transparent border-none text-fuchsia-400 uppercase tracking-widest text-[10px] sm:text-xs" />
 				</div>
 			</div>
 		</header>

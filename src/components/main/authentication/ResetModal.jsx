@@ -7,6 +7,7 @@ import CyberActionButton from "../../ui/CyberActionButton";
 import AuthFooter from "./AuthFooter";
 import CyberAlert from "../../ui/CyberAlert";
 import { useAuthModalScroll } from "./AuthModalScrollContext";
+import PasswordStrengthMeter from "../../ui/PasswordStrengthMeter"
 
 export const ResetModal = ({
 	isOpen,
@@ -165,6 +166,9 @@ export const ResetModal = ({
 							placeholder="••••••••••••"
 							required
 						/>
+						<div className="bg-black/20 p-2.5 rounded-lg border border-white/5">
+							<PasswordStrengthMeter password={password} />
+						</div>
 
 						<AuthInput
 							key={

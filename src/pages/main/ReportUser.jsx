@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { apiFetch } from "../../lib/api";
-import {
-	AlertTriangle,
-	ShieldAlert,
-	ArrowLeft,
-	Terminal,
-	User,
-} from "lucide-react";
+import { AlertTriangle, ShieldAlert, ArrowLeft, Terminal } from "lucide-react";
 import CyberActionButton from "../../components/ui/CyberActionButton";
 import CyberAlert from "../../components/ui/CyberAlert";
 
@@ -81,7 +75,7 @@ export default function ReportUser() {
 	}, [routeUserId, location.state?.profile, navigate]);
 
 	const reportReasons = [
-		{ id: "payment", label: "Payment Manipulation / Fraud" },
+		{ id: "payment", label: "Payment Issues / Fraud" },
 		{ id: "communication", label: "Harassment / Abuse" },
 		{ id: "item_issue", label: "Damaged / Counterfeit Item Received" },
 		{ id: "no_show", label: "No-Show / Ghosting" },
@@ -151,10 +145,9 @@ export default function ReportUser() {
 		`https://ui-avatars.com/api/?name=${encodeURIComponent(targetUser.name)}&background=581c87&color=fff`;
 
 	return (
-		<div className="min-h-screen bg-[#050506] font-mono text-slate-300 pb-20 relative selection:bg-fuchsia-500/30">
+		<div className="min-h-screen bg-[#050506] font-mono text-slate-300 pb-20 relative selection:bg-fuchsia-500/30 text-xs sm:text-sm md:text-base">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808002_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-			{/* HEADER SECTION */}
 			<header className="w-full max-w-3xl mx-auto px-4 pt-12 relative z-10">
 				<div className="flex gap-4 items-start">
 					<button
@@ -172,30 +165,28 @@ export default function ReportUser() {
 							className="w-12 h-12 rounded-lg border border-white/10 object-cover bg-black shrink-0 grayscale brightness-90 shadow-lg"
 						/>
 						<div className="min-w-0 flex-1">
-							<h1 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight leading-none break-words">
+							<h1 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-black uppercase tracking-tight leading-none break-words">
 								Report Account:{" "}
 								<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 									{targetUser.name}
 								</span>
 							</h1>
-							<p className="mt-2 text-xs font-bold text-slate-500 uppercase tracking-wider truncate">
-								Account Type: // {targetUser.role} (ID: #{routeUserId})
+							<p className="mt-2 text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider truncate">
+								Account Type: {targetUser.role} (ID: #{routeUserId})
 							</p>
 						</div>
 					</div>
 				</div>
 			</header>
 
-			{/* FORM WRAPPER */}
 			<main className="max-w-3xl mx-auto py-6 px-4 relative z-10">
-				<div className="bg-[#0c0c0e]/90 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden">
-					<div className="bg-gradient-to-r from-purple-950 via-[#160c28] to-purple-950 px-4 py-3.5 border-b border-white/5 flex items-center gap-3">
+				<article className="bg-[#0c0c0e]/90 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden">
+					<section className="bg-gradient-to-r from-purple-950 via-[#160c28] to-purple-950 px-4 py-3.5 border-b border-white/5 flex items-center gap-3">
 						<AlertTriangle className="text-fuchsia-400 shrink-0" size={16} />
-						<p className="sm:text-xs md:text-sm font-bold text-slate-300 uppercase tracking-wide leading-tight">
-							You are submitting a formal behavior report request for this
-							marketplace account profile.
-						</p>
-					</div>
+						<h2 className="text-[11px] sm:text-xs md:text-sm font-bold text-slate-300 uppercase tracking-wide leading-tight">
+							You are submitting a report for this account.
+						</h2>
+					</section>
 
 					{alert.show && (
 						<div className="px-5 sm:px-8 pt-6">
@@ -212,9 +203,8 @@ export default function ReportUser() {
 						onSubmit={handleSubmit}
 						noValidate
 					>
-						{/* RADIO BUTTONS SELECTION CONTAINER */}
 						<fieldset className="space-y-4">
-							<legend className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+							<legend className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
 								<Terminal size={12} className="text-fuchsia-500" />
 								<span>Violation Category</span>
 							</legend>
@@ -236,7 +226,7 @@ export default function ReportUser() {
 											} focus-within:ring-1 focus-within:ring-fuchsia-500`}
 										>
 											<span
-												className={`text-xs sm:text-sm md:text-sm font-bold uppercase tracking-wider transition-colors ${
+												className={`text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-wider transition-colors ${
 													isSelected ? "text-fuchsia-400" : "text-slate-400"
 												}`}
 											>
@@ -267,11 +257,10 @@ export default function ReportUser() {
 							</div>
 						</fieldset>
 
-						{/* STATEMENT DETAILS CONTAINER */}
 						<div className="flex flex-col gap-2">
 							<label
 								htmlFor="report-details"
-								className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"
+								className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"
 							>
 								<Terminal size={12} className="text-fuchsia-500" />
 								<span>Please tell us why you are reporting this user</span>
@@ -287,45 +276,40 @@ export default function ReportUser() {
 									setDetails(e.target.value);
 									if (errorField === "details") setErrorField("");
 								}}
-								className={`w-full h-40 bg-[#121214] rounded-lg p-4 border transition-all text-white focus:outline-none focus:border-fuchsia-500/50 text-xs sm:text-sm font-mono leading-relaxed shadow-inner placeholder:text-slate-700 resize-none ${
+								className={`w-full h-40 bg-[#121214] rounded-lg p-4 border transition-all text-white focus:outline-none focus:border-fuchsia-500/50 text-[11px] sm:text-xs md:text-sm font-mono leading-relaxed shadow-inner placeholder:text-slate-700 resize-none ${
 									errorField === "details"
 										? "border-red-500/50 animate-shake"
 										: "border-white/10"
 								}`}
-								placeholder="Provide specific statement details here regarding why this person should be reviewed by safety staff..."
+								placeholder="Provide details about why you are reporting this user..."
 							/>
 						</div>
 
-						{/* SAFETY TERMS NOTICE */}
-						<div className="flex items-start gap-2.5 bg-purple-950/10 border border-purple-500/10 rounded-lg p-3 text-[10px] uppercase tracking-wider text-slate-400 leading-relaxed">
+						<section className="flex items-start gap-2.5 bg-purple-950/10 border border-purple-500/10 rounded-lg p-3 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 leading-relaxed">
 							<ShieldAlert size={14} className="text-fuchsia-500 shrink-0" />
 							<p>
-								Filing an intentionally malicious report against community
-								members breaks platform usage rules and may lead to restrictions
-								on your personal account profile.
+								Filing false reports breaks usage rules and may lead to
+								restrictions on your account.
 							</p>
-						</div>
+						</section>
 
-						{/* FORM SUBMISSION BUTTONS */}
 						<div className="pt-2 border-t border-white/5">
 							<CyberActionButton
 								label={
 									isSubmitting ? "SENDING REPORT..." : "REPORT USER ACCOUNT"
 								}
-								className="w-full"
+								className="w-full text-xs sm:text-sm"
 								disabled={isSubmitting}
 								type="submit"
 							/>
-							<p className="text-center mt-4 text-xs sm:text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wider">
-								Reporting helps maintain community safety, trust scores, and
-								hand-off validity.
+							<p className="text-center mt-4 text-[10px] sm:text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wider">
+								Reporting helps maintain a safe community.
 							</p>
 						</div>
 					</form>
-				</div>
+				</article>
 			</main>
 
-			{/* Global Indentation Style Hooks Injection */}
 			<style
 				dangerouslySetInnerHTML={{
 					__html: `

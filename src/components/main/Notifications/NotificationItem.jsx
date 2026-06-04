@@ -30,7 +30,6 @@ const NotificationItem = ({
 	const isRead = Number(is_read) === 1;
 	const isUserSeller = Number(isSeller) === 1;
 
-	// Pick an icon based on the type of notification
 	const getIcon = () => {
 		const size = 16;
 		switch (type) {
@@ -45,13 +44,11 @@ const NotificationItem = ({
 		}
 	};
 
-	// Create the message text based on status and user role
 	const renderMessage = () => {
 		const priceStyle = "text-fuchsia-400 font-bold";
 		const successStyle = "text-emerald-400 font-black uppercase";
 		const failureStyle = "text-red-400 font-black uppercase";
 
-		// If a message exists, show it
 		if (body) {
 			return <span className="uppercase">{body}</span>;
 		}
@@ -64,7 +61,6 @@ const NotificationItem = ({
 			);
 		}
 
-		// Logic for trade offers
 		if (type === "offer") {
 			if (status === "accepted") {
 				return (
@@ -97,7 +93,6 @@ const NotificationItem = ({
 			}
 		}
 
-		// Logic for counter offers
 		if (type === "counter") {
 			if (isUserSeller) {
 				if (status === "accepted") {
@@ -132,14 +127,14 @@ const NotificationItem = ({
 						<div className="flex flex-col sm:flex-row gap-2 pt-2.5 border-t border-white/5">
 							<button
 								onClick={() => onAction?.(id, "accept")}
-								className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-xs rounded uppercase flex items-center justify-center gap-1.5 transition-all"
+								className="flex-1 h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black text-[10px] sm:text-xs rounded uppercase flex items-center justify-center gap-1.5 transition-all"
 							>
 								<Check size={12} strokeWidth={3} />
 								<span>ACCEPT</span>
 							</button>
 							<button
 								onClick={() => onAction?.(id, "decline")}
-								className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 font-black text-xs rounded uppercase flex items-center justify-center gap-1.5 transition-all"
+								className="flex-1 h-9 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 font-black text-[10px] sm:text-xs rounded uppercase flex items-center justify-center gap-1.5 transition-all"
 							>
 								<X size={12} strokeWidth={3} />
 								<span>DECLINE</span>
@@ -154,8 +149,8 @@ const NotificationItem = ({
 	};
 
 	return (
-		<div
-			className={`relative w-full p-4 sm:p-5 border rounded-lg flex flex-col gap-3.5 transition-all duration-300 ${
+		<article
+			className={`relative w-full p-4 sm:p-5 border rounded-lg flex flex-col gap-3.5 transition-all duration-300 text-xs sm:text-sm md:text-base lg:text-lg ${
 				isRead
 					? "bg-[#0c0c0e]/40 border-white/5 opacity-60"
 					: "bg-[#110d1a]/90 border-purple-500/30"
@@ -171,18 +166,18 @@ const NotificationItem = ({
 
 					<div className="space-y-0.5">
 						<div className="flex flex-wrap items-center gap-2">
-							<h4
-								className={`text-sm font-black uppercase ${isRead ? "text-slate-500" : "text-white"}`}
+							<h1
+								className={`text-xs sm:text-sm font-black uppercase ${isRead ? "text-slate-500" : "text-white"}`}
 							>
 								{title || "Notification"}
-							</h4>
+							</h1>
 							{!isRead && (
-								<span className="inline-flex items-center gap-1 bg-fuchsia-500/10 border border-fuchsia-500/30 px-1.5 py-0.5 rounded text-[9px] text-fuchsia-400 font-extrabold uppercase">
+								<span className="inline-flex items-center gap-1 bg-fuchsia-500/10 border border-fuchsia-500/30 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] text-fuchsia-400 font-extrabold uppercase">
 									<AlertCircle size={8} /> NEW
 								</span>
 							)}
 						</div>
-						<div className="text-xs text-slate-500 flex items-center gap-1.5 font-bold uppercase">
+						<div className="text-[10px] sm:text-xs text-slate-500 flex items-center gap-1.5 font-bold uppercase">
 							<Clock size={11} className="text-slate-600" />
 							<span>{time || "Recently"}</span>
 						</div>
@@ -197,10 +192,10 @@ const NotificationItem = ({
 				</button>
 			</div>
 
-			<div className="text-xs md:text-sm leading-relaxed">
+			<div className="text-[11px] sm:text-xs md:text-sm leading-relaxed">
 				{renderMessage()}
 			</div>
-		</div>
+		</article>
 	);
 };
 

@@ -26,7 +26,6 @@ try {
 
     SessionManager::init($db);
 
-    // Verify session
     if (!isset($_SESSION['user_id'])) {
         http_response_code(419);
         echo json_encode(["error" => "Your session has expired. Please log in again."]);

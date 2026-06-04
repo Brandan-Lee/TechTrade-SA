@@ -1,29 +1,25 @@
 import React from "react";
-import GradientButton from "../../ui/CyberActionButton";
 import AlternateButton from "../../ui/AlternateButton";
 
-const AuthFooter = ({ 
-    label, 
-    onClick, 
-    showDivider = true, 
-    dividerText = "OR" 
+const AuthFooter = ({
+	label,
+	onClick,
+	showDivider = true,
+	dividerText = "OR",
 }) => {
-    return (
-        <div className="w-full pt-2 flex flex-col items-center">
-            {showDivider && (
-                <div className="flex flex-col items-center gap-4 pt-4 border-t border-slate-100">
-                    <span className="text-slate-400 text-sm md:text-base font-black uppercase tracking-[0.3em] mb-4">
-                        {dividerText}
-                    </span>
-                </div>
-            )}
+	return (
+		<footer className="w-full pt-2 flex flex-col items-center text-xs sm:text-sm md:text-base lg:text-lg">
+			{showDivider && (
+				<div className="flex flex-col items-center gap-4 pt-4 border-t border-slate-100">
+					<span className="text-slate-400 text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase tracking-[0.3em] mb-4">
+						{dividerText}
+					</span>
+				</div>
+			)}
 
-            <AlternateButton
-                label={label}
-                onClick={onClick}
-            />
-        </div>
-    );
+			<AlternateButton label={label} onClick={onClick} />
+		</footer>
+	);
 };
 
 export default AuthFooter;

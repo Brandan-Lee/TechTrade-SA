@@ -2,19 +2,16 @@ import React from "react";
 import { ShieldCheck, Terminal, AlertCircle } from "lucide-react";
 
 const PasswordStrengthMeter = ({ password = "" }) => {
-	// Evaluates the exact 5 distinct criteria parameters expected by the PHP backend
 	const checks = {
 		length: password.length >= 8,
 		uppercase: /[A-Z]/.test(password),
-		lowercase: /[a-z]/.test(password), // Fixed: Now validates lowercase letters
+		lowercase: /[a-z]/.test(password),
 		number: /[0-9]/.test(password),
 		symbol: /[^A-Za-z0-9]/.test(password),
 	};
 
-	// Calculate total validation integrity score (0 to 5)
 	const strength = Object.values(checks).filter(Boolean).length;
 
-	// Score definitions mapped across a 5-tier strength layout configuration
 	const config = [
 		{
 			label: "Very Weak",
@@ -45,21 +42,19 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 	const currentLevel = config[strength];
 
 	return (
-		<div className="w-full space-y-4 font-mono select-none animate-in fade-in duration-300">
-			{/* Real-time Metric Readout Header Block */}
-			<div className="flex justify-between items-center text-sm font-bold uppercase tracking-wider">
+		<section className="w-full space-y-4 font-mono select-none animate-in fade-in duration-300 text-xs sm:text-sm md:text-base lg:text-lg">
+			<div className="flex justify-between items-center text-xs sm:text-sm font-bold uppercase tracking-wider">
 				<div className="text-slate-500 flex items-center gap-1.5">
 					<Terminal size={12} className="text-fuchsia-500" />
 					<span>Password strength:</span>
 				</div>
 				<span
-					className={`px-2 py-0.5 rounded text-xs font-black tracking-widest transition-all duration-300 ${currentLevel.color}`}
+					className={`px-2 py-0.5 rounded text-[10px] sm:text-xs font-black tracking-widest transition-all duration-300 ${currentLevel.color}`}
 				>
 					{currentLevel.label}
 				</span>
 			</div>
 
-			{/* Segmented Data Channel Grid (5 bars total) */}
 			<div className="flex gap-1.5 h-1.5">
 				{[1, 2, 3, 4, 5].map((step) => {
 					const isActive = strength >= step;
@@ -87,9 +82,8 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 				})}
 			</div>
 
-			{/* Live Security Parameter Diagnostic Checklist */}
 			<div className="border-t border-white/5 pt-3">
-				<ul className="space-y-1.5 text-xs font-bold uppercase tracking-wide">
+				<ul className="space-y-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wide">
 					<li
 						className={`flex items-center gap-2 transition-colors duration-300 ${checks.length ? "text-emerald-400" : "text-slate-600"}`}
 					>
@@ -132,7 +126,7 @@ const PasswordStrengthMeter = ({ password = "" }) => {
 					</li>
 				</ul>
 			</div>
-		</div>
+		</section>
 	);
 };
 

@@ -80,7 +80,6 @@ try {
 
     $processedMessages = [];
     foreach ($rows as $row) {
-        // Fallback names using standard properties from form fields
         $displayName = $row['form_name'];
         $contactDetails = $row['form_email'];
 

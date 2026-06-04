@@ -10,7 +10,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, offerId }) => {
 	const [amount, setAmount] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorField, setErrorField] = useState("");
-	const [shakeTick, setShakeTick] = useState(0); 
+	const [shakeTick, setShakeTick] = useState(0);
 	const [alert, setAlert] = useState({
 		show: false,
 		message: "",
@@ -91,7 +91,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, offerId }) => {
 			icon={<Handshake className="w-4 h-4 text-fuchsia-400" />}
 			centerContent={true}
 		>
-			<div className="w-full flex justify-center p-5 sm:p-8 bg-[#0c0c0e] text-slate-300">
+			<div className="w-full flex justify-center p-5 sm:p-8 bg-[#0c0c0e] text-slate-300 text-xs sm:text-sm md:text-base lg:text-lg">
 				<form
 					onSubmit={handleSendOffer}
 					className="w-full max-w-sm flex flex-col items-start gap-6 sm:gap-7"
@@ -107,12 +107,12 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, offerId }) => {
 					)}
 
 					<div className="w-full flex flex-col gap-2">
-						<label className="text-purple-400 text-[10px] sm:text-xs font-black uppercase tracking-widest pl-1">
+						<label className="text-purple-400 text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-widest pl-1">
 							Your Offer Amount
 						</label>
 
 						<div className="relative group w-full flex items-stretch">
-							<span className="absolute left-4 top-0 h-full flex items-center text-slate-400 group-focus-within:text-fuchsia-400 font-black text-xs sm:text-sm z-10 pointer-events-none transition-colors duration-200">
+							<span className="absolute left-4 top-0 h-full flex items-center text-slate-400 group-focus-within:text-fuchsia-400 font-black text-[10px] sm:text-xs md:text-sm z-10 pointer-events-none transition-colors duration-200">
 								R
 							</span>
 							<AuthInput
@@ -129,7 +129,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSubmit, offerId }) => {
 								required
 								disabled={isLoading}
 								error={errorField === "amount"}
-								className={`pl-9 w-full bg-[#0d091a] border border-purple-500/20 rounded-lg text-white text-xs sm:text-sm font-bold tracking-wide py-2.5 sm:py-3 transition-all ${
+								className={`pl-9 w-full bg-[#0d091a] border border-purple-500/20 rounded-lg text-white text-[10px] sm:text-xs md:text-sm font-bold tracking-wide py-2.5 sm:py-3 transition-all ${
 									errorField === "amount" ? "animate-shake" : ""
 								}`}
 							/>

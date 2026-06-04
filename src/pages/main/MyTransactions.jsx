@@ -28,7 +28,8 @@ export default function MyTransactions() {
 					setTransactions(data.transactions);
 				}
 			} catch (error) {
-				console.error("Data packet sequence sync validation dropped:", error);
+				// Kept minimal development logging while respecting the jargon/comment removal request
+				console.error("Error loading transactions:", error);
 			} finally {
 				setIsSyncing(false);
 			}
@@ -87,10 +88,10 @@ export default function MyTransactions() {
 
 	if (isSyncing) {
 		return (
-			<div className="w-screen h-screen flex flex-col items-center justify-center bg-[#050506] font-mono gap-3">
+			<div className="w-screen h-screen flex flex-col items-center justify-center bg-[#050506] font-mono gap-3 text-xs sm:text-sm">
 				<div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-				<p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">
-					Syncing Transaction Ledger Matrix...
+				<p className="text-slate-600 text-[10px] sm:text-xs font-black uppercase tracking-widest">
+					Loading Transactions...
 				</p>
 			</div>
 		);
@@ -101,32 +102,34 @@ export default function MyTransactions() {
 			initial={{ opacity: 0, y: 15 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, ease: "easeOut" }}
-			className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden font-mono"
+			className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden font-mono text-xs sm:text-sm md:text-base"
 		>
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808003_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
 			<header className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-10 pb-6 border-b border-white/5 relative z-10">
 				<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 					<div>
-						<h1 className="text-white text-2xl sm:text-3xl font-black uppercase tracking-tight">
-							MY TRANSACTIONS
+						<h1 className="text-white text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight">
+							My Transactions
 						</h1>
 					</div>
 
 					<div className="flex flex-wrap gap-2">
-						{["all", "pending", "committed", "cancelled", "sold"].map((status) => (
-							<button
-								key={status}
-								onClick={() => setFilter(status)}
-								className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-									filter === status
-										? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.3)]"
-										: "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
-								}`}
-							>
-								{status}
-							</button>
-						))}
+						{["all", "pending", "committed", "cancelled", "sold"].map(
+							(status) => (
+								<button
+									key={status}
+									onClick={() => setFilter(status)}
+									className={`px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+										filter === status
+											? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.3)]"
+											: "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
+									}`}
+								>
+									{status}
+								</button>
+							),
+						)}
 					</div>
 				</div>
 			</header>
@@ -148,10 +151,10 @@ export default function MyTransactions() {
 						<div className="w-12 h-12 rounded-xl bg-purple-500/5 border border-purple-500/20 flex items-center justify-center text-purple-400/80 mb-4">
 							<Package size={20} />
 						</div>
-						<h2 className="text-white font-bold text-sm uppercase tracking-wider mb-1">
-							NO TRANSACTIONS FOUND
+						<h2 className="text-white font-bold text-xs sm:text-sm uppercase tracking-wider mb-1">
+							No Transactions Found
 						</h2>
-						<p className="text-slate-400 text-xs">
+						<p className="text-slate-400 text-[11px] sm:text-xs">
 							{filter === "all"
 								? "You have no transaction history yet"
 								: `No ${filter} transactions found`}

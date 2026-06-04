@@ -27,14 +27,14 @@ export default function UserSupport() {
 					setAlertConfig({
 						show: true,
 						type: "error",
-						message: result.error || "Could not load support messages.",
+						message: result.error || "Could not load messages.",
 					});
 				}
 			} catch (err) {
 				setAlertConfig({
 					show: true,
 					type: "error",
-					message: "Could not connect to the database to find messages.",
+					message: "Could not connect to the server to find messages.",
 				});
 			} finally {
 				setIsLoading(false);
@@ -62,7 +62,7 @@ export default function UserSupport() {
 				setAlertConfig({
 					show: true,
 					type: "success",
-					message: "Message status updated successfully.",
+					message: "Status updated successfully.",
 				});
 			} else {
 				throw new Error(result.error);
@@ -71,7 +71,7 @@ export default function UserSupport() {
 			setAlertConfig({
 				show: true,
 				type: "error",
-				message: err.message || "Could not complete your update request.",
+				message: err.message || "Could not complete your request.",
 			});
 		}
 	};
@@ -101,7 +101,6 @@ export default function UserSupport() {
 		<div className="space-y-6 font-mono text-slate-300 relative">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808001_1px,transparent_1px),linear-gradient(to_bottom,#80808002_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-			{/* Title Banner */}
 			<header className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between border-b border-white/5 pb-5 relative z-10">
 				<div>
 					<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
@@ -111,15 +110,17 @@ export default function UserSupport() {
 						</span>
 					</h1>
 					<p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-500 mt-1 uppercase tracking-wider">
-						Review and handle customer help messages.
+						Review and handle customer messages.
 					</p>
 				</div>
 
-				{/* Filtering Buttons and Search Field */}
 				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-					<div className="flex flex-wrap gap-1 bg-black/40 border border-white/5 p-1 rounded-xl">
+					<nav
+						aria-label="Message status filters"
+						className="flex flex-wrap gap-1 bg-black/40 border border-white/5 p-1 rounded-xl"
+					>
 						{[
-							{ id: "all", label: "All Queues" },
+							{ id: "all", label: "All" },
 							{ id: "new", label: "New" },
 							{ id: "in_progress", label: "Active" },
 							{ id: "resolved", label: "Resolved" },
@@ -138,24 +139,27 @@ export default function UserSupport() {
 								{tab.label}
 							</button>
 						))}
-					</div>
+					</nav>
 
 					<div className="relative min-w-[240px]">
+						<label htmlFor="search-messages" className="sr-only">
+							Filter messages
+						</label>
 						<span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-							<Search size={14} />
+							<Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
 						</span>
 						<input
+							id="search-messages"
 							type="search"
-							placeholder="FILTER CURRENT QUEUE..."
+							placeholder="FILTER CURRENT LIST..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full h-10 pl-9 pr-4 rounded-xl bg-black/40 border border-white/10 text-xs sm:text-xs md:text-sm lg:text-base tracking-wide uppercase text-white placeholder-slate-600 focus:outline-none focus:border-purple-500/50 transition-all"
+							className="w-full h-10 pl-9 pr-4 rounded-xl bg-black/40 border border-white/10 text-xs sm:text-sm md:text-base tracking-wide uppercase text-white placeholder-slate-600 focus:outline-none focus:border-purple-500/50 transition-all"
 						/>
 					</div>
 				</div>
 			</header>
 
-			{/* Popup Alerts */}
 			{alertConfig.show && (
 				<div className="mb-4 relative z-10 text-xs sm:text-sm md:text-base lg:text-lg">
 					<CyberAlert
@@ -166,60 +170,62 @@ export default function UserSupport() {
 				</div>
 			)}
 
-			{/* Summary Stat Counters */}
-			<section className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+			<section
+				className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10"
+				aria-label="Message metrics"
+			>
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-purple-500/10 rounded-xl text-purple-400 shrink-0">
-						<Landmark size={20} />
+						<Landmark className="w-4 h-4 sm:w-5 sm:h-5" />
 					</div>
 					<div>
-						<p className="text-xs sm:text-xs md:text-sm lg:text-base uppercase tracking-widest text-slate-500">
+						<h2 className="text-xs sm:text-sm md:text-base uppercase tracking-widest text-slate-500 font-normal">
 							Open Messages
-						</p>
+						</h2>
 						<p className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white mt-0.5">
-							{tickets.length} Total Incoming Messages
+							{tickets.length} Total Messages
 						</p>
 					</div>
-				</div>
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+				</article>
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 shrink-0">
-						<Inbox size={20} />
+						<Inbox className="w-4 h-4 sm:w-5 sm:h-5" />
 					</div>
 					<div>
-						<p className="text-xs sm:text-xs md:text-sm lg:text-base uppercase tracking-widest text-slate-500">
+						<h2 className="text-xs sm:text-sm md:text-base uppercase tracking-widest text-slate-500 font-normal">
 							Unattended Messages
-						</p>
+						</h2>
 						<p className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-blue-400 mt-0.5">
 							{newTicketsCount} Marked As New
 						</p>
 					</div>
-				</div>
+				</article>
 			</section>
 
-			{/* Main Ticket Area */}
 			<main className="relative z-10">
 				{filteredTickets.length === 0 ? (
 					<div className="text-center py-16 border border-dashed border-white/10 rounded-2xl bg-black/20 max-w-xl mx-auto mt-6 flex flex-col items-center justify-center p-6">
 						<div className="w-12 h-12 rounded-xl bg-purple-500/5 border border-purple-500/15 flex items-center justify-center text-purple-400/70 mb-4">
-							<AlertOctagon size={20} />
+							<AlertOctagon className="w-4 h-4 sm:w-5 sm:h-5" />
 						</div>
 						<h2 className="text-white font-bold text-xs sm:text-sm md:text-base lg:text-lg uppercase tracking-widest mb-1">
-							No Tickets Match Filter
+							No Messages Found
 						</h2>
 						<p className="text-slate-500 text-xs sm:text-sm md:text-base lg:text-lg max-w-xs leading-normal">
 							{statusFilter === "all"
 								? "There are currently no support messages in the system."
-								: `No tickets found matching status "${statusFilter}".`}
+								: `No messages found matching status "${statusFilter}".`}
 						</p>
 					</div>
 				) : (
 					<ul className="grid grid-cols-1 gap-4">
 						{filteredTickets.map((ticket) => (
-							<SupportMessageCard
-								key={ticket.id}
-								ticket={ticket}
-								onUpdateStatus={handleUpdateStatus}
-							/>
+							<li key={ticket.id}>
+								<SupportMessageCard
+									ticket={ticket}
+									onUpdateStatus={handleUpdateStatus}
+								/>
+							</li>
 						))}
 					</ul>
 				)}

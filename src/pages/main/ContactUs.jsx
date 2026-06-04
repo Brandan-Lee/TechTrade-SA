@@ -53,7 +53,7 @@ export default function ContactUs() {
 
 		if (!formData.firstName.trim()) {
 			triggerStatus(
-				"Validation Error: Please enter your first name before sending.",
+				"Please enter your first name before sending.",
 				"error",
 				"firstName",
 			);
@@ -62,7 +62,7 @@ export default function ContactUs() {
 
 		if (!formData.lastName.trim()) {
 			triggerStatus(
-				"Validation Error: Please enter your last name before sending.",
+				"Please enter your last name before sending.",
 				"error",
 				"lastName",
 			);
@@ -70,17 +70,13 @@ export default function ContactUs() {
 		}
 
 		if (!formData.inquiryType) {
-			triggerStatus(
-				"Validation Error: Please select a valid inquiry type category.",
-				"error",
-				"inquiryType",
-			);
+			triggerStatus("Please select an inquiry type.", "error", "inquiryType");
 			return;
 		}
 
 		if (!formData.message.trim()) {
 			triggerStatus(
-				"Validation Error: Please provide a description message outlining your inquiry details.",
+				"Please provide a message outlining your request.",
 				"error",
 				"message",
 			);
@@ -91,14 +87,11 @@ export default function ContactUs() {
 		setAlert({ show: false, message: "", type: "error" });
 
 		try {
-			const response = await apiFetch(
-				"/support/submit_support_message.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(formData),
-				},
-			);
+			const response = await apiFetch("/support/submit_support_message.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(formData),
+			});
 			const data = await response.json();
 
 			if (!response.ok) {
@@ -106,7 +99,7 @@ export default function ContactUs() {
 			}
 
 			triggerStatus(
-				data.message || "Your support message has been sent successfully.",
+				data.message || "Your message has been sent successfully.",
 				"success",
 			);
 
@@ -120,7 +113,7 @@ export default function ContactUs() {
 			setErrorField("");
 		} catch (err) {
 			triggerStatus(
-				err.message || "An unexpected network error occurred.",
+				err.message || "An unexpected error occurred.",
 				"error",
 				"message",
 			);
@@ -130,35 +123,30 @@ export default function ContactUs() {
 	};
 
 	return (
-		<div className="min-h-screen bg-[#050505] text-slate-300 py-12 px-4 relative overflow-x-hidden selection:bg-fuchsia-500/30">
-			{/* HEADER SECTION */}
+		<div className="bg-[#050505] text-slate-300 py-12 px-4 relative overflow-x-hidden selection:bg-fuchsia-500/30 text-xs sm:text-sm md:text-base lg:text-lg">
 			<header className="w-full max-w-[1200px] mx-auto px-4 md:px-8 mb-12 relative z-10">
 				<h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-black uppercase italic tracking-tighter leading-none">
 					Contact <span className="text-fuchsia-500">Us</span>
 				</h1>
-				<p className="mt-2 text-[10px] md:text-xs font-mono font-bold text-slate-500 uppercase tracking-widest">
-					TechTrade SA Support & Inquiry Hub
+				<p className="mt-2 text-[10px] sm:text-xs font-mono font-bold text-slate-500 uppercase tracking-widest">
+					TechTrade SA Support Hub
 				</p>
 			</header>
 
-			{/* MAIN CONTAINER */}
 			<main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-					{/* LEFT COLUMN: CONTACT DETAILS */}
 					<div className="lg:col-span-5 space-y-6">
-						<div className="bg-[#0c0c0e]/60 border border-white/5 rounded-2xl p-6 backdrop-blur-md">
-							<h2 className="text-xs md:text-sm font-black uppercase tracking-[0.25em] text-fuchsia-400 font-mono mb-4 flex items-center gap-2">
+						<section className="bg-[#0c0c0e]/60 border border-white/5 rounded-2xl p-6 backdrop-blur-md">
+							<h2 className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-[0.25em] text-fuchsia-400 font-mono mb-4 flex items-center gap-2">
 								<span className="w-1.5 h-3 bg-fuchsia-500 inline-block" />
 								Help Center
 							</h2>
-							<p className="text-slate-400 font-mono text-xs md:text-sm leading-relaxed uppercase">
-								Our support team is standing by to assist with your hardware
-								transactions, account requirements, or general service
-								inquiries.
+							<p className="text-slate-400 font-mono text-[11px] sm:text-xs md:text-sm leading-relaxed uppercase">
+								Our support team is standing by to assist with your listings,
+								orders, accounts, or general inquiries.
 							</p>
-						</div>
+						</section>
 
-						{/* Informational Rows */}
 						<div className="space-y-3">
 							{[
 								{
@@ -177,7 +165,7 @@ export default function ContactUs() {
 									value: "Roodepoort, JHB, ZA",
 								},
 							].map((item, i) => (
-								<div
+								<section
 									key={i}
 									className="flex items-center gap-4 p-4 bg-[#0c0c0e]/90 rounded-xl border border-white/10 hover:border-fuchsia-500/30 transition-all group font-mono"
 								>
@@ -185,37 +173,35 @@ export default function ContactUs() {
 										{item.icon}
 									</div>
 									<div className="min-w-0">
-										<p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">
+										<h3 className="text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-widest">
 											{item.label}
-										</p>
-										<p className="text-xs md:text-sm font-bold text-slate-200 truncate">
+										</h3>
+										<p className="text-xs sm:text-sm font-bold text-slate-200 truncate">
 											{item.value}
 										</p>
 									</div>
-								</div>
+								</section>
 							))}
 						</div>
 
-						{/* Live Availability Status Card */}
-						<div className="p-5 bg-gradient-to-r from-purple-950/40 via-fuchsia-950/20 to-purple-950/40 border border-fuchsia-500/20 text-white rounded-xl relative overflow-hidden">
+						<section className="p-5 bg-gradient-to-r from-purple-950/40 via-fuchsia-950/20 to-purple-950/40 border border-fuchsia-500/20 text-white rounded-xl relative overflow-hidden">
 							<div className="relative z-10 font-mono">
 								<div className="flex items-center gap-2 mb-1.5">
 									<div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
-									<span className="text-[10px] font-black tracking-[0.3em] text-emerald-400 uppercase">
+									<span className="text-[9px] sm:text-[10px] font-black tracking-[0.3em] text-emerald-400 uppercase">
 										Support Desk Active
 									</span>
 								</div>
-								<p className="text-slate-400 text-[11px] uppercase tracking-wide">
+								<p className="text-slate-400 text-[10px] sm:text-[11px] uppercase tracking-wide">
 									Average response time{" "}
-									<span className="text-white font-bold">within 24h</span>
+									<span className="text-white font-bold">within 24 hours</span>
 								</p>
 							</div>
 							<MessageSquare className="absolute -right-4 -bottom-4 w-20 h-20 text-fuchsia-500/[0.03] rotate-12 pointer-events-none" />
-						</div>
+						</section>
 					</div>
 
-					{/* RIGHT COLUMN: CONTACT FORM CONTAINER */}
-					<div className="lg:col-span-7 bg-[#0c0c0e]/90 border border-white/10 p-6 md:p-8 rounded-2xl relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+					<section className="lg:col-span-7 bg-[#0c0c0e]/90 border border-white/10 p-6 md:p-8 rounded-2xl relative shadow-[0_0_50px_rgba(0,0,0,0.5)]">
 						<div className="absolute top-0 right-8 w-16 h-[2px] bg-fuchsia-500 shadow-[0_0_10px_#d946ef]" />
 
 						{alert.show && (
@@ -274,9 +260,11 @@ export default function ContactUs() {
 								</div>
 							</div>
 
-							{/* Category Inquiry Dropdown Menu with Error Shake Ring */}
 							<div className="space-y-2">
-								<label className="block text-slate-400 text-[10px] font-mono font-black uppercase tracking-[0.3em] ml-1">
+								<label
+									htmlFor="inquiryType"
+									className="block text-slate-400 text-[10px] sm:text-xs font-mono font-black uppercase tracking-[0.3em] ml-1"
+								>
 									Select Inquiry Type
 								</label>
 								<div
@@ -288,10 +276,11 @@ export default function ContactUs() {
 												? `shake-${shakeTick}`
 												: "sel-normal"
 										}
+										id="inquiryType"
 										name="inquiryType"
 										value={formData.inquiryType}
 										onChange={handleInputChange}
-										className={`w-full h-12 md:h-14 bg-black rounded-xl px-4 border text-slate-400 focus:text-slate-200 transition-all focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-xs md:text-sm font-mono appearance-none ${
+										className={`w-full h-12 md:h-14 bg-black rounded-xl px-4 border text-slate-400 focus:text-slate-200 transition-all focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-[10px] sm:text-xs md:text-sm font-mono appearance-none ${
 											errorField === "inquiryType"
 												? "border-red-500/50"
 												: "border-white/10"
@@ -314,9 +303,11 @@ export default function ContactUs() {
 								</div>
 							</div>
 
-							{/* Message Area with Error Shake border configuration */}
 							<div className="space-y-2">
-								<label className="block text-slate-400 text-[10px] font-mono font-black uppercase tracking-[0.3em] ml-1">
+								<label
+									htmlFor="message"
+									className="block text-slate-400 text-[10px] sm:text-xs font-mono font-black uppercase tracking-[0.3em] ml-1"
+								>
 									Message
 								</label>
 								<textarea
@@ -325,27 +316,27 @@ export default function ContactUs() {
 											? `shake-${shakeTick}`
 											: "msg-normal"
 									}
+									id="message"
 									name="message"
 									value={formData.message}
 									disabled={isSubmitting}
 									onChange={handleInputChange}
-									className={`w-full h-40 bg-black rounded-xl px-4 py-4 border text-slate-200 focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-xs md:text-sm font-mono leading-relaxed placeholder:text-slate-700 resize-none ${
+									className={`w-full h-40 bg-black rounded-xl px-4 py-4 border text-slate-200 focus:outline-none focus:border-fuchsia-500/60 focus:ring-1 focus:ring-fuchsia-500/20 text-[10px] sm:text-xs md:text-sm font-mono leading-relaxed placeholder:text-slate-700 resize-none ${
 										errorField === "message"
 											? "border-red-500/50 animate-shake"
 											: "border-white/10"
 									}`}
-									placeholder="Type your message description details here..."
+									placeholder="Type your message details here..."
 									required
 								/>
 							</div>
 
-							{/* Follow-up Toggles */}
-							<div className="p-4 bg-black rounded-xl border border-white/5 space-y-3">
-								<label className="block text-[10px] font-mono font-black uppercase tracking-[0.25em] text-fuchsia-500/80">
+							<fieldset className="p-4 bg-black rounded-xl border border-white/5 space-y-3">
+								<legend className="px-1 text-[10px] sm:text-xs font-mono font-black uppercase tracking-[0.25em] text-fuchsia-500/80">
 									Preferred Contact Method
-								</label>
+								</legend>
 								<div className="flex flex-col sm:flex-row gap-6">
-									<label className="cursor-pointer flex items-center gap-2.5 group font-mono text-xs text-slate-400 select-none">
+									<label className="cursor-pointer flex items-center gap-2.5 group font-mono text-[10px] sm:text-xs text-slate-400 select-none">
 										<input
 											type="radio"
 											name="contactPreference"
@@ -360,7 +351,7 @@ export default function ContactUs() {
 										</span>
 									</label>
 
-									<label className="cursor-pointer flex items-center gap-2.5 group font-mono text-xs text-slate-400 select-none">
+									<label className="cursor-pointer flex items-center gap-2.5 group font-mono text-[10px] sm:text-xs text-slate-400 select-none">
 										<input
 											type="radio"
 											name="contactPreference"
@@ -375,16 +366,16 @@ export default function ContactUs() {
 										</span>
 									</label>
 								</div>
-							</div>
+							</fieldset>
 
 							<CyberActionButton
 								label={isSubmitting ? "SENDING..." : "SEND MESSAGE"}
-								className="w-full"
+								className="w-full text-xs sm:text-sm md:text-base"
 								disabled={isSubmitting}
 								type="submit"
 							/>
 						</form>
-					</div>
+					</section>
 				</div>
 			</main>
 

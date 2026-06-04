@@ -6,7 +6,6 @@ export const StrikeCard = ({
 	variant = "warning",
 	icon,
 }) => {
-	// Cyberpunk variant style matrix utilizing dark purple backgrounds with glowing neon structural accents
 	const variantStyles = {
 		warning: {
 			container:
@@ -34,12 +33,11 @@ export const StrikeCard = ({
 	const currentStyle = variantStyles[variant] || variantStyles.warning;
 
 	return (
-		<div
+		<article
 			role="alert"
 			aria-live={currentStyle.aria}
-			className={`w-full p-4 rounded-lg border bg-[#0d0915] text-slate-300 font-mono flex gap-3.5 items-start transition-all duration-300 selection:bg-red-500/30 ${currentStyle.container}`}
+			className={`w-full p-4 rounded-lg border bg-[#0d0915] text-slate-300 font-mono flex gap-3.5 items-start transition-all duration-300 selection:bg-red-500/30 text-xs sm:text-sm md:text-base lg:text-lg ${currentStyle.container}`}
 		>
-			{/* Structured Icon Housing Panel */}
 			{icon && (
 				<div
 					className={`w-8 h-8 rounded border flex justify-center items-center shrink-0 shadow-sm ${currentStyle.icon}`}
@@ -49,18 +47,17 @@ export const StrikeCard = ({
 				</div>
 			)}
 
-			{/* Infraction Metadata Readout */}
 			<div className="flex flex-col gap-1 min-w-0">
-				<h5
+				<h1
 					className={`text-xs sm:text-sm md:text-base font-black uppercase tracking-[0.15em] leading-tight ${currentStyle.title}`}
 				>
 					{title}
-				</h5>
+				</h1>
 
-				<p className="text-slate-400 text-[11px] sm:text-xs md:text-sm leading-relaxed tracking-wide font-medium">
+				<p className="text-slate-400 text-[10px] sm:text-xs md:text-sm leading-relaxed tracking-wide font-medium">
 					{description}
 				</p>
 			</div>
-		</div>
+		</article>
 	);
 };

@@ -16,18 +16,16 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 			footerText={`Version ${docVersion} | Updated: ${lastUpdated}`}
 			centerContent={false}
 		>
-			<div className="flex flex-col gap-10 py-4 max-w-2xl mx-auto px-1 select-none selection:bg-fuchsia-500/30">
-				{/* Security Measures Section */}
+			<div className="flex flex-col gap-10 py-4 max-w-2xl mx-auto px-1 select-none selection:bg-fuchsia-500/30 text-xs sm:text-sm md:text-base lg:text-lg">
 				<ProtocolSection
 					title="How We Protect Your Data"
 					icon={<Lock className="text-fuchsia-400" size={16} />}
 				>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-						{/* Data Encryption */}
 						<div className="p-4 sm:p-5 bg-[#0c0915] border border-emerald-500/20 rounded-lg shadow-md flex flex-col transition-all hover:border-emerald-500/40 group">
-							<h4 className="font-black text-xs sm:text-sm text-emerald-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+							<h1 className="font-black text-[10px] sm:text-xs md:text-sm text-emerald-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
 								Advanced Encryption
-							</h4>
+							</h1>
 							<p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
 								All your profile information and saved files are scrambled using
 								high-level security standards, making them unreadable to anyone
@@ -35,11 +33,10 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 							</p>
 						</div>
 
-						{/* Connection Security */}
 						<div className="p-4 sm:p-5 bg-[#0c0915] border border-blue-500/20 rounded-lg shadow-md flex flex-col transition-all hover:border-blue-500/40 group">
-							<h4 className="font-black text-xs sm:text-sm text-blue-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+							<h1 className="font-black text-[10px] sm:text-xs md:text-sm text-blue-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
 								Secure Connection
-							</h4>
+							</h1>
 							<p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
 								Information you send while using our site is protected during
 								transit, ensuring your data cannot be intercepted or tampered
@@ -47,11 +44,10 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 							</p>
 						</div>
 
-						{/* Temporary Data Handling */}
 						<div className="p-4 sm:p-5 bg-[#0c0915] border border-fuchsia-500/20 rounded-lg shadow-md flex flex-col sm:col-span-2 lg:col-span-1 transition-all hover:border-fuchsia-500/40 group">
-							<h4 className="font-black text-xs sm:text-sm text-fuchsia-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+							<h1 className="font-black text-[10px] sm:text-xs md:text-sm text-fuchsia-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
 								Automatic Deletion
-							</h4>
+							</h1>
 							<p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
 								Temporary connection details and messaging information are
 								automatically and permanently deleted every 24 hours.
@@ -60,7 +56,6 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 					</div>
 				</ProtocolSection>
 
-				{/* Data Usage Section */}
 				<ProtocolSection
 					title="Data Usage Policy"
 					icon={<Scale className="text-fuchsia-400" size={16} />}
@@ -71,9 +66,9 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 								<ShieldCheck size={14} />
 							</div>
 							<div>
-								<h4 className="text-white text-xs sm:text-sm font-black uppercase tracking-wider mb-1">
+								<h1 className="text-white text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-wider mb-1">
 									No Selling Your Data
-								</h4>
+								</h1>
 								<p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
 									We do not sell, rent, or share your profile information with
 									outside advertisers or data collectors. We only earn through
@@ -87,9 +82,9 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 								<Zap size={14} />
 							</div>
 							<div>
-								<h4 className="text-white text-xs sm:text-sm font-black uppercase tracking-wider mb-1">
+								<h1 className="text-white text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-wider mb-1">
 									Improving Your Experience
-								</h4>
+								</h1>
 								<p className="text-[11px] sm:text-xs text-slate-400 leading-relaxed font-medium">
 									We use anonymous hardware information to help our system
 									understand and improve compatibility. This information is
@@ -100,7 +95,6 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 					</div>
 				</ProtocolSection>
 
-				{/* Rights Section */}
 				<ProtocolSection
 					title="Your Data Rights"
 					icon={<AlertCircle className="text-fuchsia-400" size={16} />}
@@ -144,9 +138,9 @@ const PrivacyModal = ({ isOpen, onClose }) => {
 						</ul>
 
 						<div className="mt-6 p-4 sm:p-5 bg-[#0a0812] border border-purple-500/20 rounded-lg">
-							<h4 className="text-purple-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-2">
+							<h1 className="text-purple-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-2">
 								Financial Records
-							</h4>
+							</h1>
 							<p className="text-slate-400 text-[11px] sm:text-xs leading-relaxed font-medium">
 								By law, we must keep financial transaction records for 7 years
 								to comply with tax and anti-fraud regulations.

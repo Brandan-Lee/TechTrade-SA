@@ -65,7 +65,6 @@ export default function ViewListing() {
 					setError(errData.error || "Unable to load listing details.");
 				}
 			} catch (err) {
-				console.error("Connection error:", err);
 				setError(
 					"A network error occurred while loading the listing. Please try again.",
 				);
@@ -91,7 +90,7 @@ export default function ViewListing() {
 		if (!datetimeStr) {
 			return "Unknown date";
 		}
-		
+
 		const uploadDate = new Date(datetimeStr.replace(/-/g, "/"));
 		const now = new Date();
 		const diffTime = Math.abs(now - uploadDate);
@@ -154,7 +153,6 @@ export default function ViewListing() {
 				});
 			}
 		} catch (err) {
-			console.error("Offer error:", err);
 			setOfferFeedback({
 				type: "error",
 				message: "Network timeout. Unable to communicate with the server.",
@@ -185,7 +183,6 @@ export default function ViewListing() {
 				setShowDeleteConfirm(false);
 			}
 		} catch (err) {
-			console.error("Delete error:", err);
 			alert("A network error occurred while attempting to delete the listing.");
 			setIsDeleting(false);
 			setShowDeleteConfirm(false);
@@ -198,22 +195,22 @@ export default function ViewListing() {
 
 	if (loading) {
 		return (
-			<div className="w-full min-h-screen bg-[#050505] py-32 flex flex-col items-center justify-center gap-3 text-slate-500 font-mono text-xs uppercase tracking-widest">
+			<div className="w-full min-h-screen bg-[#050505] py-32 flex flex-col items-center justify-center gap-3 text-slate-500 text-xs sm:text-sm tracking-widest">
 				<Loader2 className="animate-spin text-fuchsia-500" size={24} />
-				Loading listing details...
+				Loading listing...
 			</div>
 		);
 	}
 
 	if (error || !listingData) {
 		return (
-			<div className="min-h-screen bg-[#050506] flex items-center justify-center font-mono text-red-400 p-4">
-				<div className="max-w-md w-full border border-red-500/10 bg-red-500/5 p-6 rounded-2xl text-center uppercase tracking-wider">
+			<div className="min-h-screen bg-[#050506] flex items-center justify-center p-4">
+				<div className="max-w-md w-full border border-red-500/10 bg-red-500/5 p-6 rounded-2xl text-center tracking-wider">
 					<AlertTriangle size={32} className="mx-auto text-red-500 mb-3" />
-					<h2 className="text-white font-black text-sm mb-2">
+					<h2 className="text-white font-black text-xs sm:text-sm mb-2">
 						Listing Unavailable
 					</h2>
-					<p className="text-xs text-slate-500 mb-4 normal-case tracking-normal">
+					<p className="text-xs text-slate-500 mb-4 tracking-normal">
 						{error || "The requested listing could not be found."}
 					</p>
 					<AlternateButton
@@ -236,7 +233,6 @@ export default function ViewListing() {
 
 	const isOwner = user && String(user.id) === String(listing.seller_id);
 	const isStaff = user && user.roleId && [3, 4].includes(Number(user.roleId));
-
 	const isLocked =
 		listing.status === "COMMITED" || listing.status === "COMPLETED";
 
@@ -250,31 +246,30 @@ export default function ViewListing() {
 		`https://ui-avatars.com/api/?name=${encodeURIComponent(seller.name || "Seller")}&background=581c87&color=fff`;
 
 	return (
-		<div className="min-h-screen bg-[#050506] text-slate-300 pb-20 font-mono selection:bg-fuchsia-500/30 selection:text-white relative">
+		<div className="min-h-screen bg-[#050506] text-slate-300 pb-20 selection:bg-fuchsia-500/30 selection:text-white relative">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808002_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
-				View{" "}
-				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-					Listing
-				</span>
-			</h1>
+			<header className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-4 relative z-10">
+				<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
+					View{" "}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+						Listing
+					</span>
+				</h1>
+			</header>
 
-			<main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+			<main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
 				<div className="lg:col-span-7 flex flex-col gap-6 min-w-0">
-					<section
-						aria-label="Product Media Gallery"
-						className="flex flex-col gap-3"
-					>
+					<section aria-label="Images" className="flex flex-col gap-3">
 						<div className="aspect-square w-full bg-[#0c0c0e] rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.4)] border border-white/10 relative group">
 							<img
 								src={displayImages[activeImg]}
 								alt={listing.title}
-								className="w-full h-full object-cover transition-all duration-500 group-hover:scale-102 filter brightness-90 group-hover:brightness-100"
+								className="w-full h-full object-cover transition-all duration-500 group-hover:scale-102 brightness-90 group-hover:brightness-100"
 							/>
 
-							<div className="absolute top-4 right-4 bg-[#050506]/80 border border-white/10 backdrop-blur-md px-3 py-1 rounded text-fuchsia-400 text-xs font-black tracking-widest">
-								[{activeImg + 1} // {displayImages.length}]
+							<div className="absolute top-4 right-4 bg-[#050506]/80 border border-white/10 backdrop-blur-md px-3 py-1 rounded text-fuchsia-400 text-[10px] sm:text-xs font-black tracking-widest">
+								[{activeImg + 1} / {displayImages.length}]
 							</div>
 
 							<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
@@ -295,7 +290,7 @@ export default function ViewListing() {
 									<button
 										key={i}
 										onClick={() => setActiveImg(i)}
-										aria-label={`Switch main asset view image item to ${i + 1}`}
+										aria-label={`View image ${i + 1}`}
 										className={`aspect-square rounded-lg overflow-hidden border transition-all bg-[#0c0c0e] ${
 											activeImg === i
 												? "border-fuchsia-500 shadow-[0_0_15px_rgba(217,70,239,0.2)] scale-95"
@@ -304,7 +299,7 @@ export default function ViewListing() {
 									>
 										<img
 											src={img}
-											alt="Thumbnail item row view"
+											alt="Thumbnail"
 											className="w-full h-full object-cover"
 										/>
 									</button>
@@ -318,13 +313,13 @@ export default function ViewListing() {
 
 						<div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
 							<div>
-								<h1 className="text-white text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight leading-none break-words">
+								<h2 className="text-white text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight leading-none break-words">
 									{listing.title}
-								</h1>
+								</h2>
 							</div>
 
 							<div className="sm:text-right shrink-0 flex flex-col items-start sm:items-end gap-2">
-								<p className="text-fuchsia-400 text-2xl sm:text-3xl font-black tracking-tight leading-none">
+								<p className="text-fuchsia-400 text-xl sm:text-2xl md:text-3xl font-black tracking-tight leading-none">
 									{formatCurrency(listing.price_cents)}
 								</p>
 								<div className="flex gap-2.5">
@@ -340,7 +335,7 @@ export default function ViewListing() {
 							</div>
 						</div>
 
-						<div className="flex gap-5 mb-6 text-slate-500 border-b border-white/5 pb-4 text-xs">
+						<div className="flex gap-5 mb-6 text-slate-500 border-b border-white/5 pb-4 text-[10px] sm:text-xs">
 							<div className="flex items-center gap-1.5 uppercase font-bold tracking-wider">
 								<Eye size={12} className="text-fuchsia-500/60" />{" "}
 								<span>{listing.view_count} VIEWS</span>
@@ -352,7 +347,7 @@ export default function ViewListing() {
 						</div>
 
 						<div className="space-y-2">
-							<h3 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+							<h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
 								<Info size={14} className="text-fuchsia-500" /> DESCRIPTION
 							</h3>
 							<p className="text-slate-300 leading-relaxed text-xs sm:text-sm whitespace-pre-wrap">
@@ -365,8 +360,8 @@ export default function ViewListing() {
 						<section className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-5 md:p-6 shadow-xl relative">
 							<div className="flex items-center gap-2 mb-4">
 								<Cpu size={16} className="text-fuchsia-400" />
-								<h2 className="text-white text-sm sm:text-base font-black uppercase tracking-wider">
-									TECHNICAL SPECIFICATIONS
+								<h2 className="text-white text-xs sm:text-sm md:text-base font-black uppercase tracking-wider">
+									SPECIFICATIONS
 								</h2>
 							</div>
 
@@ -395,22 +390,16 @@ export default function ViewListing() {
 
 				<div className="lg:col-span-5 flex flex-col gap-6">
 					{isOwner && (
-						<section
-							aria-label="Owner Management Actions"
-							className="bg-[#0c0c0e]/90 border border-fuchsia-500/30 rounded-xl p-5 md:p-6 shadow-xl relative bg-gradient-to-b from-fuchsia-950/10 to-transparent"
-						>
-							<h3 className="text-white text-xs sm:text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+						<section className="bg-[#0c0c0e]/90 border border-fuchsia-500/30 rounded-xl p-5 md:p-6 shadow-xl relative bg-gradient-to-b from-fuchsia-950/10 to-transparent">
+							<h3 className="text-white text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse" />
-								Listing Management
+								Options
 							</h3>
 
 							{isLocked ? (
-								/* Renders a lock notice block instead of edit buttons if status is locked */
-								<div className="border border-amber-500/20 bg-amber-500/[0.02] text-amber-400 p-4 rounded-lg text-center text-xs font-bold uppercase tracking-wider flex flex-col items-center gap-2">
+								<div className="border border-amber-500/20 bg-amber-500/[0.02] text-amber-400 p-4 rounded-lg text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider flex flex-col items-center gap-2">
 									<Lock size={18} className="text-amber-500" />
-									<span>
-										This listing is {listing.status} and cannot be modified.
-									</span>
+									<span>This item is locked and cannot be changed.</span>
 								</div>
 							) : !showDeleteConfirm ? (
 								<div className="flex flex-col gap-3">
@@ -419,14 +408,14 @@ export default function ViewListing() {
 											navigate(`/sell?listingId=${encodeURIComponent(id)}`)
 										}
 										label="UPDATE LISTING"
-										className="w-full"
+										className="w-full text-xs sm:text-sm"
 									>
 										<Edit size={16} className="mr-2" />
 									</CyberActionButton>
 
 									<button
 										onClick={() => setShowDeleteConfirm(true)}
-										className="w-full h-[48px] rounded-lg border border-red-500/30 text-red-400 font-mono font-bold text-xs tracking-widest uppercase hover:bg-red-500/10 hover:border-red-500 transition-all duration-300 flex items-center justify-center gap-2"
+										className="w-full h-[48px] rounded-lg border border-red-500/30 text-red-400 font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-red-500/10 hover:border-red-500 transition-all duration-300 flex items-center justify-center gap-2"
 									>
 										<Trash2 size={14} />
 										<span>DELETE LISTING</span>
@@ -434,22 +423,21 @@ export default function ViewListing() {
 								</div>
 							) : (
 								<div className="border border-red-500/30 bg-red-950/10 rounded-lg p-4 text-center">
-									<p className="text-xs text-slate-300 font-bold uppercase tracking-wide mb-3">
-										Are you sure you want to remove this listing from the
-										marketplace?
+									<p className="text-[10px] sm:text-xs text-slate-300 font-bold uppercase tracking-wide mb-3">
+										Remove this listing from the marketplace?
 									</p>
 									<div className="flex gap-2">
 										<button
 											onClick={handleDeleteListing}
 											disabled={isDeleting}
-											className="flex-1 h-9 rounded bg-red-600 hover:bg-red-700 font-bold text-white text-[11px] uppercase tracking-wider transition-colors disabled:opacity-50"
+											className="flex-1 h-9 rounded bg-red-600 hover:bg-red-700 font-bold text-white text-[10px] sm:text-xs uppercase tracking-wider transition-colors disabled:opacity-50"
 										>
 											{isDeleting ? "DELETING..." : "YES, DELETE"}
 										</button>
 										<button
 											onClick={() => setShowDeleteConfirm(false)}
 											disabled={isDeleting}
-											className="flex-1 h-9 rounded bg-white/5 border border-white/10 hover:bg-white/10 font-bold text-slate-300 text-[11px] uppercase tracking-wider transition-colors"
+											className="flex-1 h-9 rounded bg-white/5 border border-white/10 hover:bg-white/10 font-bold text-slate-300 text-[10px] sm:text-xs uppercase tracking-wider transition-colors"
 										>
 											CANCEL
 										</button>
@@ -459,28 +447,25 @@ export default function ViewListing() {
 						</section>
 					)}
 
-					<section
-						aria-label="Seller Profile Details"
-						className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-5 md:p-6 shadow-xl relative"
-					>
+					<section className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-5 md:p-6 shadow-xl relative">
 						<div className="flex items-center gap-4 mb-6">
 							<div className="relative w-12 h-12 rounded-lg border border-white/10 flex justify-center items-center overflow-hidden bg-fuchsia-950 shadow-md shrink-0">
 								<img
 									src={sellerAvatar}
 									alt={seller.name}
-									className="w-full h-full object-cover filter brightness-90"
+									className="w-full h-full object-cover brightness-90"
 								/>
 							</div>
 							<div className="min-w-0">
-								<h4 className="font-black text-white text-sm sm:text-base uppercase tracking-wide truncate">
+								<h4 className="font-black text-white text-xs sm:text-sm md:text-base uppercase tracking-wide truncate">
 									{seller.name}{" "}
 									{isOwner && (
-										<span className="text-[10px] text-fuchsia-400 ml-1 font-normal lowercase italic">
+										<span className="text-[9px] sm:text-[10px] text-fuchsia-400 ml-1 font-normal lowercase italic">
 											(you)
 										</span>
 									)}
 								</h4>
-								<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] mt-1 font-bold text-slate-500 uppercase tracking-widest">
+								<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[8px] sm:text-[9px] mt-1 font-bold text-slate-500 uppercase tracking-widest">
 									<span className="flex items-center gap-1 text-fuchsia-400">
 										<ShieldCheck size={10} /> VERIFIED SELLER
 									</span>
@@ -496,32 +481,32 @@ export default function ViewListing() {
 						<CyberActionButton
 							onClick={() => handleViewProfile(listing.seller_id)}
 							label="VIEW PROFILE"
-							className="w-full"
+							className="w-full text-xs sm:text-sm"
 						/>
 
 						<div className="grid grid-cols-3 gap-1 text-center bg-black/40 border border-white/5 rounded-lg py-3 mt-4">
 							<div>
-								<div className="flex items-center justify-center gap-1 text-white text-sm sm:text-base font-black">
+								<div className="flex items-center justify-center gap-1 text-white text-xs sm:text-sm md:text-base font-black">
 									<Star size={12} className="text-amber-400 fill-amber-400" />{" "}
 									{seller.trust_score}
 								</div>
-								<p className="text-[8px] font-bold uppercase text-slate-600 tracking-wider mt-0.5">
-									TRUST RATING
+								<p className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-600 tracking-wider mt-0.5">
+									RATING
 								</p>
 							</div>
 							<div>
-								<p className="text-white text-sm sm:text-base font-black">
+								<p className="text-white text-xs sm:text-sm md:text-base font-black">
 									{seller.trade_count}
 								</p>
-								<p className="text-[8px] font-bold uppercase text-slate-600 tracking-wider mt-0.5">
+								<p className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-600 tracking-wider mt-0.5">
 									TRADES
 								</p>
 							</div>
 							<div>
-								<p className="text-emerald-400 text-sm sm:text-base font-black">
+								<p className="text-emerald-400 text-xs sm:text-sm md:text-base font-black">
 									100%
 								</p>
-								<p className="text-[8px] font-bold uppercase text-slate-600 tracking-wider mt-0.5">
+								<p className="text-[7px] sm:text-[8px] font-bold uppercase text-slate-600 tracking-wider mt-0.5">
 									FEEDBACK
 								</p>
 							</div>
@@ -531,19 +516,15 @@ export default function ViewListing() {
 					{!isOwner &&
 						!isStaff &&
 						(isLocked ? (
-							/* Blocks offers from buyers if the item status is already locked */
-							<section className="bg-[#0c0c0e]/90 border border-amber-500/20 rounded-xl p-5 text-center text-amber-500 text-xs uppercase tracking-widest font-black flex flex-col items-center gap-2">
+							<section className="bg-[#0c0c0e]/90 border border-amber-500/20 rounded-xl p-5 text-center text-amber-500 text-[10px] sm:text-xs uppercase tracking-widest font-black flex flex-col items-center gap-2">
 								<Lock size={16} />
-								<span>This listing is no longer accepting offers.</span>
+								<span>Offers are closed.</span>
 							</section>
 						) : listing.accepts_offers !== false ? (
-							<section
-								aria-label="Make an Offer Interface"
-								className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-5 md:p-6 shadow-xl relative"
-							>
+							<section className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl p-5 md:p-6 shadow-xl relative">
 								<div className="flex items-center gap-2 mb-4">
 									<Coins size={16} className="text-fuchsia-400" />
-									<h3 className="text-white text-sm sm:text-base font-black uppercase tracking-wider">
+									<h3 className="text-white text-xs sm:text-sm md:text-base font-black uppercase tracking-wider">
 										Make an Offer
 									</h3>
 								</div>
@@ -555,12 +536,12 @@ export default function ViewListing() {
 									<div className="relative flex flex-col gap-1.5">
 										<label
 											htmlFor="offer-amount"
-											className="text-slate-500 text-[10px] font-black uppercase tracking-widest ml-1"
+											className="text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest ml-1"
 										>
-											Enter Offer Amount
+											Offer Amount
 										</label>
 										<div className="relative">
-											<span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-black text-sm z-10">
+											<span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-black text-xs sm:text-sm z-10">
 												R
 											</span>
 											<AuthInput
@@ -568,7 +549,7 @@ export default function ViewListing() {
 												type="number"
 												value={offerValue}
 												onChange={(e) => setOfferValue(e.target.value)}
-												className="pl-10 font-mono text-sm"
+												className="pl-10 text-xs sm:text-sm"
 												placeholder="0.00"
 												disabled={submittingOffer}
 												required
@@ -579,14 +560,14 @@ export default function ViewListing() {
 									<div className="flex flex-col gap-1.5">
 										<label
 											htmlFor="buyer-note"
-											className="text-slate-500 text-[10px] font-black uppercase tracking-widest ml-1"
+											className="text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest ml-1"
 										>
-											Message for Seller
+											Message
 										</label>
 										<textarea
 											id="buyer-note"
-											className="w-full h-32 bg-[#121214] rounded-lg p-3 border border-white/10 transition-all text-white focus:outline-none focus:border-fuchsia-500/50 text-xs sm:text-sm font-mono leading-relaxed shadow-inner placeholder:text-slate-700 resize-none"
-											placeholder="Add a friendly note or conditions to your offer..."
+											className="w-full h-32 bg-[#121214] rounded-lg p-3 border border-white/10 text-white focus:outline-none focus:border-fuchsia-500/50 text-xs sm:text-sm leading-relaxed placeholder:text-slate-700 resize-none"
+											placeholder="Add a note to your offer..."
 											value={buyerNote}
 											onChange={(e) => setBuyerNote(e.target.value)}
 											disabled={submittingOffer}
@@ -595,7 +576,7 @@ export default function ViewListing() {
 
 									{offerFeedback.message && (
 										<div
-											className={`text-[11px] font-bold p-2.5 rounded border uppercase text-center tracking-wider ${
+											className={`text-[10px] sm:text-[11px] font-bold p-2.5 rounded border uppercase text-center tracking-wider ${
 												offerFeedback.type === "success"
 													? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
 													: "bg-red-500/10 border-red-500/30 text-red-400"
@@ -608,39 +589,32 @@ export default function ViewListing() {
 									<CyberActionButton
 										type="submit"
 										label={submittingOffer ? "SUBMITTING..." : "SUBMIT OFFER"}
-										className="mt-2"
+										className="mt-2 text-xs sm:text-sm"
 										disabled={submittingOffer}
 									/>
 								</form>
 							</section>
 						) : (
-							<section className="bg-[#0c0c0e]/90 border border-white/5 rounded-xl p-5 text-center text-slate-500 text-xs uppercase tracking-widest font-black">
-								Offers are disabled for this listing.
+							<section className="bg-[#0c0c0e]/90 border border-white/5 rounded-xl p-5 text-center text-slate-500 text-[10px] sm:text-xs uppercase tracking-widest font-black">
+								Offers are disabled.
 							</section>
 						))}
 
 					{!isOwner && (
-						<nav
-							aria-label="Supplementary Listing Utilities"
-							className="flex flex-col gap-3"
-						>
+						<div className="flex flex-col gap-3">
 							<button
 								onClick={handleReport}
-								className="w-full h-[48px] rounded-lg border border-red-500/20 text-red-400 font-mono font-bold text-xs tracking-widest uppercase hover:bg-red-500/10 hover:border-red-500 transition-all duration-300 flex items-center justify-center gap-2 outline-none focus-visible:ring-1 focus-visible:ring-red-500"
+								className="w-full h-[48px] rounded-lg border border-red-500/20 text-red-400 font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-red-500/10 hover:border-red-500 transition-all duration-300 flex items-center justify-center gap-2 outline-none focus-visible:ring-1 focus-visible:ring-red-500"
 							>
 								<AlertTriangle size={14} />
-								<span>REPORT THIS LISTING</span>
+								<span>REPORT LISTING</span>
 							</button>
-						</nav>
+						</div>
 					)}
 
-					{/* Similar Items Loop */}
 					{matching_assets && matching_assets.length > 0 && (
-						<section
-							aria-label="Similar Listings Section"
-							className="flex flex-col gap-4 mt-2"
-						>
-							<h3 className="text-white text-xs sm:text-sm font-black uppercase tracking-widest flex items-center gap-2">
+						<section className="flex flex-col gap-4 mt-2">
+							<h3 className="text-white text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest flex items-center gap-2">
 								<span className="text-slate-400">SIMILAR ITEMS</span>
 							</h3>
 							<div className="flex flex-col gap-3">

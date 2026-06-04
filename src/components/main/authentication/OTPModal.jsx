@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RefreshCw, Terminal, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthModalWrapper from "./AuthModalWrapper";
 import CyberActionButton from "../../ui/CyberActionButton";
@@ -172,19 +172,19 @@ export const OTPModal = ({
 					: onSwitchToForgot
 			}
 		>
-			<div className="space-y-6 sm:space-y-8 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl">
-				<div className="space-y-1.5">
-					<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
+			<div className="space-y-6 sm:space-y-8 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl text-xs sm:text-sm md:text-base lg:text-lg">
+				<header className="space-y-1.5">
+					<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
 						{isFromAdmin ? "Staff" : "Verification"}{" "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 							Code
 						</span>
 					</h1>
-					<p className="text-slate-500 text-sm font-medium uppercase tracking-wider pt-1">
+					<p className="text-slate-500 text-xs sm:text-sm md:text-base font-medium uppercase tracking-wider pt-1">
 						Enter the code sent to{" "}
 						<span className="text-slate-300 font-bold">{email}</span>
 					</p>
-				</div>
+				</header>
 
 				{alert.show && (
 					<CyberAlert
@@ -205,13 +205,13 @@ export const OTPModal = ({
 								onChange={(e) => handleChange(index, e.target.value)}
 								onKeyDown={(e) => handleKeyDown(index, e)}
 								disabled={isLoading}
-								className="w-16 h-16 text-center text-2xl font-black rounded-lg bg-[#121214] border border-white/10 text-white focus:border-fuchsia-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+								className="w-16 h-16 text-center text-xl sm:text-2xl font-black rounded-lg bg-[#121214] border border-white/10 text-white focus:border-fuchsia-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
 							/>
 						))}
 					</fieldset>
 
 					<div className="flex justify-between items-center bg-black/30 p-4 rounded-lg border border-white/5">
-						<span className="text-slate-500 text-sm font-bold uppercase tracking-widest">
+						<span className="text-slate-500 text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest">
 							Expires in:{" "}
 							<span className="text-fuchsia-400">
 								00:{timer < 10 ? `0${timer}` : timer}
@@ -221,7 +221,7 @@ export const OTPModal = ({
 							type="button"
 							disabled={isResendDisabled}
 							onClick={handleResend}
-							className={`font-black uppercase tracking-widest transition-all ${
+							className={`text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest transition-all ${
 								isResendDisabled
 									? "text-slate-600 cursor-not-allowed opacity-40 pointer-events-none"
 									: "text-fuchsia-400 hover:text-fuchsia-300 cursor-pointer"
@@ -240,11 +240,11 @@ export const OTPModal = ({
 					<AuthFooter
 						label="Cancel"
 						onClick={onSwitchToLogin}
-						className="hover:text-fuchsia-400 text-xs text-center block w-full transition-colors font-bold tracking-wider"
+						className="hover:text-fuchsia-400 text-[10px] sm:text-xs md:text-sm text-center block w-full transition-colors font-bold tracking-wider"
 					/>
 				</form>
 
-				<div className="pt-2 flex justify-center items-center gap-1 sm:text-xs md:text-sm text-slate-600 font-bold uppercase tracking-wide">
+				<footer className="pt-2 flex justify-center items-center gap-1 text-[10px] sm:text-xs md:text-sm text-slate-600 font-bold uppercase tracking-wide">
 					<HelpCircle size={12} className="text-slate-700" />
 					<span>Need help with this code?</span>
 					<button
@@ -254,7 +254,7 @@ export const OTPModal = ({
 					>
 						Learn more
 					</button>
-				</div>
+				</footer>
 			</div>
 		</AuthModalWrapper>
 	);

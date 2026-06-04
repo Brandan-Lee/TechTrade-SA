@@ -58,14 +58,14 @@ export default function HardwareEditForm() {
 					setAlertConfig({
 						show: true,
 						type: "error",
-						message: result.error || "Failed to load component profiles.",
+						message: result.error || "Failed to load component details.",
 					});
 				}
 			} catch (err) {
 				setAlertConfig({
 					show: true,
 					type: "error",
-					message: "Communications breakdown while hitting core servers.",
+					message: "Could not connect to the server.",
 				});
 			} finally {
 				setIsLoading(false);
@@ -119,22 +119,22 @@ export default function HardwareEditForm() {
 				setAlertConfig({
 					show: true,
 					type: "success",
-					message: result.message || "Hardware specifications updated cleanly!",
+					message:
+						result.message || "Hardware specifications updated successfully!",
 				});
 				setTimeout(() => navigate(-1), 1500);
 			} else {
 				setAlertConfig({
 					show: true,
 					type: "error",
-					message:
-						result.error || "Could not preserve hardware specs updating state.",
+					message: result.error || "Could not save the updates.",
 				});
 			}
 		} catch (err) {
 			setAlertConfig({
 				show: true,
 				type: "error",
-				message: "Failed to execute updates package on backend tables.",
+				message: "Failed to save the information to the system.",
 			});
 		} finally {
 			setIsSaving(false);
@@ -143,10 +143,10 @@ export default function HardwareEditForm() {
 
 	if (isLoading) {
 		return (
-			<div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400 font-mono gap-4">
+			<div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400 gap-4">
 				<Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
 				<p className="uppercase tracking-widest text-xs sm:text-sm animate-pulse">
-					Retrieving item profile...
+					Loading component details...
 				</p>
 			</div>
 		);
@@ -167,21 +167,21 @@ export default function HardwareEditForm() {
 			: "";
 
 	return (
-		<div className="max-w-5xl mx-auto p-4 font-mono text-slate-300 space-y-6">
+		<div className="max-w-5xl mx-auto p-4 text-slate-300 space-y-6">
 			<header className="flex items-center justify-between border-b border-white/5 pb-4">
 				<button
 					onClick={() => navigate(-1)}
 					className="flex items-center gap-2 text-xs sm:text-sm uppercase tracking-wider text-slate-400 hover:text-white transition-colors cursor-pointer"
 				>
-					<ArrowLeft size={14} /> Back to Database
+					<ArrowLeft size={14} /> Back to Directory
 				</button>
-				<h2 className="text-white font-black uppercase text-base sm:text-lg md:text-xl xl:text-2xl flex items-center gap-2">
-					<Cpu className="text-purple-500" size={20} />
+				<h1 className="text-white font-black uppercase text-base sm:text-lg md:text-xl lg:text-2xl flex items-center gap-2">
+					<Cpu className="text-purple-500 w-4 h-4 sm:w-5 sm:h-5" />
 					<span>
-						Edit Selected Component specs &middot;{" "}
+						Edit Component Details &middot;{" "}
 						<span className="text-purple-400">{category.toUpperCase()}</span>
 					</span>
-				</h2>
+				</h1>
 			</header>
 
 			{alertConfig.show && (
@@ -196,17 +196,22 @@ export default function HardwareEditForm() {
 
 			{formData && (
 				<form onSubmit={handleSubmit} className="space-y-6">
-					<div className="bg-black/20 border border-white/5 p-6 rounded-xl space-y-4">
-						<h3 className="text-purple-400 text-xs sm:text-sm font-bold uppercase tracking-widest border-b border-white/5 pb-2 mb-4 flex items-center gap-2">
-							<FileText size={14} /> Retrieved Hardware Specs
-						</h3>
+					<section className="bg-black/20 border border-white/5 p-4 sm:p-6 rounded-xl space-y-4">
+						<h2 className="text-purple-400 text-xs sm:text-sm font-bold uppercase tracking-widest border-b border-white/5 pb-2 mb-4 flex items-center gap-2">
+							<FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Component
+							Details
+						</h2>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div>
-								<label className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1">
+								<label
+									htmlFor="brand"
+									className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1"
+								>
 									Brand
 								</label>
 								<input
+									id="brand"
 									type="text"
 									name="brand"
 									value={formData.brand || ""}
@@ -215,10 +220,14 @@ export default function HardwareEditForm() {
 								/>
 							</div>
 							<div>
-								<label className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1">
+								<label
+									htmlFor="model"
+									className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1"
+								>
 									Model
 								</label>
 								<input
+									id="model"
 									type="text"
 									name="model"
 									value={formData.model || ""}
@@ -227,10 +236,14 @@ export default function HardwareEditForm() {
 								/>
 							</div>
 							<div className="md:col-span-2">
-								<label className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1">
-									Full System Name
+								<label
+									htmlFor="full_name"
+									className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1"
+								>
+									Full Name
 								</label>
 								<input
+									id="full_name"
 									type="text"
 									name="full_name"
 									value={formData.full_name || ""}
@@ -240,21 +253,25 @@ export default function HardwareEditForm() {
 							</div>
 
 							<div>
-								<label className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1 flex items-center gap-1">
-									Reference MSRP (ZAR)
+								<label
+									htmlFor="msrp"
+									className="block text-xs sm:text-sm uppercase font-bold text-slate-500 mb-1 flex items-center gap-1"
+								>
+									Reference Suggested Retail Price (ZAR)
 								</label>
 								<div className="relative">
 									<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs sm:text-sm text-slate-500 font-bold">
 										R
 									</span>
 									<input
+										id="msrp"
 										type="number"
 										step="0.01"
 										name="msrp_rand"
 										value={currentRandDisplayValue}
 										onChange={handleRandPriceChange}
 										placeholder="0.00"
-										className="w-full bg-black/40 border border-white/5 rounded-lg pl-8 pr-4 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-purple-500 transition-colors font-mono"
+										className="w-full bg-black/40 border border-white/5 rounded-lg pl-8 pr-4 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-purple-500 transition-colors"
 									/>
 								</div>
 							</div>
@@ -271,17 +288,18 @@ export default function HardwareEditForm() {
 								/>
 								<div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600 peer-checked:after:bg-white" />
 								<span className="ml-3 text-xs sm:text-sm uppercase font-bold text-slate-400 flex items-center gap-1">
-									<Activity size={12} /> Component Active Status
+									<Activity className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Component
+									Active Status
 								</span>
 							</label>
 						</div>
-					</div>
+					</section>
 
 					{specColumns.length > 0 && (
-						<div className="bg-black/20 border border-white/5 p-6 rounded-xl space-y-4">
-							<h3 className="text-purple-400 text-xs sm:text-sm font-bold uppercase tracking-widest border-b border-white/5 pb-2 mb-4">
-								Retrieved Category Specs ({category})
-							</h3>
+						<section className="bg-black/20 border border-white/5 p-4 sm:p-6 rounded-xl space-y-4">
+							<h2 className="text-purple-400 text-xs sm:text-sm font-bold uppercase tracking-widest border-b border-white/5 pb-2 mb-4">
+								Category Specifications ({category.toUpperCase()})
+							</h2>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 								{specColumns.map((key) => {
@@ -294,10 +312,14 @@ export default function HardwareEditForm() {
 
 									return (
 										<div key={key} className="space-y-1">
-											<label className="block text-xs sm:text-sm uppercase font-bold text-slate-500 truncate">
+											<label
+												htmlFor={key}
+												className="block text-xs sm:text-sm uppercase font-bold text-slate-500 truncate"
+											>
 												{formatLabel(key)}
 											</label>
 											<input
+												id={key}
 												type={isNumberInput ? "number" : "text"}
 												name={key}
 												value={formData[key] ?? ""}
@@ -309,7 +331,7 @@ export default function HardwareEditForm() {
 									);
 								})}
 							</div>
-						</div>
+						</section>
 					)}
 
 					<footer className="pt-4 flex justify-end">

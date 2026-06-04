@@ -21,15 +21,15 @@ const AdminInterceptors = () => {
 			return;
 		}
 
-		// 🚀 BYPASS LOOP: If this admin has already been verified for this session, skip further checks
+
 		if (hasVerifiedAdmin.current) {
 			return;
 		}
 
-		// Set verification flag to true on the very first successful validation pass
+
 		hasVerifiedAdmin.current = true;
 
-		// 🔒 MFA Safety Gate (Only executes once during initial admin verification)
+
 		if (user.getLastLoginAt?.() !== null) {
 			const needsMFA = !user.isMFAEnabled?.();
 			const isNotAtDashboardRoot = location.pathname !== "/admin";
@@ -38,7 +38,7 @@ const AdminInterceptors = () => {
 				navigate("/admin", { replace: true });
 			}
 		}
-	}, [isLoading, user, isAdminUser, navigate]); // Removed location.pathname to eliminate path change loops
+	}, [isLoading, user, isAdminUser, navigate]); 
 
 	if (isLoading || !user || !isAdminUser) {
 		return null;

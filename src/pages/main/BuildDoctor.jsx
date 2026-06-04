@@ -39,7 +39,7 @@ function RenderModule({
 	const isOpen = dropdown.category === category && dropdown.list.length > 0;
 
 	return (
-		<div
+		<section
 			key={
 				error
 					? `shake-${category.toLowerCase()}-${shakeTick}`
@@ -57,7 +57,7 @@ function RenderModule({
 						<div className="w-9 h-9 bg-fuchsia-500/10 border border-fuchsia-500/30 rounded-lg flex items-center justify-center text-fuchsia-400">
 							<Icon size={18} />
 						</div>
-						<h3 className="text-white font-black uppercase tracking-wider">
+						<h3 className="text-white font-black uppercase tracking-wider text-sm sm:text-base md:text-lg">
 							{title}
 						</h3>
 					</div>
@@ -72,7 +72,7 @@ function RenderModule({
 									error
 										? "border-red-500/30 focus:ring-red-500"
 										: "border-white/10 focus:ring-fuchsia-500"
-								} rounded-xl text-xs md:text-sm outline-none focus:ring-1`}
+								} rounded-xl text-xs sm:text-sm outline-none focus:ring-1`}
 								placeholder={`Search ${title}...`}
 							/>
 							<button
@@ -99,7 +99,7 @@ function RenderModule({
 												type="button"
 												onMouseDown={(e) => e.preventDefault()}
 												onClick={() => onSelectComponent(item)}
-												className="w-full p-3 text-left hover:bg-fuchsia-600/20 text-xs text md:text-sm -slate-300 hover:text-white rounded-lg border-b border-white/5 last:border-0"
+												className="w-full p-3 text-left hover:bg-fuchsia-600/20 text-xs sm:text-sm -slate-300 hover:text-white rounded-lg border-b border-white/5 last:border-0"
 											>
 												{item.full_name}
 											</button>
@@ -113,15 +113,15 @@ function RenderModule({
 				<div className="w-full bg-black/50 border border-fuchsia-500/10 rounded-xl p-4 min-h-[120px]">
 					<div className="flex items-center gap-2 mb-3">
 						<ShieldCheck size={14} className="text-fuchsia-500" />
-						<span className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-400">
-							Verified Specs
+						<span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest text-slate-400">
+							Verified Details
 						</span>
 					</div>
 					<div className="space-y-1">
 						{specLines.map((line, i) => (
 							<div
 								key={i}
-								className="text-xs md:text-sm text-fuchsia-400/90 font-mono py-1 border-b border-white/[0.03] last:border-0"
+								className="text-[11px] sm:text-xs md:text-sm text-fuchsia-400/90 font-mono py-1 border-b border-white/[0.03] last:border-0"
 							>
 								{line}
 							</div>
@@ -129,7 +129,7 @@ function RenderModule({
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 }
 
@@ -149,9 +149,9 @@ export default function BuildDoctor() {
 
 	const [dropdown, setDropdown] = useState({ category: null, list: [] });
 	const [specs, setSpecs] = useState({
-		cpu: ["Please search for your CPU to add its build specs"],
-		gpu: ["Please search for your GPU to add its build specs"],
-		psu: ["Please search for your PSU to add its build specs"],
+		cpu: ["Please search for your CPU to add its details"],
+		gpu: ["Please search for your GPU to add its details"],
+		psu: ["Please search for your PSU to add its details"],
 	});
 
 	const [errorField, setErrorField] = useState("");
@@ -184,13 +184,10 @@ export default function BuildDoctor() {
 			if (!user) return;
 			setIsDataFetching(true);
 			try {
-				const response = await apiFetch(
-					"/build_doctor/get_user_build.php",
-					{
-						method: "GET",
-						headers: { Accept: "application/json" },
-					},
-				);
+				const response = await apiFetch("/build_doctor/get_user_build.php", {
+					method: "GET",
+					headers: { Accept: "application/json" },
+				});
 
 				if (response.ok) {
 					const data = await response.json();
@@ -203,9 +200,9 @@ export default function BuildDoctor() {
 							psu: { name: data.psu_display_name || "", id: data.psu_id },
 						});
 						setSpecs({
-							cpu: data.cpu_specs || ["Verified specs could not be loaded."],
-							gpu: data.gpu_specs || ["Verified specs could not be loaded."],
-							psu: data.psu_specs || ["Verified specs could not be loaded."],
+							cpu: data.cpu_specs || ["Verified details could not be loaded."],
+							gpu: data.gpu_specs || ["Verified details could not be loaded."],
+							psu: data.psu_specs || ["Verified details could not be loaded."],
 						});
 					}
 				}
@@ -248,7 +245,7 @@ export default function BuildDoctor() {
 		}
 
 		if (!apiCategory) {
-			triggerStatus("Unknown hardware category.", "error");
+			triggerStatus("Unknown category.", "error");
 			return;
 		}
 
@@ -275,7 +272,7 @@ export default function BuildDoctor() {
 
 			if (list.length === 0) {
 				triggerStatus(
-					`No matching ${titleForCategory(category)} found in the catalog.`,
+					`No matching ${titleForCategory(category)} found in the list.`,
 					"error",
 					category.toLowerCase(),
 				);
@@ -286,7 +283,7 @@ export default function BuildDoctor() {
 		} catch (err) {
 			console.error("Search failed", err);
 			triggerStatus(
-				"Connection to the catalog failed.",
+				"Connection to the list failed.",
 				"error",
 				category.toLowerCase(),
 			);
@@ -298,86 +295,72 @@ export default function BuildDoctor() {
 		const catKey = category.toLowerCase();
 
 		const specLines = [
-			`MANUFACTURER: ${component.brand.toUpperCase()}`,
-			`MODEL VARIANT: ${component.model.toUpperCase()}`,
+			`MAKER: ${component.brand.toUpperCase()}`,
+			`MODEL: ${component.model.toUpperCase()}`,
 		];
 
 		switch (category.toUpperCase()) {
 			case "GPU":
-				if (dbSpecs.chipset)
-					specLines.push(`CHIPSET CORE ARCHITECTURE: ${dbSpecs.chipset}`);
+				if (dbSpecs.chipset) specLines.push(`CHIPSET: ${dbSpecs.chipset}`);
 				if (dbSpecs.vram_gb)
 					specLines.push(
-						`VRAM MEMORY: ${parseFloat(dbSpecs.vram_gb)} GB ${dbSpecs.vram_type || ""}`,
+						`MEMORY: ${parseFloat(dbSpecs.vram_gb)} GB ${dbSpecs.vram_type || ""}`,
 					);
 				if (dbSpecs.boost_clock_mhz)
 					specLines.push(
-						`CLOCK PROFILES: ${dbSpecs.core_clock_mhz || "—"} MHz BASE / ${dbSpecs.boost_clock_mhz} MHz BOOST`,
+						`SPEED: ${dbSpecs.core_clock_mhz || "—"} MHz BASE / ${dbSpecs.boost_clock_mhz} MHz BOOST`,
 					);
 				if (dbSpecs.pcie_version)
-					specLines.push(`BUS INTERFACE REVISION: ${dbSpecs.pcie_version}`);
+					specLines.push(`INTERFACE: ${dbSpecs.pcie_version}`);
 				if (dbSpecs.power_connectors)
-					specLines.push(
-						`REQUIRED INPUT POWER RAILS: ${dbSpecs.power_connectors}`,
-					);
+					specLines.push(`POWER CONNECTORS: ${dbSpecs.power_connectors}`);
 				if (dbSpecs.tdp_watts)
-					specLines.push(`THERMAL DESIGN POWER (TDP): ${dbSpecs.tdp_watts}W`);
-				if (dbSpecs.outputs)
-					specLines.push(
-						`DISPLAY CONNECTIVITY DISPLAYPORTS/HDMI: ${dbSpecs.outputs}`,
-					);
+					specLines.push(`POWER USAGE: ${dbSpecs.tdp_watts}W`);
+				if (dbSpecs.outputs) specLines.push(`PORTS: ${dbSpecs.outputs}`);
 				if (dbSpecs.length_mm)
 					specLines.push(
-						`PHYSICAL CLEARANCE METRICS: ${dbSpecs.length_mm}mm LENGTH / ${dbSpecs.slot_width || "—"} SLOT WIDTH`,
+						`SIZE: ${dbSpecs.length_mm}mm LENGTH / ${dbSpecs.slot_width || "—"} SLOT WIDTH`,
 					);
 				break;
 			case "CPU":
-				if (dbSpecs.socket)
-					specLines.push(`MOTHERBOARD SOCKET INTERFACE: ${dbSpecs.socket}`);
+				if (dbSpecs.socket) specLines.push(`SOCKET: ${dbSpecs.socket}`);
 				if (dbSpecs.architecture)
-					specLines.push(`MICROARCHITECTURE REVISION: ${dbSpecs.architecture}`);
+					specLines.push(`ARCHITECTURE: ${dbSpecs.architecture}`);
 				if (dbSpecs.cores)
 					specLines.push(
-						`COMPUTE MATRIX: ${dbSpecs.cores} PHYSICAL CORES / ${dbSpecs.threads || dbSpecs.cores * 2} LOGICAL THREADS`,
+						`CORES: ${dbSpecs.cores} CORES / ${dbSpecs.threads || dbSpecs.cores * 2} THREADS`,
 					);
 				if (dbSpecs.boost_clock_ghz)
 					specLines.push(
-						`OPERATING CLOCK FREQUENCY: ${parseFloat(dbSpecs.base_clock_ghz) || "—"} GHz BASE / ${parseFloat(dbSpecs.boost_clock_ghz)} GHz BOOST`,
+						`SPEED: ${parseFloat(dbSpecs.base_clock_ghz) || "—"} GHz BASE / ${parseFloat(dbSpecs.boost_clock_ghz)} GHz BOOST`,
 					);
 				if (dbSpecs.tdp_watts)
-					specLines.push(
-						`THERMAL PROFILE PACKAGE POWER: ${dbSpecs.tdp_watts}W`,
-					);
+					specLines.push(`POWER USAGE: ${dbSpecs.tdp_watts}W`);
 				if (dbSpecs.integrated_graphics)
-					specLines.push(
-						`INTEGRATED DISPLAY PROCESSOR: ${dbSpecs.integrated_graphics}`,
-					);
+					specLines.push(`BUILT-IN GRAPHICS: ${dbSpecs.integrated_graphics}`);
 				specLines.push(
-					`OVERCLOCK MATRIX CAPABILITY: ${dbSpecs.unlocked ? "UNLOCKED (MANUFACTURER MULTIPLIER ACTIVE)" : "LOCKED ARCHITECTURE"}`,
+					`OVERCLOCKING: ${dbSpecs.unlocked ? "UNLOCKED" : "LOCKED"}`,
 				);
 				break;
 			case "PSU":
 				if (dbSpecs.wattage)
-					specLines.push(
-						`TOTAL POWER OUTPUT CEILING: ${dbSpecs.wattage} WATTS`,
-					);
+					specLines.push(`TOTAL POWER: ${dbSpecs.wattage} WATTS`);
 				if (dbSpecs.efficiency_rating)
 					specLines.push(
-						`EFFICIENCY MATRIX VALUATION: 80 PLUS ${dbSpecs.efficiency_rating.replace("80+", "").trim()}`,
+						`EFFICIENCY: 80 PLUS ${dbSpecs.efficiency_rating.replace("80+", "").trim()}`,
 					);
 				if (dbSpecs.modular_type)
 					specLines.push(
-						`STRUCTURAL CABLE ROUTING MECHANISM: ${dbSpecs.modular_type.replace("_", " ").toUpperCase()}`,
+						`CABLES: ${dbSpecs.modular_type.replace("_", " ").toUpperCase()}`,
 					);
-				if (dbSpecs.form_factor)
-					specLines.push(`PHYSICAL PSU SCALE PROFILE: ${dbSpecs.form_factor}`);
+				if (dbSpecs.form_factor) specLines.push(`SIZE: ${dbSpecs.form_factor}`);
 				if (dbSpecs.pcie_connectors || dbSpecs.sata_connectors)
 					specLines.push(
-						`POWER EXTENSION HEADER BULK: ${dbSpecs.pcie_connectors || 0}x PCIe INTERFACES / ${dbSpecs.sata_connectors || 0}x SATA LINKS`,
+						`CONNECTIONS: ${dbSpecs.pcie_connectors || 0}x PCIe / ${dbSpecs.sata_connectors || 0}x SATA`,
 					);
 				break;
 			default:
-				specLines.push("HARDWARE ARCHITECTURE SIGNATURE RECOGNIZED");
+				specLines.push("COMPONENT RECOGNIZED");
 				break;
 		}
 
@@ -418,7 +401,7 @@ export default function BuildDoctor() {
 
 		if (!user) {
 			triggerStatus(
-				"Please log in or create an account to save custom configurations.",
+				"Please log in or create an account to save custom lists.",
 				"error",
 			);
 			return;
@@ -426,7 +409,7 @@ export default function BuildDoctor() {
 
 		if (!formData.cpu.id && !formData.gpu.id && !formData.psu.id) {
 			triggerStatus(
-				"Build must contain at least one component",
+				"Your list must contain at least one component",
 				"error",
 				"cpu",
 			);
@@ -436,11 +419,11 @@ export default function BuildDoctor() {
 		let activeName = buildName;
 		if (!activeName || activeName.trim() === "") {
 			const requestedName = prompt(
-				"Enter a name for your custom hardware snapshot:",
-				"My Custom Configuration",
+				"Enter a name for your custom list:",
+				"My Custom List",
 			);
 			if (!requestedName || requestedName.trim() === "") {
-				triggerStatus("A configuration label name is mandatory.", "error");
+				triggerStatus("A list name is required.", "error");
 				return;
 			}
 			activeName = requestedName.trim();
@@ -475,8 +458,8 @@ export default function BuildDoctor() {
 			if (response.ok && (data.success || data.build_id)) {
 				triggerStatus(
 					editingBuildId
-						? "Hardware modification revision applied!"
-						: "Your Custom Build has been added successfully",
+						? "Changes saved!"
+						: "Your Custom List has been added successfully",
 					"success",
 				);
 				if (!editingBuildId && data.build_id) {
@@ -484,14 +467,11 @@ export default function BuildDoctor() {
 				}
 			} else {
 				throw new Error(
-					data.error || "There was a problem processing your hardware metrics.",
+					data.error || "There was a problem processing your details.",
 				);
 			}
 		} catch (err) {
-			triggerStatus(
-				err.message || "Failed to finalize build changes.",
-				"error",
-			);
+			triggerStatus(err.message || "Failed to finalize changes.", "error");
 		}
 	};
 
@@ -502,27 +482,21 @@ export default function BuildDoctor() {
 		setErrorField("");
 
 		const confirmed = window.confirm(
-			`Are you absolutely sure you want to delete "${buildName || "this configuration"}"?`,
+			`Are you sure you want to delete "${buildName || "this list"}"?`,
 		);
 		if (!confirmed) return;
 
 		try {
-			const response = await apiFetch(
-				"/build_doctor/delete_user_build.php",
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ build_id: editingBuildId }),
-				},
-			);
+			const response = await apiFetch("/build_doctor/delete_user_build.php", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ build_id: editingBuildId }),
+			});
 
 			const data = await response.json();
 
 			if (response.ok && data.success) {
-				triggerStatus(
-					"The User build has been removed from the system",
-					"success",
-				);
+				triggerStatus("The list has been removed from the system", "success");
 				setEditingBuildId(null);
 				setBuildName("");
 				setFormData({
@@ -531,12 +505,12 @@ export default function BuildDoctor() {
 					psu: { name: "", id: null },
 				});
 				setSpecs({
-					cpu: ["Please search for your CPU to add its build specs"],
-					gpu: ["Please search for your GPU to add its build specs"],
-					psu: ["Please search for your PSU to add its build specs"],
+					cpu: ["Please search for your CPU to add its details"],
+					gpu: ["Please search for your GPU to add its details"],
+					psu: ["Please search for your PSU to add its details"],
 				});
 			} else {
-				throw new Error(data.error || "Failed to execute delete transaction.");
+				throw new Error(data.error || "Failed to delete.");
 			}
 		} catch (err) {
 			triggerStatus(err.message, "error");
@@ -545,19 +519,17 @@ export default function BuildDoctor() {
 
 	if (authLoading || isDataFetching) {
 		return (
-			<div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center gap-3 text-slate-400 font-mono text-xs uppercase tracking-widest">
+			<div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center gap-3 text-slate-400 font-mono text-xs sm:text-sm uppercase tracking-widest">
 				<Loader2 className="animate-spin text-fuchsia-500" size={24} />
-				Retrieving user build
+				Loading your list...
 			</div>
 		);
 	}
 
 	return (
-		<motion.div
+		<div
 			ref={containerRef}
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			className="min-h-screen bg-[#050505] text-slate-300 p-6 scroll-mt-6"
+			className="min-h-screen bg-[#050505] text-slate-300 p-6 scroll-mt-6 text-xs sm:text-sm md:text-base lg:text-lg"
 		>
 			<header className="max-w-3xl mx-auto py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 				<div>
@@ -569,15 +541,14 @@ export default function BuildDoctor() {
 					</h1>
 				</div>
 
-				{/* Users Current Build Name Banner Display */}
 				<div className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/5 rounded-xl self-start sm:self-center">
 					<Layers size={14} className="text-fuchsia-400" />
 					<div className="flex flex-col">
-						<span className="text xs md:text-sm text-slate-500 uppercase tracking-widest font-bold">
-							Current Profile
+						<span className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-widest font-bold">
+							Current List
 						</span>
-						<span className="text-xs md:text-sm text-slate-200 font-mono font-bold truncate max-w-[180px]">
-							{buildName ? buildName : "Unsaved Configuration"}
+						<span className="text-xs sm:text-sm text-slate-200 font-mono font-bold truncate max-w-[180px]">
+							{buildName ? buildName : "Unsaved List"}
 						</span>
 					</div>
 				</div>
@@ -642,9 +613,9 @@ export default function BuildDoctor() {
 
 				<div className="flex flex-col md:flex-row gap-4 w-full pt-4">
 					<CyberActionButton
-						label={editingBuildId ? "UPDATE MY BUILD" : "SAVE MY BUILD"}
+						label={editingBuildId ? "UPDATE MY LIST" : "SAVE MY LIST"}
 						onClick={handleSaveOrUpdateBuild}
-						className="flex-1 py-5 text-sm uppercase font-black"
+						className="flex-1 py-5 text-xs sm:text-sm uppercase font-black"
 					/>
 
 					{editingBuildId && (
@@ -654,11 +625,11 @@ export default function BuildDoctor() {
 							className="md:w-1/4 h-[62px] border border-red-500/30 bg-red-950/10 hover:bg-red-600/20 text-red-400 hover:text-red-200 transition-all rounded-xl text-xs uppercase font-black tracking-wider flex items-center justify-center gap-2"
 						>
 							<Trash2 size={16} />
-							Delete Build
+							Delete List
 						</button>
 					)}
 				</div>
 			</main>
-		</motion.div>
+		</div>
 	);
 }

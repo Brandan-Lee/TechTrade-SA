@@ -7,16 +7,11 @@ import {
 	useLocation,
 } from "react-router-dom";
 import "./App.css";
-
 import { AuthProvider, useAuth } from "./components/AuthContext";
-
-// Layout & Navigation
 import MainLayout from "./components/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ScrollToTop from "./components/main/common/ScrollToTop";
 import AdminInterceptors from "./components/AdminInterceptors";
-
-// Main Pages
 import Home from "./pages/main/Home";
 import About from "./pages/main/About";
 import Market from "./pages/main/Market";
@@ -34,11 +29,7 @@ import MyTransactions from "./pages/main/MyTransactions";
 import ViewListing from "./pages/main/ViewListing";
 import ManageOffer from "./pages/main/ManageOffer";
 import WhatsAppTTLPage from "./pages/main/WhatsAppTTLPage";
-
-// Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
-
-// Auth Modals
 import LoginModal from "./components/main/authentication/LoginModal";
 import RegisterModal from "./components/main/authentication/RegisterModal";
 import ForgotModal from "./components/main/authentication/ForgotModal";
@@ -60,7 +51,6 @@ function App() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { loginContext, isLoading, user } = useAuth();
-
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
 	const [isForgotOpen, setIsForgotOpen] = useState(false);
@@ -74,7 +64,6 @@ function App() {
 	const [transactionId, setTransactionId] = useState(null);
 	const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 	const [isDataModalOpen, setIsDataModalOpen] = useState(false);
-
 	const [authEmail, setAuthEmail] = useState("");
 	const [authOTP, setAuthOTP] = useState("");
 	const [authPurpose, setAuthPurpose] = useState("login");
@@ -111,7 +100,6 @@ function App() {
 		}
 	};
 
-	// Profile Guard Effect
 	useEffect(() => {
 		if (location.pathname !== "/profile/edit") return;
 		if (isLoading) return;
@@ -154,12 +142,12 @@ function App() {
 
 	if (isLoading) {
 		return (
-			<div className="w-screen h-screen flex flex-col items-center justify-center bg-[#0c0c0e] font-mono gap-4">
+			<main className="w-screen h-screen flex flex-col items-center justify-center bg-[#0c0c0e] gap-4">
 				<div className="w-12 h-12 border-2 border-fuchsia-500 border-t-transparent rounded-full animate-spin"></div>
-				<p className="text-slate-500 text-xs font-bold uppercase tracking-widest animate-pulse">
-					Initializing Security Session...
+				<p className="text-slate-500 text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest animate-pulse">
+					Loading...
 				</p>
-			</div>
+			</main>
 		);
 	}
 

@@ -29,7 +29,6 @@ try {
     if (isset($_SESSION['user_id'])) {
         $user = User::findById($db, $_SESSION['user_id']);
 
-        // Verify the account is valid and active
         if ($user && !$user->isBanned()) {
             $roleId = (int)$user->getRoleId();
 

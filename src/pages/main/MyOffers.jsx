@@ -17,12 +17,9 @@ export default function MyOffers() {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await apiFetch(
-					"/offers/get_incoming_offers.php",
-					{
-						method: "GET",
-					},
-				);
+				const response = await apiFetch("/offers/get_incoming_offers.php", {
+					method: "GET",
+				});
 				const data = await response.json();
 
 				if (!response.ok) {
@@ -101,14 +98,14 @@ export default function MyOffers() {
 			initial={{ opacity: 0, y: 15 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, ease: "easeOut" }}
-			className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden font-mono selection:bg-fuchsia-500/30 selection:text-white"
+			className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden font-mono selection:bg-fuchsia-500/30 selection:text-white text-xs sm:text-sm md:text-base"
 		>
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808003_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 			<div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-purple-600/5 blur-[120px] rounded-full pointer-events-none" />
 
 			<header className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-10 pb-6 border-b border-white/5 relative z-10">
-				<h1 className="text-white text-2xl sm:text-3xl font-black uppercase tracking-tight">
-					YOUR ACTIVE LISTINGS & OFFERS
+				<h1 className="text-white text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight">
+					Your Active Items & Offers
 				</h1>
 			</header>
 
@@ -116,13 +113,13 @@ export default function MyOffers() {
 				{isLoading ? (
 					<div className="py-20 flex flex-col items-center justify-center gap-3">
 						<Loader2 className="w-8 h-8 text-fuchsia-500 animate-spin" />
-						<p className="text-xs uppercase tracking-widest text-slate-500 font-bold animate-pulse">
+						<p className="text-[10px] sm:text-xs uppercase tracking-widest text-slate-500 font-bold animate-pulse">
 							Loading Offers...
 						</p>
 					</div>
 				) : error ? (
 					<div className="py-12 border border-red-500/20 bg-red-950/10 rounded-2xl text-center max-w-xl mx-auto p-6 font-bold">
-						<p className="text-red-400 text-xs uppercase tracking-wider">
+						<p className="text-red-400 text-[11px] sm:text-xs uppercase tracking-wider">
 							Error: {error}
 						</p>
 					</div>
@@ -135,7 +132,6 @@ export default function MyOffers() {
 
 							return (
 								<section key={group.listingId} className="space-y-3">
-									{/* Listing Shell Banner Header */}
 									<div className="flex items-center justify-between gap-4 bg-[#0d0d11] border border-white/5 rounded-xl p-4 shadow-md">
 										<div className="flex items-center gap-3 min-w-0">
 											<img
@@ -144,23 +140,22 @@ export default function MyOffers() {
 												className="w-12 h-12 rounded object-cover border border-white/10"
 											/>
 											<div className="min-w-0">
-												<h2 className="text-white text-sm font-bold uppercase tracking-wide truncate">
+												<h2 className="text-white text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide truncate">
 													{group.listingTitle}
 												</h2>
-												<p className="text-slate-500 text-xs font-medium">
-													Retail Price: {formatCurrency(group.originalPrice)}
+												<p className="text-slate-500 text-[11px] sm:text-xs font-medium">
+													Original Price: {formatCurrency(group.originalPrice)}
 												</p>
 											</div>
 										</div>
 										<div className="shrink-0 text-right">
-											<span className="inline-flex items-center gap-1.5 bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-[10px] font-black uppercase px-2.5 py-1 rounded-md tracking-wider">
+											<span className="inline-flex items-center gap-1.5 bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-[9px] sm:text-[10px] font-black uppercase px-2.5 py-1 rounded-md tracking-wider">
 												<Tag size={10} /> {group.offersList.length}{" "}
 												{group.offersList.length === 1 ? "Offer" : "Offers"}
 											</span>
 										</div>
 									</div>
 
-									{/* Embedded associated sub-offers column stack */}
 									<div className="space-y-3 pl-2 sm:pl-6 border-l border-white/5">
 										{group.offersList.map((offer) => {
 											const buyerAvatar = offer.buyer_avatar
@@ -202,8 +197,8 @@ export default function MyOffers() {
 						<div className="w-12 h-12 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-center justify-center text-amber-400/80 mb-4">
 							<ShieldAlert size={20} />
 						</div>
-						<h2 className="text-white font-bold text-sm uppercase tracking-wider mb-1">
-							YOU HAVE NO INCOMING OFFERS YET
+						<h2 className="text-white font-bold text-xs sm:text-sm uppercase tracking-wider mb-1">
+							You have no offers yet
 						</h2>
 					</div>
 				)}

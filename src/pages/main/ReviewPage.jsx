@@ -4,7 +4,6 @@ import {
 	Star,
 	MessageSquare,
 	ShieldAlert,
-	User,
 	ArrowLeft,
 	Terminal,
 	AlertOctagon,
@@ -28,7 +27,6 @@ export default function ReviewPage() {
 		avatar: location.state?.profile?.avatar || null,
 	});
 
-	// Core State for the Review Form
 	const [rating, setRating] = useState(0);
 	const [hoveredRating, setHoveredRating] = useState(0);
 	const [reviewText, setReviewText] = useState("");
@@ -149,11 +147,9 @@ export default function ReviewPage() {
 		`https://ui-avatars.com/api/?name=${encodeURIComponent(targetUser.name)}&background=581c87&color=fff`;
 
 	return (
-		<div className="bg-[#050506] font-mono text-slate-300 pb-20 relative selection:bg-fuchsia-500/30">
-			{/* Decorative Cyber Grid Background */}
+		<div className="bg-[#050506] font-mono text-slate-300 pb-20 relative selection:bg-fuchsia-500/30 text-xs sm:text-sm md:text-base">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808002_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-			{/* HEADER SECTION */}
 			<header className="w-full max-w-3xl mx-auto px-4 pt-12 relative z-10">
 				<div className="flex gap-4 items-start">
 					<button
@@ -171,7 +167,7 @@ export default function ReviewPage() {
 							className="w-12 h-12 rounded-lg border border-white/10 object-cover bg-black shrink-0 grayscale brightness-90 shadow-lg"
 						/>
 						<div className="min-w-0 flex-1">
-							<h1 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight leading-none break-words">
+							<h1 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-black uppercase tracking-tight leading-none break-words">
 								Rate Experience:{" "}
 								<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 									{targetUser.name}
@@ -182,16 +178,14 @@ export default function ReviewPage() {
 				</div>
 			</header>
 
-			{/* MAIN FORM CONTAINER */}
 			<main className="max-w-3xl mx-auto py-6 px-4 relative z-10">
-				<div className="bg-[#0c0c0e]/90 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden">
-					<div className="bg-gradient-to-r from-purple-950 via-[#160c28] to-purple-950 px-4 py-3.5 border-b border-white/5 flex items-center gap-3">
+				<article className="bg-[#0c0c0e]/90 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden">
+					<section className="bg-gradient-to-r from-purple-950 via-[#160c28] to-purple-950 px-4 py-3.5 border-b border-white/5 flex items-center gap-3">
 						<MessageSquare className="text-fuchsia-400 shrink-0" size={16} />
-						<p className="sm:text-xs md:text-sm font-bold text-slate-300 uppercase tracking-wide leading-tight">
-							Your shared review builds peer standing and marketplace reputation
-							markers.
-						</p>
-					</div>
+						<h2 className="text-[11px] sm:text-xs md:text-sm font-bold text-slate-300 uppercase tracking-wide leading-tight">
+							Your review helps other users and shapes community trust scores.
+						</h2>
+					</section>
 
 					{alert.show && (
 						<div className="px-5 sm:px-8 pt-6">
@@ -208,12 +202,11 @@ export default function ReviewPage() {
 						className="p-5 sm:p-8 space-y-8"
 						noValidate
 					>
-						{/* STAR RATING CONTROLLER */}
-						<div className="space-y-4">
-							<label className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+						<fieldset className="space-y-4">
+							<legend className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
 								<Terminal size={12} className="text-fuchsia-500" />
-								<span>Overall Experience Score</span>
-							</label>
+								<span>Overall Rating</span>
+							</legend>
 
 							<div className="bg-black/20 border border-white/5 rounded-lg p-6 flex flex-col items-center justify-center gap-4">
 								<div className="flex items-center gap-3">
@@ -227,7 +220,7 @@ export default function ReviewPage() {
 												onMouseEnter={() => setHoveredRating(starValue)}
 												onMouseLeave={() => setHoveredRating(0)}
 												disabled={isSubmitting}
-												aria-label={`Rate ${starValue} out of 5 points`}
+												aria-label={`Rate ${starValue} out of 5`}
 												className="p-1 focus:outline-none focus:ring-1 focus:ring-fuchsia-500 rounded-md transition-transform active:scale-90 disabled:opacity-50"
 											>
 												<Star
@@ -243,15 +236,14 @@ export default function ReviewPage() {
 									})}
 								</div>
 
-								{/* Dynamic Inline Icon & Text Meaning Row */}
-								<div className="text-xs font-bold uppercase tracking-wider text-center h-5 text-violet-400 flex items-center justify-center gap-2">
+								<div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-center h-5 text-violet-400 flex items-center justify-center gap-2">
 									{rating === 1 && (
 										<>
 											<AlertOctagon
 												size={14}
 												className="text-red-500 shrink-0"
 											/>
-											<span>Major complications during deal</span>
+											<span>Many problems during trade</span>
 										</>
 									)}
 									{rating === 2 && (
@@ -266,7 +258,7 @@ export default function ReviewPage() {
 									{rating === 3 && (
 										<>
 											<Zap size={14} className="text-yellow-500 shrink-0" />
-											<span>Average, successful transaction</span>
+											<span>Average, successful trade</span>
 										</>
 									)}
 									{rating === 4 && (
@@ -275,30 +267,29 @@ export default function ReviewPage() {
 												size={14}
 												className="text-fuchsia-400 shrink-0"
 											/>
-											<span>Great communication and fast response</span>
+											<span>Great communication and quick response</span>
 										</>
 									)}
 									{rating === 5 && (
 										<>
 											<Gem size={14} className="text-cyan-400 shrink-0" />
-											<span>Perfect transaction, highly recommended</span>
+											<span>Perfect trade, highly recommended</span>
 										</>
 									)}
 								</div>
 							</div>
-						</div>
+						</fieldset>
 
-						{/* TEXT FEEDBACK AREA */}
 						<div className="flex flex-col gap-2">
 							<div className="flex justify-between items-center">
 								<label
 									htmlFor="review-textarea"
-									className="text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"
+									className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"
 								>
 									<Terminal size={12} className="text-fuchsia-500" />
-									<span>Share your narrative experience</span>
+									<span>Write your review</span>
 								</label>
-								<span className="text-[10px] font-mono text-slate-600">
+								<span className="text-[9px] sm:text-[10px] font-mono text-slate-600">
 									{reviewText.length}/500
 								</span>
 							</div>
@@ -309,42 +300,35 @@ export default function ReviewPage() {
 								value={reviewText}
 								disabled={isSubmitting}
 								onChange={(e) => setReviewText(e.target.value)}
-								placeholder="How did the interaction go? Was communication clear? Was payment or handover on time? Provide specific details..."
-								className="w-full h-36 bg-[#121214] rounded-lg p-4 border border-white/10 text-white focus:outline-none focus:border-fuchsia-500/50 text-xs sm:text-sm font-mono leading-relaxed shadow-inner placeholder:text-slate-700 resize-none transition-all"
+								placeholder="How did the trade go? Was communication clear? Was payment or meetup on time?"
+								className="w-full h-36 bg-[#121214] rounded-lg p-4 border border-white/10 text-white focus:outline-none focus:border-fuchsia-500/50 text-[11px] sm:text-xs md:text-sm font-mono leading-relaxed shadow-inner placeholder:text-slate-700 resize-none transition-all"
 							/>
 						</div>
 
-						{/* SAFETY TERMS DISCLAIMER */}
-						<div className="flex items-start gap-2.5 bg-purple-950/10 border border-purple-500/10 rounded-lg p-3 text-[10px] uppercase tracking-wider text-slate-400 leading-relaxed">
+						<section className="flex items-start gap-2.5 bg-purple-950/10 border border-purple-500/10 rounded-lg p-3 text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400 leading-relaxed">
 							<ShieldAlert
 								size={14}
 								className="text-fuchsia-500 shrink-0 mt-0.5"
 							/>
 							<p>
-								Keep logs objective, accurate, and fair. Do not post public
-								personal details, residential addresses, bank numbers, or
-								insults.
+								Keep reviews accurate and fair. Do not post personal details,
+								addresses, bank numbers, or offensive language.
 							</p>
-						</div>
+						</section>
 
-						{/* ACTION BUTTON */}
 						<div className="pt-2 border-t border-white/5">
 							<CyberActionButton
-								label={
-									isSubmitting
-										? "PUBLISHING SYSTEM REVIEW..."
-										: "PUBLISH EXPERIENCE REVIEW"
-								}
-								className="w-full"
+								label={isSubmitting ? "PUBLISHING REVIEW..." : "PUBLISH REVIEW"}
+								className="w-full text-xs sm:text-sm"
 								disabled={isSubmitting || rating === 0}
 								type="submit"
 							/>
-							<p className="text-center mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">
-								Feedback updates trust metrics and safeguards trading protocols.
+							<p className="text-center mt-4 text-[10px] sm:text-xs md:text-sm font-bold text-slate-600 uppercase tracking-wider">
+								Reviews help make the community safer.
 							</p>
 						</div>
 					</form>
-				</div>
+				</article>
 			</main>
 		</div>
 	);

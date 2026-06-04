@@ -140,7 +140,6 @@ try {
         $listingId
     ]);
 
-    // Lock in all changes securely
     $db->commit();
 
     http_response_code(200);

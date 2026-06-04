@@ -42,10 +42,7 @@ export default function UserRoleManagement() {
 					);
 				}
 			} catch (err) {
-				triggerNotification(
-					"error",
-					"Failed to connect to the database server.",
-				);
+				triggerNotification("error", "Failed to connect to the server.");
 			} finally {
 				setIsLoading(false);
 			}
@@ -112,7 +109,7 @@ export default function UserRoleManagement() {
 
 	if (isLoading) {
 		return (
-			<div className="text-center py-12 font-mono text-xs sm:text-sm text-slate-500 uppercase tracking-widest animate-pulse">
+			<div className="text-center py-12 font-mono text-xs sm:text-sm md:text-base text-slate-500 uppercase tracking-widest animate-pulse">
 				Loading user records...
 			</div>
 		);
@@ -128,21 +125,21 @@ export default function UserRoleManagement() {
 							Management
 						</span>
 					</h1>
-					<p className="text-[10px] sm:text-xs md:text-sm text-slate-500 mt-1 uppercase tracking-wider">
-						Manage staff privileges and administrative access levels.
+					<p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-500 mt-1 uppercase tracking-wider">
+						Manage staff privileges and access levels.
 					</p>
 				</div>
 
 				<div className="relative w-full sm:w-72">
 					<span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-						<Search size={16} />
+						<Search className="w-4 h-4 sm:w-5 sm:h-5" />
 					</span>
 					<input
 						type="search"
 						placeholder="SEARCH BY NAME OR PROVINCE..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
-						className="w-full h-10 pl-10 pr-4 rounded-xl bg-black/40 border border-white/10 text-[10px] sm:text-xs tracking-wide uppercase text-white placeholder-slate-600 focus:outline-none focus:border-fuchsia-500/50 transition-all"
+						className="w-full h-10 pl-10 pr-4 rounded-xl bg-black/40 border border-white/10 text-[10px] sm:text-xs md:text-sm tracking-wide uppercase text-white placeholder-slate-600 focus:outline-none focus:border-fuchsia-500/50 transition-all"
 					/>
 				</div>
 			</header>
@@ -157,69 +154,67 @@ export default function UserRoleManagement() {
 				</div>
 			)}
 
-			{/* System Metrics Overview with Scaled Text sizes */}
 			<section
 				className="grid grid-cols-1 md:grid-cols-3 gap-4"
-				aria-label="System Metrics"
+				aria-label="System Overview"
 			>
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-fuchsia-500/10 rounded-xl text-fuchsia-400 shrink-0">
-						<Users size={20} />
+						<Users className="w-5 h-5 sm:w-6 sm:h-6" />
 					</div>
 					<div>
-						<p className="text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest text-slate-500">
+						<p className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm uppercase tracking-widest text-slate-500">
 							Total Operations Staff
 						</p>
-						<p className="text-base sm:text-lg md:text-xl font-black text-white mt-0.5">
+						<p className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white mt-0.5">
 							{users.filter((u) => u.roleId > 1).length}
 						</p>
 					</div>
-				</div>
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+				</article>
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-cyan-500/10 rounded-xl text-cyan-400 shrink-0">
-						<ShieldCheck size={20} />
+						<ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
 					</div>
 					<div>
-						<p className="text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest text-slate-500">
+						<p className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm uppercase tracking-widest text-slate-500">
 							Active Moderators
 						</p>
-						<p className="text-base sm:text-lg md:text-xl font-black text-white mt-0.5">
+						<p className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white mt-0.5">
 							{users.filter((u) => u.roleId === 3).length}
 						</p>
 					</div>
-				</div>
-				<div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
+				</article>
+				<article className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-4">
 					<div className="p-3 bg-fuchsia-500/10 rounded-xl text-fuchsia-500 shrink-0">
-						<ShieldAlert size={20} />
+						<ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6" />
 					</div>
 					<div>
-						<p className="text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest text-slate-500">
-							Root Administrators
+						<p className="text-[9px] sm:text-[10px] md:text-xs lg:text-sm uppercase tracking-widest text-slate-500">
+							Administrators
 						</p>
-						<p className="text-base sm:text-lg md:text-xl font-black text-white mt-0.5">
+						<p className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white mt-0.5">
 							{users.filter((u) => u.roleId === 4).length}
 						</p>
 					</div>
-				</div>
+				</article>
 			</section>
 
-			{/* Workspace Cards Layout */}
 			<main>
 				{filteredUsers.length === 0 ? (
 					<div className="text-center py-12 border border-dashed border-white/10 rounded-2xl bg-black/20">
-						{/* Scaled empty state message */}
-						<p className="text-xs sm:text-sm text-slate-500 font-bold uppercase tracking-widest">
-							No matching user records identified.
+						<p className="text-xs sm:text-sm md:text-base text-slate-500 font-bold uppercase tracking-widest">
+							No matching user records found.
 						</p>
 					</div>
 				) : (
 					<ul className="grid grid-cols-1 xl:grid-cols-2 gap-4">
 						{filteredUsers.map((userObj) => (
-							<UserRoleCard
-								key={userObj.id}
-								userObj={userObj}
-								onUpdateRole={handleUpdateRole}
-							/>
+							<li key={userObj.id}>
+								<UserRoleCard
+									userObj={userObj}
+									onUpdateRole={handleUpdateRole}
+								/>
+							</li>
 						))}
 					</ul>
 				)}

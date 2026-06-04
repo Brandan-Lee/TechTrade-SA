@@ -1,7 +1,6 @@
 import {
 	Calendar1,
 	MapPin,
-	Quote,
 	ShieldCheck,
 	Trophy,
 	Loader2,
@@ -56,7 +55,7 @@ export default function Profile() {
 			const data = await response.json();
 			if (response.ok) setTrades(data.trades || []);
 		} catch (err) {
-			console.error("Failed to load trades", err);
+			console.error("Failed to load history", err);
 		}
 	};
 
@@ -127,7 +126,7 @@ export default function Profile() {
 
 		return (
 			<div
-				className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase font-mono tracking-widest ${design.classes}`}
+				className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[9px] sm:text-[10px] font-black uppercase font-mono tracking-widest ${design.classes}`}
 			>
 				<User size={10} />
 				<span>{design.label}</span>
@@ -137,7 +136,7 @@ export default function Profile() {
 
 	const handleDeleteProfile = async () => {
 		const confirmed = window.confirm(
-			"CRITICAL WARNING:\n\nAre you sure you want to delete this profile? This action is permanent and will withdraw all active listings from circulation.",
+			"Are you sure you want to delete this profile? This action is permanent and will remove all your active listings.",
 		);
 
 		if (!confirmed) return;
@@ -150,20 +149,18 @@ export default function Profile() {
 			const data = await response.json();
 
 			if (!response.ok) {
-				throw new Error(
-					data.message || "Network system rejected profile removal execution.",
-				);
+				throw new Error(data.message || "Failed to remove profile.");
 			}
 
-			alert(data.message || "Account successfully wiped.");
+			alert(data.message || "Account successfully removed.");
 
 			if (typeof logout === "function") {
 				await logout();
 			}
 			navigate("/marketplace", { replace: true });
 		} catch (err) {
-			console.error("Account termination workflow fault:", err);
-			alert(`TERMINATION FAULT: ${err.message}`);
+			console.error("Account removal error:", err);
+			alert(`Error: ${err.message}`);
 		} finally {
 			setIsDeleting(false);
 		}
@@ -184,7 +181,7 @@ export default function Profile() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-[#050506] flex items-center justify-center gap-3 text-slate-500 font-mono text-xs uppercase tracking-widest">
+			<div className="min-h-screen bg-[#050506] flex items-center justify-center gap-3 text-slate-500 font-mono text-xs sm:text-sm uppercase tracking-widest">
 				<Loader2 className="animate-spin text-fuchsia-500" size={24} />
 				Loading profile...
 			</div>
@@ -193,15 +190,15 @@ export default function Profile() {
 
 	if (error || !profile) {
 		return (
-			<div className="min-h-screen bg-[#050506] flex items-center justify-center p-4 font-mono">
+			<div className="min-h-screen bg-[#050506] flex items-center justify-center p-4 font-mono text-xs sm:text-sm">
 				<div className="max-w-md w-full border border-red-500/10 bg-red-500/5 p-6 rounded-2xl text-center">
 					<AlertTriangle size={32} className="mx-auto text-red-500 mb-3" />
-					<p className="text-red-400 text-sm mb-4">
+					<p className="text-red-400 text-xs sm:text-sm mb-4">
 						{error || "Profile unavailable."}
 					</p>
 					<Link
 						to="/marketplace"
-						className="text-fuchsia-400 text-xs uppercase tracking-widest hover:underline"
+						className="text-fuchsia-400 text-[10px] sm:text-xs uppercase tracking-widest hover:underline"
 					>
 						Return to marketplace
 					</Link>
@@ -211,16 +208,18 @@ export default function Profile() {
 	}
 
 	return (
-		<div className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden">
+		<div className="bg-[#050506] text-slate-300 pb-20 relative overflow-hidden text-xs sm:text-sm md:text-base">
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
 
-			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none p-4 max-w-4xl mx-auto mt-4">
-				User{" "}
-				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-					Profile
-				</span>
-			</h1>
+			<header className="max-w-4xl mx-auto mt-4 p-4">
+				<h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-black uppercase italic tracking-tighter leading-none">
+					User{" "}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+						Profile
+					</span>
+				</h1>
+			</header>
 
 			<section className="w-full bg-[#0c0c0e]/80 border-b border-white/5 pt-14 pb-16 px-4 flex flex-col items-center relative z-10 backdrop-blur-md">
 				<div className="relative">
@@ -238,13 +237,13 @@ export default function Profile() {
 				</div>
 
 				<div className="mt-6 text-center space-y-2.5">
-					<h1 className="text-white text-xl md:text-2xl lg:text-3xl font-black uppercase font-mono tracking-tight leading-none">
+					<h2 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-black uppercase font-mono tracking-tight leading-none">
 						{profile.fullName}
-					</h1>
+					</h2>
 
 					<div className="flex flex-col items-center gap-2">
 						{renderRegistrationBadge()}
-						<div className="flex items-center justify-center gap-1 text-slate-500 font-mono text-xs uppercase tracking-widest">
+						<div className="flex items-center justify-center gap-1 text-slate-500 font-mono text-[11px] sm:text-xs uppercase tracking-widest">
 							<MapPin size={12} className="text-fuchsia-500/60" />
 							<span>{profile.province}</span>
 						</div>
@@ -257,22 +256,31 @@ export default function Profile() {
 							<Trophy size={16} />
 						</div>
 						<div>
-							<p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
-								Trust Integrity
+							<p className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+								Trust Score
 							</p>
-							<p className="text-base font-black text-white tracking-tight">
+							<p className="text-sm sm:text-base font-black text-white tracking-tight">
 								{profile.trust_score} / 5.0
 							</p>
 						</div>
 					</div>
-					<div className="bg-fuchsia-500/10 border border-fuchsia-500/30 px-2.5 py-1 rounded text-fuchsia-400 font-bold text-[10px] md:text-xs tracking-wider">
-						{profile.trade_count} TRADES
-					</div>
 				</div>
 			</section>
 
+			<div className="max-w-4xl w-full px-4 mt-10 grid grid-cols-2 gap-3 m-auto">
+				<StatCard
+					icon={<ShieldCheck className="text-white" />}
+					label="Total Trades"
+					value={profile.trade_count}
+				/>
+				<StatCard
+					icon={<Calendar1 className="text-white" />}
+					label="Member since"
+					value={profile.member_since}
+				/>
+			</div>
+
 			<main className="max-w-4xl w-full mx-auto px-4 mt-8 flex flex-col gap-8 relative z-10">
-				{/* PRIMARY ACTIVITY CONTAINER (LISTINGS / TRADES) */}
 				<div className="bg-[#0c0c0e]/90 border border-white/10 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.4)]">
 					<div
 						className="flex bg-black border-b border-white/5 font-mono"
@@ -282,7 +290,7 @@ export default function Profile() {
 							<>
 								<button
 									onClick={() => setActiveTab("active")}
-									className={`flex-1 py-4 font-black text-xs md:text-sm uppercase transition-all ${activeTab === "active" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
+									className={`flex-1 py-4 font-black text-[11px] sm:text-xs md:text-sm uppercase transition-all ${activeTab === "active" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
 								>
 									Active Listings
 								</button>
@@ -291,7 +299,7 @@ export default function Profile() {
 										setActiveTab("history");
 										if (trades.length === 0) loadTrades();
 									}}
-									className={`flex-1 py-4 font-black text-xs md:text-sm uppercase transition-all ${activeTab === "history" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
+									className={`flex-1 py-4 font-black text-[11px] sm:text-xs md:text-sm uppercase transition-all ${activeTab === "history" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
 								>
 									Trade History
 								</button>
@@ -304,7 +312,7 @@ export default function Profile() {
 									setActiveTab("history");
 									if (trades.length === 0) loadTrades();
 								}}
-								className={`flex-1 py-4 font-black text-xs md:text-sm uppercase transition-all ${activeTab === "history" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
+								className={`flex-1 py-4 font-black text-[11px] sm:text-xs md:text-sm uppercase transition-all ${activeTab === "history" ? "text-fuchsia-400 bg-white/[0.02] border-b-2 border-fuchsia-500" : "text-slate-600"}`}
 							>
 								Trade History
 							</button>
@@ -319,7 +327,7 @@ export default function Profile() {
 									<ActiveListingCard key={item.id} {...item} />
 								))
 							) : (
-								<p className="text-center text-slate-500 text-xs py-8">
+								<p className="text-center text-slate-500 text-[11px] sm:text-xs py-8">
 									No active listings.
 								</p>
 							))}
@@ -338,7 +346,7 @@ export default function Profile() {
 										/>
 									))
 								) : (
-									<p className="text-center text-slate-500 text-xs py-8">
+									<p className="text-center text-slate-500 text-[11px] sm:text-xs py-8">
 										No trade history found.
 									</p>
 								)}
@@ -347,18 +355,17 @@ export default function Profile() {
 					</div>
 				</div>
 
-				{/* PROFILE ACTION CONFIGURATIONS */}
 				{!isOwnProfile && (
 					<div className="flex flex-col sm:flex-row gap-4 pt-2">
 						<button
 							onClick={handleReport}
-							className="flex-1 h-12 rounded-xl border border-rose-500/20 bg-rose-500/[0.03] text-rose-400 hover:bg-rose-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
+							className="flex-1 h-12 rounded-xl border border-rose-500/20 bg-rose-500/[0.03] text-rose-400 hover:bg-rose-500 hover:text-white font-mono font-black text-[11px] sm:text-xs uppercase tracking-widest transition-all"
 						>
 							Report This User
 						</button>
 						<button
 							onClick={handleReview}
-							className="flex-1 h-12 rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/[0.03] text-fuchsia-400 hover:bg-fuchsia-500 hover:text-white font-mono font-black text-xs uppercase tracking-widest transition-all"
+							className="flex-1 h-12 rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/[0.03] text-fuchsia-400 hover:bg-fuchsia-500 hover:text-white font-mono font-black text-[11px] sm:text-xs uppercase tracking-widest transition-all"
 						>
 							Leave A Review
 						</button>
@@ -370,7 +377,7 @@ export default function Profile() {
 						<div className="w-full max-w-xs">
 							<CyberActionButton
 								label="EDIT PROFILE"
-								className="w-full"
+								className="w-full text-xs sm:text-sm"
 								onClick={() => navigate("/profile/edit")}
 							/>
 						</div>
@@ -378,14 +385,14 @@ export default function Profile() {
 						<button
 							type="button"
 							disabled={isDeleting}
-							aria-label="Permanently terminate this network identity profile account link"
-							className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] text-rose-400 font-mono font-black text-xs tracking-widest hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+							aria-label="Delete profile"
+							className="w-full max-w-xs h-12 md:h-14 rounded-xl border border-rose-500/30 bg-rose-500/[0.02] text-rose-400 font-mono font-black text-[11px] sm:text-xs tracking-widest hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:shadow-[0_0_25px_rgba(244,63,94,0.25)] transition-all duration-300 uppercase active:scale-95 outline-none focus:ring-1 focus:ring-rose-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 							onClick={handleDeleteProfile}
 						>
 							{isDeleting ? (
 								<>
 									<Loader2 className="animate-spin text-white" size={14} />
-									<span>SHREDDING DATA...</span>
+									<span>DELETING...</span>
 								</>
 							) : (
 								<span>Delete Profile</span>
@@ -394,11 +401,10 @@ export default function Profile() {
 					</div>
 				)}
 
-				{/* PERMANENT BOTTOM USER REVIEWS CONTAINER */}
 				<section className="mt-4 space-y-4">
 					<div className="flex items-center gap-2 px-1 border-b border-white/5 pb-2">
 						<MessageSquare className="text-fuchsia-400" size={16} />
-						<h2 className="text-white text-sm md:text-base font-black uppercase tracking-wider font-mono">
+						<h2 className="text-white text-xs sm:text-sm md:text-base font-black uppercase tracking-wider font-mono">
 							User Feedback History ({reviews.length})
 						</h2>
 					</div>
@@ -411,21 +417,19 @@ export default function Profile() {
 										key={review.id}
 										{...review}
 										onReport={(reviewId) => {
-											// 1. Initial warning threshold verification prompt
 											const confirmReport = window.confirm(
-												"CRITICAL: Flag this transmission block for moderation review?",
+												"Flag this feedback for review?",
 											);
 											if (!confirmReport) return;
 
-											// 2. Open inline input node to capture reason string parameter
 											const reportReason = window.prompt(
-												"ENTER VIOLATION REASON:\n(e.g., Spam, Harassment, Fraudulent Feedback, False Information)",
+												"Enter reason:\n(e.g., Spam, Harassment, False Information)",
 											);
 
 											if (reportReason === null) return;
 											if (reportReason.trim() === "") {
 												alert(
-													"REPORT ABORTED: A valid reason string must be specified.",
+													"Report cancelled: A valid reason must be provided.",
 												);
 												return;
 											}
@@ -442,23 +446,22 @@ export default function Profile() {
 													const data = await res.json();
 													if (!res.ok)
 														throw new Error(
-															data.error || "Server transaction rejected.",
+															data.error || "Failed to submit report.",
 														);
 													alert(
-														data.message ||
-															"Incident ticket authorized. Review queued for moderation.",
+														data.message || "Report submitted successfully.",
 													);
 												})
 												.catch((err) => {
-													console.error("Reporting transaction error:", err);
-													alert(`REPORT FAULT: ${err.message}`);
+													console.error("Reporting error:", err);
+													alert(`Error: ${err.message}`);
 												});
 										}}
 									/>
 								))
 							) : (
-								<p className="text-center text-slate-500 text-xs py-8 font-mono">
-									No network feedback profiles logged yet for this identity.
+								<p className="text-center text-slate-500 text-[11px] sm:text-xs py-8 font-mono">
+									No feedback received yet.
 								</p>
 							)}
 						</div>

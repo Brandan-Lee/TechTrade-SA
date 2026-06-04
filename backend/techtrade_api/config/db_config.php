@@ -7,7 +7,6 @@ require_once __DIR__ . '/config.php';
 global $pdo;
 
 try {
-    // echo json_encode(["status" => "error", "message" => "The problem is here."]);
     if (!isset($pdo)) {
         $host = getEnvVariable('DB_HOST');
         $db   = getEnvVariable('DB_NAME');

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+	useCallback,
+} from "react";
 import { apiFetch, setSessionExpiredHandler } from "../lib/api";
 
 const AuthContext = createContext(null);
@@ -42,7 +48,10 @@ export const AuthProvider = ({ children }) => {
 				writeStoredUser(null);
 			}
 		} catch (error) {
-			console.error("There was an error retrieving the users logged in status", error);
+			console.error(
+				"There was an error retrieving the users logged in status",
+				error,
+			);
 			setUser(null);
 			writeStoredUser(null);
 		} finally {
@@ -93,7 +102,9 @@ export const AuthProvider = ({ children }) => {
 				refreshAuth: checkAuthStatus,
 			}}
 		>
-			{children}
+			<div className="text-xs sm:text-sm md:text-base lg:text-lg">
+				{children}
+			</div>
 		</AuthContext.Provider>
 	);
 };
@@ -101,8 +112,6 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
 	const context = useContext(AuthContext);
 	if (!context)
-		throw new Error(
-			"useAuth must be run inside an explicit AuthProvider matrix.",
-		);
+		throw new Error("useAuth must be run inside an explicit AuthProvider.");
 	return context;
 };

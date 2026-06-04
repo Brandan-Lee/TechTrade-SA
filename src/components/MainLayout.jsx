@@ -20,8 +20,8 @@ export default function MainLayout({
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen bg-[#090614] flex items-center justify-center text-white">
-				Initializing Session...
+			<div className="min-h-screen bg-[#090614] flex items-center justify-center text-white text-sm sm:text-base md:text-lg">
+				Loading...
 			</div>
 		);
 	}
@@ -34,7 +34,7 @@ export default function MainLayout({
 
 	return (
 		<div
-			className="flex flex-col min-h-screen bg-neutral-50"
+			className="flex flex-col min-h-screen bg-neutral-50 text-xs sm:text-sm md:text-base lg:text-lg"
 			data-theme="techtrade"
 		>
 			<MenuDrawer

@@ -23,7 +23,6 @@ class UserValidator
         if (!filter_var($data['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
             $this->errors[] = "Please enter a valid email address.";
         } else {
-            // Using positional (?) parameter style
             $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
             $stmt->execute([$data['email']]);
 

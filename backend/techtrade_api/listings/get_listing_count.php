@@ -31,7 +31,6 @@ try {
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Return the result
     http_response_code(200);
     echo json_encode([
         "success" => true,
@@ -41,7 +40,6 @@ try {
     http_response_code(400);
     echo json_encode(["error" => $e->getMessage()]);
 } catch (Throwable $t) {
-    // Handle unexpected server errors
     http_response_code(500);
     echo json_encode(["error" => "An unexpected error occurred on the server."]);
 }

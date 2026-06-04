@@ -50,33 +50,33 @@ export default function HardwareSpecCard({
 	const showGlobalPlaceholder = isGlobal && Number(item.has_specs) === 0;
 
 	return (
-		<div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between gap-4 hover:border-white/10 transition-all font-mono text-slate-300">
-			<div>
-				<div className="flex justify-between items-start gap-2 mb-1">
-					<span className="text-[10px] sm:text-xs md:text-sm lg:text-base font-bold text-slate-500 uppercase tracking-widest">
+		<article className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between gap-4 hover:border-white/10 transition-all font-mono text-slate-300">
+			<section>
+				<header className="flex justify-between items-start gap-2 mb-1">
+					<span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-slate-500 uppercase tracking-widest">
 						{item.brand}
 					</span>
-					<span className="text-xs sm:text-sm md:text-base lg:text-lg font-black text-emerald-400">
+					<span className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-emerald-400">
 						{priceFormatter(item.msrp_cents)}
 					</span>
-				</div>
-				<h3 className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-black text-white uppercase tracking-wide leading-tight mb-3">
+				</header>
+				<h3 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-black text-white uppercase tracking-wide leading-tight mb-3">
 					{item.full_name}
 				</h3>
 
-				<div className="text-[11px] sm:text-xs md:text-sm lg:text-base text-slate-400 bg-black/20 p-3 rounded-xl border border-white/[0.02] space-y-1.5">
+				<div className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 bg-black/20 p-3 rounded-xl border border-white/[0.02] space-y-1.5">
 					{showGlobalPlaceholder ? (
 						<div className="flex flex-col items-center justify-center text-center py-6 px-2 space-y-2">
 							<Info size={20} className="text-purple-400 animate-pulse" />
-							<p className="text-xs sm:text-sm text-slate-400 font-medium uppercase tracking-wide">
-								Polymorphic Global Entry
+							<p className="text-xs sm:text-sm md:text-base font-medium uppercase tracking-wide">
+								General Listing
 							</p>
-							<p className="text-[10px] sm:text-[11px] text-slate-500 max-w-[200px] leading-relaxed">
+							<p className="text-xs sm:text-sm text-slate-500 max-w-[200px] leading-relaxed">
 								Select the specific{" "}
 								<strong className="text-purple-400 uppercase">
 									"{itemCategory}"
 								</strong>{" "}
-								segment tab above to parse complete technical specifications.
+								category above to see full details.
 							</p>
 						</div>
 					) : (
@@ -85,47 +85,39 @@ export default function HardwareSpecCard({
 								<>
 									<p className="flex items-center gap-2">
 										<Zap size={14} className="text-amber-400 shrink-0" />
-										<span className="text-slate-500">
-											Connection Type:
-										</span>{" "}
+										<span className="text-slate-500">Plug Type:</span>{" "}
 										{item.cpu_socket || item.socket || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Binary size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">Engine Type:</span>{" "}
+										<span className="text-slate-500">Build Style:</span>{" "}
 										{item.architecture || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Brain size={14} className="text-purple-400 shrink-0" />
-										<span className="text-slate-500">
-											Processing Cores:
-										</span>{" "}
+										<span className="text-slate-500">Brain Power:</span>{" "}
 										{item.cores ? `${item.cores} Cores` : "N/A"} /{" "}
 										{item.threads ? `${item.threads} Tasks` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Gauge size={14} className="text-blue-400 shrink-0" />
-										<span className="text-slate-500">Running Speed:</span>{" "}
+										<span className="text-slate-500">Speed:</span>{" "}
 										{item.base_clock_ghz ? `${item.base_clock_ghz} GHz` : "N/A"}{" "}
-										Base (
+										(Up to{" "}
 										{item.boost_clock_ghz
 											? `${item.boost_clock_ghz} GHz`
-											: "N/A"}{" "}
-										Max)
+											: "N/A"}
+										)
 									</p>
 									<p className="flex items-center gap-2">
 										<Flame size={14} className="text-rose-500 shrink-0" />
-										<span className="text-slate-500">
-											Power Consumption:
-										</span>{" "}
+										<span className="text-slate-500">Power Needs:</span>{" "}
 										{item.tdp_watts ? `${item.tdp_watts}W` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Monitor size={14} className="text-sky-400 shrink-0" />
-										<span className="text-slate-500">
-											Built-in Display:
-										</span>{" "}
-										{item.integrated_graphics || "Requires Graphics Card"}
+										<span className="text-slate-500">Visuals:</span>{" "}
+										{item.integrated_graphics || "Needs Video Card"}
 									</p>
 									<p className="flex items-center gap-2">
 										{Number(item.unlocked) === 1 ? (
@@ -135,19 +127,17 @@ export default function HardwareSpecCard({
 													className="text-emerald-400 shrink-0"
 												/>
 												<span className="text-slate-500">
-													Speed Customization:
+													Adjustable Speed:
 												</span>{" "}
-												<span className="text-emerald-400 font-bold">
-													Unlocked
-												</span>
+												<span className="text-emerald-400 font-bold">Yes</span>
 											</>
 										) : (
 											<>
 												<Lock size={14} className="text-slate-500 shrink-0" />
 												<span className="text-slate-500">
-													Speed Customization:
+													Adjustable Speed:
 												</span>{" "}
-												<span>Locked Speed</span>
+												<span>Fixed</span>
 											</>
 										)}
 									</p>
@@ -158,7 +148,7 @@ export default function HardwareSpecCard({
 								<>
 									<p className="flex items-center gap-2">
 										<Cpu size={14} className="text-purple-400 shrink-0" />
-										<span className="text-slate-500">Processor Slot:</span>{" "}
+										<span className="text-slate-500">Fits Processor:</span>{" "}
 										{item.mobo_socket || item.socket || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
@@ -173,48 +163,32 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<Layers size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">Memory Options:</span>{" "}
+										<span className="text-slate-500">Memory Type:</span>{" "}
 										{item.mobo_memory_type || item.memory_type || "N/A"} (
-										{item.memory_slots || 0} Slots, Max{" "}
-										{item.max_memory_gb || 0}GB)
+										{item.memory_slots || 0} Slots)
 									</p>
 									<p className="flex items-center gap-2">
 										<Box size={14} className="text-indigo-400 shrink-0" />
-										<span className="text-slate-500">
-											Accessory Slots:
-										</span>{" "}
-										{item.pcie_x16_slots || 0}x Card Slots
+										<span className="text-slate-500">Expansion:</span>{" "}
+										{item.pcie_x16_slots || 0} Slot(s)
 									</p>
 									<p className="flex items-center gap-2">
 										<HardDrive
 											size={14}
 											className="text-emerald-400 shrink-0"
 										/>
-										<span className="text-slate-500">Fast Storage Slots:</span>{" "}
-										{item.m2_slots || 0}x Modern Drive Slot
-										{Number(item.m2_slots) !== 1 ? "s" : ""}
-									</p>
-									<p className="flex items-center gap-2">
-										<HardDriveDownload
-											size={14}
-											className="text-fuchsia-400 shrink-0"
-										/>
-										<span className="text-slate-500">
-											Standard Storage Ports:
-										</span>{" "}
-										{item.sata_ports || 0}x Drive Cables
+										<span className="text-slate-500">Fast Storage:</span>{" "}
+										{item.m2_slots || 0} Slot(s)
 									</p>
 									<p className="flex items-center gap-2">
 										<Network size={14} className="text-cyan-400 shrink-0" />
-										<span className="text-slate-500">
-											Wireless Network:
-										</span>{" "}
+										<span className="text-slate-500">Internet:</span>{" "}
 										{Number(item.wifi) === 1 ? (
 											<span className="text-emerald-400 font-bold">
-												Wi-Fi Built-In
+												Built-In Wi-Fi
 											</span>
 										) : (
-											"Cable Network Only"
+											"Wired Only"
 										)}
 									</p>
 								</>
@@ -224,9 +198,7 @@ export default function HardwareSpecCard({
 								<>
 									<p className="flex items-center gap-2">
 										<Layers size={14} className="text-indigo-400 shrink-0" />
-										<span className="text-slate-500">
-											Memory Generation:
-										</span>{" "}
+										<span className="text-slate-500">Generation:</span>{" "}
 										{item.memory_type || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
@@ -234,11 +206,11 @@ export default function HardwareSpecCard({
 											size={14}
 											className="text-emerald-400 shrink-0"
 										/>
-										<span className="text-slate-500">Total Size:</span>{" "}
+										<span className="text-slate-500">Total Space:</span>{" "}
 										{item.ram_capacity || item.capacity_gb
 											? `${item.ram_capacity || item.capacity_gb}GB`
 											: "N/A"}{" "}
-										({item.kit_modules || 1}x Stick
+										({item.kit_modules || 1} Stick
 										{Number(item.kit_modules) !== 1 ? "s" : ""})
 									</p>
 									<p className="flex items-center gap-2">
@@ -250,24 +222,6 @@ export default function HardwareSpecCard({
 										{item.speed_mhz ? `${item.speed_mhz}MHz` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
-										<Gauge size={14} className="text-blue-400 shrink-0" />
-										<span className="text-slate-500">
-											Responsiveness Speed:
-										</span>{" "}
-										{item.cas_latency
-											? item.cas_latency.toUpperCase().startsWith("CL")
-												? item.cas_latency.toUpperCase()
-												: `CL${item.cas_latency}`
-											: "N/A"}
-									</p>
-									<p className="flex items-center gap-2">
-										<Activity size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">Power Level:</span>{" "}
-										{item.voltage
-											? `${parseFloat(item.voltage).toFixed(2)}V`
-											: "N/A"}
-									</p>
-									<p className="flex items-center gap-2">
 										<Sparkles
 											size={14}
 											className={
@@ -276,13 +230,13 @@ export default function HardwareSpecCard({
 													: "text-slate-500 shrink-0"
 											}
 										/>
-										<span className="text-slate-500">Color Lights:</span>{" "}
+										<span className="text-slate-500">Lighting:</span>{" "}
 										{Number(item.ram_rgb || item.rgb) === 1 ? (
 											<span className="text-fuchsia-400 font-bold">
-												Glow Lights Included
+												Colorful Glow
 											</span>
 										) : (
-											"Solid Dark Theme"
+											"None"
 										)}
 									</p>
 								</>
@@ -305,7 +259,7 @@ export default function HardwareSpecCard({
 									<p className="flex items-center gap-2">
 										<Image size={14} className="text-sky-400 shrink-0" />
 										<span className="text-slate-500">
-											Max Graphics Card Length:
+											Max Card Length:
 										</span>{" "}
 										{item.max_gpu_length_mm
 											? `${item.max_gpu_length_mm}mm`
@@ -316,22 +270,20 @@ export default function HardwareSpecCard({
 											size={14}
 											className="text-rose-400 shrink-0"
 										/>
-										<span className="text-slate-500">Max Fan Unit Height:</span>{" "}
+										<span className="text-slate-500">Max Cooler Height:</span>{" "}
 										{item.max_cooler_height_mm
 											? `${item.max_cooler_height_mm}mm`
 											: "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<HardDrive size={14} className="text-amber-400 shrink-0" />
-										<span className="text-slate-500">
-											Drive Storage Slots:
-										</span>{" "}
-										{item.drive_bays_3_5 || 0}x Large /{" "}
-										{item.drive_bays_2_5 || 0}x Small
+										<span className="text-slate-500">Storage Bays:</span>{" "}
+										{item.drive_bays_3_5 || 0} Large /{" "}
+										{item.drive_bays_2_5 || 0} Small
 									</p>
 									<p className="flex items-center gap-2">
 										<Ruler size={14} className="text-purple-400 shrink-0" />
-										<span className="text-slate-500">Box Dimensions:</span>{" "}
+										<span className="text-slate-500">Dimensions:</span>{" "}
 										{item.dimensions || "N/A"}
 									</p>
 								</>
@@ -353,16 +305,14 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<Plug size={14} className="text-zinc-400 shrink-0" />
-										<span className="text-slate-500">
-											Plug Connection:
-										</span>{" "}
+										<span className="text-slate-500">Connection:</span>{" "}
 										{item.ssd_interface || item.interface_type || "N/A"} (
 										{item.ssd_form_factor || item.form_factor || "N/A"})
 									</p>
 									<p className="flex items-center gap-2">
 										<Binary size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">Storage Tech:</span>{" "}
-										{item.nand_type || "N/A"} Chips
+										<span className="text-slate-500">Build Type:</span>{" "}
+										{item.nand_type || "N/A"}
 									</p>
 									{item.pcie_gen && (
 										<p className="flex items-center gap-2">
@@ -379,7 +329,7 @@ export default function HardwareSpecCard({
 											size={14}
 											className="text-sky-400 shrink-0"
 										/>
-										<span className="text-slate-500">Loading Speed:</span>{" "}
+										<span className="text-slate-500">Read Speed:</span>{" "}
 										{item.read_speed_mbps
 											? `Up to ${item.read_speed_mbps} MB/s`
 											: "N/A"}
@@ -389,7 +339,7 @@ export default function HardwareSpecCard({
 											size={14}
 											className="text-amber-400 shrink-0"
 										/>
-										<span className="text-slate-500">Saving Speed:</span>{" "}
+										<span className="text-slate-500">Write Speed:</span>{" "}
 										{item.write_speed_mbps
 											? `Up to ${item.write_speed_mbps} MB/s`
 											: "N/A"}
@@ -413,14 +363,12 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<RefreshCw size={14} className="text-amber-400 shrink-0" />
-										<span className="text-slate-500">Spinning Speed:</span>{" "}
+										<span className="text-slate-500">Spin Speed:</span>{" "}
 										{item.rpm ? `${item.rpm} RPM` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Layers3 size={14} className="text-purple-400 shrink-0" />
-										<span className="text-slate-500">
-											Temporary Quick Cache:
-										</span>{" "}
+										<span className="text-slate-500">Cache Memory:</span>{" "}
 										{item.cache_mb ? `${item.cache_mb}MB` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
@@ -430,9 +378,7 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<Plug size={14} className="text-zinc-400 shrink-0" />
-										<span className="text-slate-500">
-											Connection Cable:
-										</span>{" "}
+										<span className="text-slate-500">Connection:</span>{" "}
 										{item.hdd_interface || item.interface_type || "N/A"}
 									</p>
 								</>
@@ -449,27 +395,25 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<Gauge size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">
-											Max Rotation Speed:
-										</span>{" "}
+										<span className="text-slate-500">Max Speed:</span>{" "}
 										{item.max_rpm ? `${item.max_rpm} RPM` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Wind size={14} className="text-blue-400 shrink-0" />
-										<span className="text-slate-500">Blowing Power:</span>{" "}
+										<span className="text-slate-500">Airflow Power:</span>{" "}
 										{item.airflow_cfm ? `${item.airflow_cfm} CFM` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Volume2 size={14} className="text-amber-400 shrink-0" />
-										<span className="text-slate-500">Sound Loudness:</span>{" "}
+										<span className="text-slate-500">Loudness:</span>{" "}
 										{item.noise_db ? `${item.noise_db} dBA` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Activity size={14} className="text-purple-400 shrink-0" />
-										<span className="text-slate-500">Speed Controls:</span>{" "}
+										<span className="text-slate-500">Speed Control:</span>{" "}
 										{Number(item.pwm) === 1
 											? "Automatic Adjust"
-											: "Fixed Constant Speed"}
+											: "Fixed Speed"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Sparkles
@@ -480,13 +424,13 @@ export default function HardwareSpecCard({
 													: "text-slate-500 shrink-0"
 											}
 										/>
-										<span className="text-slate-500">Lights Matrix:</span>{" "}
+										<span className="text-slate-500">Lighting:</span>{" "}
 										{Number(item.fan_rgb || item.rgb) === 1 ? (
 											<span className="text-fuchsia-400 font-bold">
-												Colorful Lighting
+												Colorful Glow
 											</span>
 										) : (
-											"Dark / No Lights"
+											"None"
 										)}
 									</p>
 								</>
@@ -496,9 +440,7 @@ export default function HardwareSpecCard({
 								<>
 									<p className="flex items-center gap-2">
 										<Ruler size={14} className="text-sky-400 shrink-0" />
-										<span className="text-slate-500">
-											Cooling Block Size:
-										</span>{" "}
+										<span className="text-slate-500">Cooler Size:</span>{" "}
 										{item.radiator_mm ? `${item.radiator_mm}mm` : "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
@@ -532,11 +474,9 @@ export default function HardwareSpecCard({
 													: "text-slate-500 shrink-0"
 											}
 										/>
-										<span className="text-slate-500">Liquid Block Lights:</span>{" "}
+										<span className="text-slate-500">Glow Lights:</span>{" "}
 										{Number(item.aio_rgb || item.rgb) === 1 ? (
-											<span className="text-fuchsia-400 font-bold">
-												RGB Supported
-											</span>
+											<span className="text-fuchsia-400 font-bold">Yes</span>
 										) : (
 											"None"
 										)}
@@ -548,16 +488,14 @@ export default function HardwareSpecCard({
 								<>
 									<p className="flex items-center gap-2">
 										<ArrowUpRight size={14} className="text-sky-400 shrink-0" />
-										<span className="text-slate-500">Tower Height:</span>{" "}
+										<span className="text-slate-500">Cooler Height:</span>{" "}
 										{item.cooler_height || item.height_mm
 											? `${item.cooler_height || item.height_mm}mm`
 											: "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Wind size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">
-											Fan System Setup:
-										</span>{" "}
+										<span className="text-slate-500">Fan Setup:</span>{" "}
 										{item.cooler_fan_count || item.fan_count || 0}x{" "}
 										{item.cooler_fan_size || item.fan_size_mm || ""}mm Fan
 										{Number(item.cooler_fan_count || item.fan_count) !== 1
@@ -567,7 +505,7 @@ export default function HardwareSpecCard({
 									<p className="flex items-center gap-2">
 										<Flame size={14} className="text-rose-500 shrink-0" />
 										<span className="text-slate-500">
-											Heat Dissipation Cap:
+											Heat Management:
 										</span>{" "}
 										{item.tdp_rating_watts
 											? `${item.tdp_rating_watts}W`
@@ -597,11 +535,9 @@ export default function HardwareSpecCard({
 													: "text-slate-500 shrink-0"
 											}
 										/>
-										<span className="text-slate-500">Attached Fan Lights:</span>{" "}
+										<span className="text-slate-500">Fan Lights:</span>{" "}
 										{Number(item.cooler_rgb || item.rgb) === 1 ? (
-											<span className="text-fuchsia-400 font-bold">
-												RGB Supported
-											</span>
+											<span className="text-fuchsia-400 font-bold">Yes</span>
 										) : (
 											"None"
 										)}
@@ -619,14 +555,14 @@ export default function HardwareSpecCard({
 									<p className="flex items-center gap-2">
 										<Award size={14} className="text-yellow-500 shrink-0" />
 										<span className="text-slate-500">
-											Efficiency Grade:
+											Efficiency Rating:
 										</span>{" "}
 										{item.efficiency_rating || "Unrated"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Grid size={14} className="text-blue-400 shrink-0" />
 										<span className="text-slate-500">
-											Detachable Cables:
+											Removable Cables:
 										</span>{" "}
 										<span className="capitalize">
 											{item.modular_type
@@ -636,24 +572,20 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<Maximize size={14} className="text-purple-400 shrink-0" />
-										<span className="text-slate-500">
-											Form Factor Style:
-										</span>{" "}
+										<span className="text-slate-500">Size Style:</span>{" "}
 										{item.psu_form_factor || item.form_factor || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Plug size={14} className="text-rose-400 shrink-0" />
 										<span className="text-slate-500">
-											Graphics Card Links:
+											Video Card Links:
 										</span>{" "}
-										{item.pcie_connectors || 0}x Power Cables
+										{item.pcie_connectors || 0}x Cables
 									</p>
 									<p className="flex items-center gap-2">
 										<Cable size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">
-											Drive Power Links:
-										</span>{" "}
-										{item.sata_connectors || 0}x Power Cables
+										<span className="text-slate-500">Drive Links:</span>{" "}
+										{item.sata_connectors || 0}x Cables
 									</p>
 								</>
 							)}
@@ -662,7 +594,7 @@ export default function HardwareSpecCard({
 								<>
 									<p className="flex items-center gap-2">
 										<Image size={14} className="text-sky-400 shrink-0" />
-										<span className="text-slate-500">Core Engine:</span>{" "}
+										<span className="text-slate-500">Video Chip:</span>{" "}
 										{item.gpu_chipset || item.chipset || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
@@ -676,54 +608,46 @@ export default function HardwareSpecCard({
 									</p>
 									<p className="flex items-center gap-2">
 										<Gauge size={14} className="text-teal-400 shrink-0" />
-										<span className="text-slate-500">Engine Clocks:</span>{" "}
+										<span className="text-slate-500">Running Speed:</span>{" "}
 										{item.core_clock_mhz ? `${item.core_clock_mhz} MHz` : "N/A"}{" "}
-										Base (
+										(Up to{" "}
 										{item.boost_clock_mhz
 											? `${item.boost_clock_mhz} MHz`
-											: "N/A"}{" "}
-										Max)
+											: "N/A"}
+										)
 									</p>
 									<p className="flex items-center gap-2">
 										<TrendingUp
 											size={14}
 											className="text-purple-400 shrink-0"
 										/>
-										<span className="text-slate-500">Connector Interface:</span>{" "}
+										<span className="text-slate-500">Connection Style:</span>{" "}
 										{item.pcie_version || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Plug size={14} className="text-indigo-400 shrink-0" />
-										<span className="text-slate-500">
-											Power Input Link:
-										</span>{" "}
+										<span className="text-slate-500">Power Input:</span>{" "}
 										{item.power_connectors || "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<Flame size={14} className="text-rose-500 shrink-0" />
-										<span className="text-slate-500">
-											Electricity Needs:
-										</span>{" "}
+										<span className="text-slate-500">Power Needs:</span>{" "}
 										{item.gpu_tdp || item.tdp_watts
 											? `${item.gpu_tdp || item.tdp_watts}W`
 											: "N/A"}
 									</p>
 									<p className="flex items-center gap-2">
 										<MonitorUp size={14} className="text-amber-400 shrink-0" />
-										<span className="text-slate-500">
-											Screen Output Ports:
-										</span>{" "}
+										<span className="text-slate-500">Screen Ports:</span>{" "}
 										<span className="truncate" title={item.outputs}>
 											{item.outputs || "N/A"}
 										</span>
 									</p>
 									<p className="flex items-center gap-2">
 										<Ruler size={14} className="text-cyan-400 shrink-0" />
-										<span className="text-slate-500">
-											Card Size Length:
-										</span>{" "}
+										<span className="text-slate-500">Card Length:</span>{" "}
 										{item.length_mm ? `${item.length_mm}mm` : "N/A"} (
-										{item.slot_width ? `${item.slot_width} Slots` : "N/A"})
+										{item.slot_width ? `${item.slot_width} Slots Wide` : "N/A"})
 									</p>
 								</>
 							)}
@@ -741,19 +665,19 @@ export default function HardwareSpecCard({
 								"case-fans",
 								"pc-cases",
 							].includes(itemCategory) && (
-								<p className="text-[10px] sm:text-xs text-slate-500 italic py-1 text-center">
-									Layout parameters rendering sheet unassigned
+								<p className="text-xs sm:text-sm text-slate-500 italic py-1 text-center">
+									Details coming soon
 								</p>
 							)}
 						</>
 					)}
 				</div>
-			</div>
+			</section>
 
-			<div className="text-[9px] sm:text-[10px] md:text-xs text-slate-600 border-t border-white/[0.02] pt-2 flex justify-between items-center gap-2">
+			<footer className="text-xs sm:text-sm md:text-base text-slate-600 border-t border-white/[0.02] pt-2 flex justify-between items-center gap-2">
 				<div className="flex flex-col">
 					<span>Model: {item.model}</span>
-					<span className="uppercase tracking-widest text-[8px] sm:text-[9px] mt-1 px-1.5 py-0.5 rounded bg-white/5 w-max font-bold text-slate-400 border border-white/5">
+					<span className="uppercase tracking-widest text-[10px] sm:text-xs mt-1 px-1.5 py-0.5 rounded bg-white/5 w-max font-bold text-slate-400 border border-white/5">
 						{itemCategory}
 					</span>
 				</div>
@@ -761,13 +685,13 @@ export default function HardwareSpecCard({
 				{!showGlobalPlaceholder && (
 					<button
 						onClick={onEdit}
-						className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-[10px] sm:text-xs text-white transition-colors cursor-pointer"
+						className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-xs sm:text-sm text-white transition-colors cursor-pointer"
 					>
 						<Sliders size={12} className="text-slate-400" />
 						<span>Edit Hardware Specs</span>
 					</button>
 				)}
-			</div>
-		</div>
+			</footer>
+		</article>
 	);
 }

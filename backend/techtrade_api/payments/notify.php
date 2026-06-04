@@ -39,7 +39,6 @@ function pfValidServerConfirmation($pfParamString, $pfHost)
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     $response = curl_exec($ch);
     $error = curl_error($ch);
-    $close = curl_close($ch);
 
     return ($response === 'VALID');
 }
@@ -61,11 +60,9 @@ if ($signatureValid && $serverValid) {
         $db->prepare("UPDATE transactions SET status = 'committed', escrow_step = 2 WHERE id = ?")
             ->execute([$transactionId]);
 
-        // Log the payment confirmation event in the order timeline history
         $db->prepare("INSERT INTO transaction_events (transaction_id, event_type, from_step, to_step, metadata_json) VALUES (?, 'payment_received', 1, 2, ?)")
             ->execute([$transactionId, json_encode(['note' => 'Payment confirmed and verified by payment provider.'])]);
 
-        // Lock in all changes securely
         $db->commit();
     } catch (Exception $e) {
         if (isset($db)) $db->rollBack();

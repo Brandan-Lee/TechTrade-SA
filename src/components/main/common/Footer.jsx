@@ -5,10 +5,6 @@ import {
 	Globe,
 	ShieldAlert,
 	ChevronRight,
-	Zap,
-	HelpCircle,
-	Info,
-	Shield,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.png";
@@ -40,13 +36,12 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 	];
 
 	return (
-		<footer className="w-full bg-[#050505] border-t border-white/10 font-['Inter'] overflow-hidden">
-			{/* 1. Order Process Timeline */}
+		<footer className="w-full bg-[#050505] border-t border-white/10 font-['Inter'] overflow-hidden text-xs sm:text-sm md:text-base lg:text-lg">
 			<section className="w-full py-16 px-4 bg-[#0a0a0c] border-b border-white/5 relative">
 				<div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
 
 				<div className="max-w-6xl mx-auto text-center relative z-10">
-					<h2 className="text-white text-3xl md:text-5xl font-black mb-12 uppercase italic tracking-tighter">
+					<h2 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-12 uppercase italic tracking-tighter">
 						Safe{" "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 							Trading Steps
@@ -63,11 +58,11 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 									<div className="hidden lg:block absolute top-7 left-1/2 w-full h-[1px] bg-gradient-to-r from-fuchsia-500/30 to-transparent z-0" />
 								)}
 								<div className="relative z-10 w-14 h-14 rounded-2xl bg-[#121214] border-2 border-fuchsia-500/30 group-hover:border-fuchsia-500 group-hover:shadow-[0_0_20px_rgba(217,70,239,0.4)] transition-all duration-300 flex items-center justify-center mb-4">
-									<span className="text-white font-black text-xl italic">
+									<span className="text-white font-black text-lg sm:text-xl italic">
 										{step.id}
 									</span>
 								</div>
-								<span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition-colors text-center px-2">
+								<span className="text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition-colors text-center px-2">
 									{step.label}
 								</span>
 							</div>
@@ -76,7 +71,6 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 				</div>
 			</section>
 
-			{/* 2. Security Alert Bar */}
 			<div className="w-full py-5 px-4 bg-gradient-to-r from-[#1a0b2e] to-[#0a0a0c] border-y border-fuchsia-500/20 relative">
 				<div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
 					<div className="flex items-center gap-4">
@@ -85,7 +79,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 							<div className="absolute inset-0 bg-fuchsia-500/20 blur-xl rounded-full"></div>
 						</div>
 						<div>
-							<span className="block text-white font-black text-lg tracking-tight uppercase leading-none">
+							<span className="block text-white font-black text-base sm:text-lg tracking-tight uppercase leading-none">
 								Security Active
 							</span>
 						</div>
@@ -93,11 +87,9 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 				</div>
 			</div>
 
-			{/* 3. Navigation & Branding */}
 			<section className="w-full pt-20 pb-12 px-6">
 				<div className="max-w-7xl mx-auto">
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
-						{/* Brand Column */}
 						<div className="lg:col-span-4 space-y-8">
 							<div className="flex items-center gap-4">
 								<img
@@ -105,11 +97,11 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 									alt="TechTrade Logo"
 									className="w-12 h-12 object-cover"
 								/>
-								<h3 className="text-2xl font-black italic tracking-tighter uppercase text-white">
+								<h3 className="text-xl sm:text-2xl font-black italic tracking-tighter uppercase text-white">
 									TechTrade <span className="text-fuchsia-500">SA</span>
 								</h3>
 							</div>
-							<p className="text-slate-500 text-sm leading-relaxed max-w-sm font-medium">
+							<p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-sm font-medium">
 								We make buying and selling second-hand computer hardware safe,
 								simple, and reliable for everyone.
 							</p>
@@ -126,8 +118,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 							</div>
 						</div>
 
-						{/* Links Column */}
-						<div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+						<nav className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 							{navigationLinks.map((link) => (
 								<div key={link.name} className="flex">
 									{link.isModal ? (
@@ -137,7 +128,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 												else if (link.name === "Terms of Service") onTOSClick();
 												else onDataClick();
 											}}
-											className="group flex items-center gap-2 text-slate-400 hover:text-white text-[13px] font-black uppercase tracking-widest transition-all text-left"
+											className="group flex items-center gap-2 text-slate-400 hover:text-white text-[11px] sm:text-[12px] md:text-[13px] font-black uppercase tracking-widest transition-all text-left"
 										>
 											<ChevronRight
 												size={14}
@@ -148,7 +139,7 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 									) : (
 										<Link
 											to={link.path}
-											className="group flex items-center gap-2 text-slate-400 hover:text-white text-[13px] font-black uppercase tracking-widest transition-all"
+											className="group flex items-center gap-2 text-slate-400 hover:text-white text-[11px] sm:text-[12px] md:text-[13px] font-black uppercase tracking-widest transition-all"
 										>
 											<ChevronRight
 												size={14}
@@ -159,13 +150,12 @@ export default function Footer({ onLoginClick, onTOSClick, onDataClick }) {
 									)}
 								</div>
 							))}
-						</div>
+						</nav>
 					</div>
 
-					{/* Bottom Copyright */}
 					<div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
 						<div className="flex items-center gap-4">
-							<p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.2em]">
+							<p className="text-slate-600 text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">
 								&copy; 2026 TechTrade SA
 							</p>
 						</div>

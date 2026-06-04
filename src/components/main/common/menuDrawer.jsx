@@ -49,31 +49,27 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 
 	return (
 		<>
-			{/* Dark background overlay */}
 			<div
-				className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 
-				${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+				className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
 				onClick={closeMenu}
 				aria-hidden="true"
 			/>
 
-			{/* Side menu panel */}
 			<aside
 				aria-modal="true"
 				role="dialog"
 				aria-label="Site Navigation Menu"
-				className={`fixed top-0 left-0 w-80 max-w-[85vw] h-full z-[70] bg-[#09090b]/95 border-r border-white/10 shadow-[5px_0_40px_rgba(0,0,0,0.6)] backdrop-blur-md transition-transform duration-300 ease-in-out text-slate-300 ${
+				className={`fixed top-0 left-0 w-80 max-w-[85vw] h-full z-[70] bg-[#09090b]/95 border-r border-white/10 shadow-[5px_0_40px_rgba(0,0,0,0.6)] backdrop-blur-md transition-transform duration-300 ease-in-out text-slate-300 text-xs sm:text-sm md:text-base lg:text-lg ${
 					isOpen ? "translate-x-0" : "-translate-x-full"
 				}`}
 			>
 				<div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-fuchsia-500/0 via-fuchsia-500/20 to-fuchsia-500/0" />
 
 				<div className="flex flex-col h-full p-5 sm:p-6 gap-8">
-					{/* Header section with title and close button */}
-					<div className="flex justify-between items-center w-full pb-4 border-b border-white/5">
+					<header className="flex justify-between items-center w-full pb-4 border-b border-white/5">
 						<div className="flex items-center gap-2">
 							<Menu size={14} className="text-fuchsia-500" />
-							<h2 className="text-white text-xs font-black uppercase tracking-[0.25em]">
+							<h2 className="text-white text-[10px] sm:text-xs font-black uppercase tracking-[0.25em]">
 								Main Menu
 							</h2>
 						</div>
@@ -84,9 +80,8 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 						>
 							<X size={16} />
 						</button>
-					</div>
+					</header>
 
-					{/* Navigation list */}
 					<nav className="flex flex-col gap-1.5 w-full items-start">
 						{menuItems.map((item, index) => {
 							if (item.name === "divider") {
@@ -132,7 +127,7 @@ export default function MenuDrawer({ isOpen, closeMenu, onSwitchToLogin }) {
 									)}
 
 									<div className="flex items-center justify-between w-full">
-										<span className="text-xs sm:text-sm font-bold tracking-wide transition-transform group-hover:translate-x-0.5">
+										<span className="text-[11px] sm:text-xs md:text-sm font-bold tracking-wide transition-transform group-hover:translate-x-0.5">
 											{item.label}
 										</span>
 										<ChevronRight

@@ -72,14 +72,12 @@ try {
         throw new Exception("Funds can only be released for orders that are currently marked as completed.");
     }
 
-    // Format the financial breakdown text for alerts
     $payoutAmount = number_format(($tx['agreed_price_cents'] / 100), 2, '.', '');
     $itemTitle = $tx['item_title'];
     $orderPublicId = $tx['public_id'];
 
     $db->beginTransaction();
 
-    // 1. Update the main transaction record
     $updateTx = $db->prepare("
         UPDATE transactions 
         SET 
@@ -92,8 +90,6 @@ try {
     ");
     $updateTx->execute([$transactionId]);
 
-    // 2. 🚀 NEW: Update the associated payment status record
-    // We update the status from 'complete' (held in escrow) to show it is finalized/settled out.
     $updatePayment = $db->prepare("
         UPDATE payments 
         SET 
@@ -103,7 +99,6 @@ try {
     ");
     $updatePayment->execute([$transactionId]);
 
-    // 3. Create system notification records
     $insertNotification = $db->prepare("
         INSERT INTO notifications (
             user_id, type, title, body, status, transaction_id, listing_id, is_read

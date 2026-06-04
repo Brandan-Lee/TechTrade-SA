@@ -13,12 +13,12 @@ class User
     private string $passwordHash;
     private string $firstName;
     private string $lastName;
-    private ?string $encryptedMobile; 
-    private ?string $hardwareId;      
-    private ?string $province;        
-    private ?string $avatarUrl;       
+    private ?string $encryptedMobile;
+    private ?string $hardwareId;
+    private ?string $province;
+    private ?string $avatarUrl;
     private string $regType;
-    private string $memberSince;      
+    private string $memberSince;
     private float $trustScore;
     private int $tradeCount;
     private int $strikeCount;
@@ -30,12 +30,12 @@ class User
     private bool $isBanned;
     private ?string $bannedAt;
     private ?string $banReason;
-    private ?string $tosAcceptedAt;   
-    private ?string $lastLoginAt;    
-    private string $createdAt;        
-    private string $updatedAt;        
+    private ?string $tosAcceptedAt;
+    private ?string $lastLoginAt;
+    private string $createdAt;
+    private string $updatedAt;
     private bool $isDeleted;
-    private bool $isMFA;              
+    private bool $isMFA;
     private ?string $deletedAt;
 
     public function __construct(PDO $db)
@@ -126,7 +126,7 @@ class User
         $this->createdAt = $row['created_at'];
         $this->updatedAt = $row['updated_at'];
         $this->isDeleted = (bool) $row['is_deleted'];
-        $this->isMFA = (bool) ($row['MFA'] ?? 1); 
+        $this->isMFA = (bool) ($row['MFA'] ?? 1);
         $this->deletedAt = $row['deleted_at'] ?? null;
     }
 
@@ -284,11 +284,13 @@ class User
         $params = [$this->strikeCount];
         $sql = "UPDATE users SET strike_count = ?";
 
-        if ($this->hasBeenSuspended && $this->strikeCount >= 3) {
-            $this->isBanned = true;
-            $this->banReason = empty($reason) ? 'Permanent Hardware Ban' : $reason;
-            $sql .= ", is_banned = 1, banned_at = NOW(), ban_reason = ?";
-            $params[] = $this->banReason;
+        if ($this->strikeCount >= 3) {
+            $this->isSuspended = true;
+            $this->hasBeenSuspended = true;
+            $this->suspendedReason = empty($reason) ? 'Automatic 3rd strike system suspension' : $reason;
+            $sql .= ", is_suspended = 1, has_been_suspended = 1, suspended_at = NOW(), suspended_until = DATE_ADD(NOW(), INTERVAL ? DAY), suspended_reason = ?";
+            $params[] = 30;
+            $params[] = $this->suspendedReason;
         } else if ($this->strikeCount == 2) {
             $this->isSuspended = true;
             $this->hasBeenSuspended = true;

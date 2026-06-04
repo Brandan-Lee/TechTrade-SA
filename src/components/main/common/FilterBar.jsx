@@ -172,12 +172,12 @@ export default function FilterBar() {
 	return (
 		<div
 			ref={dropdownRef}
-			className="w-full sticky top-0 z-40 bg-[#050505]/90 backdrop-blur-xl border-b border-white/10"
+			className="w-full sticky top-0 z-40 bg-[#050505]/90 backdrop-blur-xl border-b border-white/10 text-xs sm:text-sm md:text-base lg:text-lg"
 		>
 			<nav className="max-w-[1440px] mx-auto h-16 px-4 flex items-center gap-4">
 				<div className="flex items-center gap-2 pr-4 border-r border-white/10 shrink-0">
 					<SlidersHorizontal className="w-4 h-4 text-fuchsia-500" />
-					<span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] hidden md:block">
+					<span className="text-slate-400 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] hidden md:block">
 						Filters
 					</span>
 				</div>
@@ -185,7 +185,7 @@ export default function FilterBar() {
 				<div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 grow">
 					<button
 						onClick={clearFilters}
-						className={`h-9 px-4 rounded-md text-[11px] font-black uppercase tracking-widest transition-all shrink-0 border ${
+						className={`h-9 px-4 rounded-md text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-all shrink-0 border ${
 							!isAnyFilterActive
 								? "bg-fuchsia-600 text-white border-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.3)]"
 								: "bg-white/5 text-slate-400 border-white/10 hover:border-fuchsia-500/50"
@@ -208,7 +208,7 @@ export default function FilterBar() {
 							<button
 								key={dropdown.id}
 								onClick={(e) => handleToggle(e, dropdown.id)}
-								className={`h-9 px-4 rounded-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all shrink-0 border ${
+								className={`h-9 px-4 rounded-md flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all shrink-0 border ${
 									isSet || openDropdown === dropdown.id
 										? "bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.2)]"
 										: "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
@@ -235,14 +235,14 @@ export default function FilterBar() {
 					>
 						<div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
-								<span className="text-fuchsia-500/50 text-[9px] font-black uppercase tracking-widest shrink-0">
+								<span className="text-fuchsia-500/50 text-[8px] sm:text-[9px] font-black uppercase tracking-widest shrink-0">
 									Active Filters:
 								</span>
 								<div className="flex flex-wrap gap-2">
 									{activeFiltersList.map((f, i) => (
 										<div
 											key={i}
-											className="flex items-center gap-2 px-2 py-0.5 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded text-fuchsia-400 text-[10px] font-bold uppercase"
+											className="flex items-center gap-2 px-2 py-0.5 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded text-fuchsia-400 text-[8px] sm:text-[10px] font-bold uppercase"
 										>
 											{f}
 										</div>
@@ -255,7 +255,7 @@ export default function FilterBar() {
 									type="button"
 									onClick={applySelectedFilters}
 									disabled={!hasPendingChanges}
-									className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[9px] font-black uppercase tracking-widest transition-all group ${
+									className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[8px] sm:text-[9px] font-black uppercase tracking-widest transition-all group ${
 										!hasPendingChanges
 											? "bg-white/5 text-slate-600 border-white/10 cursor-not-allowed opacity-60"
 											: "bg-fuchsia-500/10 hover:bg-fuchsia-500/20 border-fuchsia-500/30 hover:border-fuchsia-500 text-fuchsia-400"
@@ -271,7 +271,7 @@ export default function FilterBar() {
 								<button
 									type="button"
 									onClick={clearFilters}
-									className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-400 text-[9px] font-black uppercase tracking-widest transition-all group"
+									className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-400 text-[8px] sm:text-[9px] font-black uppercase tracking-widest transition-all group"
 								>
 									<X
 										size={10}
@@ -317,7 +317,7 @@ export default function FilterBar() {
 															: { category: item },
 													)
 												}
-												className="w-full h-10 flex items-center justify-between px-3 rounded text-slate-300 text-[11px] font-bold uppercase hover:bg-fuchsia-600 hover:text-white transition-all group"
+												className="w-full h-10 flex items-center justify-between px-3 rounded text-slate-300 text-[10px] sm:text-[11px] font-bold uppercase hover:bg-fuchsia-600 hover:text-white transition-all group"
 											>
 												{item}
 												<Zap
@@ -341,7 +341,7 @@ export default function FilterBar() {
 													}))
 												}
 												placeholder="Min Price"
-												className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
+												className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[9px] sm:text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
 											/>
 											<input
 												type="text"
@@ -353,7 +353,7 @@ export default function FilterBar() {
 													}))
 												}
 												placeholder="Max Price"
-												className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
+												className="w-full h-9 bg-black border border-white/10 rounded px-2 text-[9px] sm:text-[10px] font-mono text-fuchsia-400 focus:border-fuchsia-500 outline-none"
 											/>
 										</div>
 										<button
@@ -363,7 +363,7 @@ export default function FilterBar() {
 													priceMax: tempPrice.max,
 												})
 											}
-											className="w-full h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded text-[10px] font-black uppercase tracking-widest transition-colors"
+											className="w-full h-9 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors"
 										>
 											Update Results
 										</button>

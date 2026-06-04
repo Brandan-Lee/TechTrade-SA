@@ -50,7 +50,6 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 		};
 	}, [isOpen]);
 
-	// Remove a notification
 	const handleDelete = async (id) => {
 		const confirmed = window.confirm(
 			"Are you sure you want to delete this notification?",
@@ -68,7 +67,6 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 		}
 	};
 
-	// Handle accept or decline actions
 	const handleAction = async (id, actionType) => {
 		const item = notifications.find((n) => n.id === id);
 		if (!item) return;
@@ -119,7 +117,6 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 		}
 	};
 
-	// Simple time display
 	const formatTime = (dateString) => {
 		if (!dateString) return "Recently";
 		const past = new Date(dateString.replace(/-/g, "/"));
@@ -144,7 +141,7 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 					<button
 						onClick={markAllAsRead}
 						disabled={unread.length === 0}
-						className="text-xs font-black uppercase flex items-center gap-1.5 px-2 py-1 rounded border border-fuchsia-500/20 text-fuchsia-400"
+						className="text-[10px] sm:text-xs font-black uppercase flex items-center gap-1.5 px-2 py-1 rounded border border-fuchsia-500/20 text-fuchsia-400"
 					>
 						<CheckCheck size={12} /> Mark All Read
 					</button>
@@ -153,23 +150,25 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 			footerText={isLoading ? "Syncing..." : `${unread.length} new items`}
 			className="bg-[#08080a] border border-purple-500/20 rounded-xl max-w-2xl w-full mx-auto"
 		>
-			<div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
+			<div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1 text-xs sm:text-sm md:text-base lg:text-lg">
 				{isLoading ? (
 					<div className="py-20 flex flex-col items-center gap-3">
 						<Loader2 className="w-6 h-6 text-fuchsia-500 animate-spin" />
-						<p className="text-xs uppercase text-slate-500 font-bold">
+						<p className="text-[10px] sm:text-xs uppercase text-slate-500 font-bold">
 							Loading updates...
 						</p>
 					</div>
 				) : error ? (
-					<p className="text-red-400 text-center p-6">{error}</p>
+					<p className="text-red-400 text-center p-6 text-[11px] sm:text-xs md:text-sm">
+						{error}
+					</p>
 				) : (
-					<>
+					<div className="space-y-6">
 						{unread.length > 0 && (
-							<div className="flex flex-col gap-2">
+							<section className="flex flex-col gap-2">
 								<div className="flex items-center gap-2 text-fuchsia-500 px-1">
 									<Eye size={12} />
-									<h3 className="text-xs font-black uppercase tracking-widest">
+									<h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest">
 										New
 									</h3>
 								</div>
@@ -182,13 +181,13 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 										onDelete={handleDelete}
 									/>
 								))}
-							</div>
+							</section>
 						)}
 						{read.length > 0 && (
-							<div className="flex flex-col gap-2">
+							<section className="flex flex-col gap-2">
 								<div className="flex items-center gap-2 text-slate-500 px-1">
 									<EyeOff size={12} />
-									<h3 className="text-xs font-black uppercase tracking-widest">
+									<h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest">
 										Earlier
 									</h3>
 								</div>
@@ -201,14 +200,14 @@ const NotificationModal = ({ isOpen, onClose, onCounterAccept }) => {
 										onDelete={handleDelete}
 									/>
 								))}
-							</div>
+							</section>
 						)}
 						{active.length === 0 && (
-							<p className="text-slate-600 text-center p-12">
+							<p className="text-slate-600 text-center p-12 text-[11px] sm:text-xs md:text-sm">
 								No notifications found.
 							</p>
 						)}
-					</>
+					</div>
 				)}
 			</div>
 		</BaseModal>

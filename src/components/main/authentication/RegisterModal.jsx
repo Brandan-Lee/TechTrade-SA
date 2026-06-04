@@ -1,12 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import {
-	User,
-	ChevronDown,
-	Check,
-	ShieldAlert,
-	Image,
-	Layers,
-} from "lucide-react";
+import { User, ChevronDown, Check, ShieldAlert, Image } from "lucide-react";
 import AuthModalWrapper from "./AuthModalWrapper";
 import AuthInput from "../../ui/AuthInput";
 import GradientButton from "../../ui/CyberActionButton";
@@ -332,13 +325,15 @@ const RegisterModalContent = ({
 	};
 
 	return (
-		<div className="space-y-5 sm:space-y-6 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30">
-			<h1 className="text-white text-5xl font-black uppercase italic tracking-tighter leading-none">
-				{mode === "edit" ? "Edit" : "Create"}{" "}
-				<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
-					{mode === "edit" ? "Profile" : "Account"}
-				</span>
-			</h1>
+		<div className="space-y-5 sm:space-y-6 p-1 font-mono bg-[#0c0c0e]/95 text-slate-300 rounded-xl selection:bg-fuchsia-500/30 text-xs sm:text-sm md:text-base lg:text-lg">
+			<header>
+				<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
+					{mode === "edit" ? "Edit" : "Create"}{" "}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
+						{mode === "edit" ? "Profile" : "Account"}
+					</span>
+				</h1>
+			</header>
 
 			{alert.show && (
 				<CyberAlert
@@ -377,7 +372,7 @@ const RegisterModalContent = ({
 						<button
 							type="button"
 							onClick={() => fileInputRef.current.click()}
-							className="inline-flex items-center gap-2 sm:text-xs md:text-base font-black uppercase tracking-widest text-fuchsia-400 border border-fuchsia-500/20 bg-fuchsia-500/[0.02] hover:bg-fuchsia-500/[0.05] hover:border-fuchsia-500/50 px-3 py-1.5 rounded transition-all focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
+							className="inline-flex items-center gap-2 text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-widest text-fuchsia-400 border border-fuchsia-500/20 bg-fuchsia-500/[0.02] hover:bg-fuchsia-500/[0.05] hover:border-fuchsia-500/50 px-3 py-1.5 rounded transition-all focus:outline-none focus:ring-1 focus:ring-fuchsia-500"
 						>
 							<Image size={12} />
 							<span>{profileImage ? "Change Photo" : "Add Profile Photo"}</span>
@@ -491,7 +486,7 @@ const RegisterModalContent = ({
 					}
 					className={`space-y-1.5 ${errorField === "province" ? "animate-shake" : ""}`}
 				>
-					<label className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest ml-0.5">
+					<label className="text-fuchsia-500/80 text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest ml-0.5">
 						PROVINCE
 					</label>
 					<div className="relative">
@@ -562,7 +557,7 @@ const RegisterModalContent = ({
 				</div>
 
 				<div className="p-4 bg-black/20 rounded-lg border border-white/5 space-y-3">
-					<h3 className="text-fuchsia-500/80 text-sm sm:text-xs md:text-base font-bold uppercase tracking-widest">
+					<h3 className="text-fuchsia-500/80 text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest">
 						REGISTER AS
 					</h3>
 					<div className="flex flex-wrap gap-5">
@@ -578,7 +573,7 @@ const RegisterModalContent = ({
 									checked={formData.regType === type}
 									onChange={() => setFormData({ ...formData, regType: type })}
 								/>
-								<span className="text-xs font-bold text-slate-400 capitalize tracking-wide group-hover:text-fuchsia-400 transition-colors">
+								<span className="text-[10px] sm:text-xs font-bold text-slate-400 capitalize tracking-wide group-hover:text-fuchsia-400 transition-colors">
 									{type}
 								</span>
 							</label>
@@ -611,7 +606,7 @@ const RegisterModalContent = ({
 								/>
 							</div>
 
-							<span className="text-sm sm:text-xs md:text-base font-bold text-slate-500 uppercase tracking-wide leading-normal">
+							<span className="text-[10px] sm:text-xs md:text-sm font-bold text-slate-500 uppercase tracking-wide leading-normal">
 								I AGREE TO THE{" "}
 								<button
 									type="button"
@@ -625,7 +620,7 @@ const RegisterModalContent = ({
 					</div>
 				)}
 
-				<div className="space-y-4 pt-2 border-t border-white/5">
+				<footer className="space-y-4 pt-2 border-t border-white/5">
 					<GradientButton
 						label={
 							isLoading
@@ -636,12 +631,11 @@ const RegisterModalContent = ({
 						}
 						type="submit"
 						isLoading={isLoading}
-						className="w-full text-xs sm:text-sm tracking-widest font-black"
+						className="w-full text-[10px] sm:text-xs md:text-sm tracking-widest font-black"
 					/>
 
 					{mode !== "edit" && (
-						<div className="flex justify-center items-center gap-1.5 text-sm md:text-base sm:text-xs text-slate-600 font-bold uppercase tracking-wide">
-							<ShieldAlert size={11} className="text-slate-700" />
+						<div className="flex justify-center items-center gap-1.5 text-[10px] sm:text-xs md:text-sm text-slate-600 font-bold uppercase tracking-wide">
 							<AuthFooter
 								label="Back to Login"
 								onClick={onSwitchToLogin}
@@ -649,7 +643,7 @@ const RegisterModalContent = ({
 							/>
 						</div>
 					)}
-				</div>
+				</footer>
 			</form>
 		</div>
 	);

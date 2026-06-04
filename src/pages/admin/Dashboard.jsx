@@ -180,7 +180,7 @@ export default function DashBoard() {
 					totalIncomingMessages: incomingMessages.active_support_messages ?? 0,
 				});
 			} catch (error) {
-				console.error("Failed to load dashboard stats:", error);
+				console.error("Failed to load dashboard statistics:", error);
 			}
 		};
 
@@ -188,11 +188,10 @@ export default function DashBoard() {
 	}, []);
 
 	return (
-		<div className="bg-[#07050e] p-4 sm:p-8 text-white font-mono selection:bg-purple-500 selection:text-black">
-			{/* Structural Semantic Header */}
+		<div className="bg-[#07050e] p-4 sm:p-6 md:p-8 text-white selection:bg-purple-500 selection:text-black">
 			<header className="border-b border-purple-500/20 pb-4 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 				<div>
-					<h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
+					<h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
 						TechTrade ZA{" "}
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-500">
 							Stats
@@ -201,11 +200,11 @@ export default function DashBoard() {
 				</div>
 			</header>
 
-			<main className="space-y-10">
+			<main className="space-y-8 md:space-y-10">
 				<section aria-labelledby="sec-marketplace">
 					<h2
 						id="sec-marketplace"
-						className="text-sm sm:text-base font-bold text-cyan-400 mb-4 tracking-widest uppercase border-l-2 border-cyan-500 pl-2"
+						className="text-xs sm:text-sm md:text-base font-bold text-cyan-400 mb-4 tracking-widest uppercase border-l-2 border-cyan-500 pl-2"
 					>
 						Marketplace Activity & Sales
 					</h2>
@@ -214,33 +213,32 @@ export default function DashBoard() {
 							label="Total Escrow in Vault"
 							value={data.totalEscrowValue}
 							icon={Landmark}
-							colorClass="text-emerald-400"
+							colorClass="text-emerald-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Active Listings"
 							value={data.totalListings}
 							icon={ShoppingBag}
-							colorClass="text-cyan-400"
+							colorClass="text-cyan-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Active Transactions"
 							value={data.totalTransactions}
 							icon={Activity}
-							colorClass="text-indigo-400"
+							colorClass="text-indigo-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Offers Active"
 							value={data.totalOffers}
 							icon={FileText}
-							colorClass="text-blue-400"
+							colorClass="text-blue-400 text-sm sm:text-base md:text-lg"
 						/>
 					</div>
 				</section>
-
 				<section aria-labelledby="sec-community">
 					<h2
 						id="sec-community"
-						className="text-sm sm:text-base font-bold text-purple-400 mb-4 tracking-widest uppercase border-l-2 border-purple-500 pl-2"
+						className="text-xs sm:text-sm md:text-base font-bold text-purple-400 mb-4 tracking-widest uppercase border-l-2 border-purple-500 pl-2"
 					>
 						User Profiles & Security
 					</h2>
@@ -249,25 +247,25 @@ export default function DashBoard() {
 							label="Total Members"
 							value={data.totalUsers}
 							icon={Users}
-							colorClass="text-purple-400"
+							colorClass="text-purple-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Avg Member Rating"
 							value={data.avgTrustScore}
 							icon={Percent}
-							colorClass="text-fuchsia-400"
+							colorClass="text-fuchsia-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Active Signed-In Devices"
 							value={data.currentSessions}
 							icon={Shield}
-							colorClass="text-purple-500"
+							colorClass="text-purple-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
-							label="Total Active OTP Codes"
+							label="Total Active Verification Codes"
 							value={data.pendingOTPs}
 							icon={Key}
-							colorClass="text-pink-500"
+							colorClass="text-pink-500 text-sm sm:text-base md:text-lg"
 						/>
 					</div>
 				</section>
@@ -275,7 +273,7 @@ export default function DashBoard() {
 				<section aria-labelledby="sec-moderation">
 					<h2
 						id="sec-moderation"
-						className="text-sm sm:text-base font-bold text-pink-500 mb-4 tracking-widest uppercase border-l-2 border-pink-500 pl-2"
+						className="text-xs sm:text-sm md:text-base font-bold text-pink-500 mb-4 tracking-widest uppercase border-l-2 border-pink-500 pl-2"
 					>
 						Complaints & Help Desk
 					</h2>
@@ -284,46 +282,44 @@ export default function DashBoard() {
 							label="Total Active Order Disputes"
 							value={data.totalDisputes}
 							icon={AlertOctagon}
-							colorClass="text-red-500 font-bold animate-pulse"
+							colorClass="text-red-500 font-bold animate-pulse text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Flagged User Profiles"
 							value={data.totalUserReports}
 							icon={Users}
-							colorClass="text-orange-400"
+							colorClass="text-orange-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Flagged Listings"
 							value={data.totalListingReports}
 							icon={ShoppingBag}
-							colorClass="text-amber-500"
+							colorClass="text-amber-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Flagged Reviews"
 							value={data.totalReviewReports}
 							icon={FileText}
-							colorClass="text-yellow-500"
+							colorClass="text-yellow-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Help Messages Received"
 							value={data.totalIncomingMessages}
 							icon={MessageSquare}
-							colorClass="text-teal-400"
+							colorClass="text-teal-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Custom User Builds"
 							value={data.totalUserBuilds}
 							icon={Layout}
-							colorClass="text-sky-400"
+							colorClass="text-sky-400 text-sm sm:text-base md:text-lg"
 						/>
 					</div>
 				</section>
-
-				{/* SECTION 4: HARDWARE DATABASE CATALOGUE */}
 				<section aria-labelledby="sec-hardware">
 					<h2
 						id="sec-hardware"
-						className="text-sm sm:text-base font-bold text-amber-400 mb-4 tracking-widest uppercase border-l-2 border-amber-500 pl-2"
+						className="text-xs sm:text-sm md:text-base font-bold text-amber-400 mb-4 tracking-widest uppercase border-l-2 border-amber-500 pl-2"
 					>
 						Hardware Catalogue Directory
 					</h2>
@@ -332,79 +328,79 @@ export default function DashBoard() {
 							label="Total Hardware Stored in Database"
 							value={data.totalHardwareCount}
 							icon={Layers}
-							colorClass="text-amber-400"
+							colorClass="text-amber-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Total Categories"
 							value={data.totalCategories}
 							icon={Box}
-							colorClass="text-yellow-500"
+							colorClass="text-yellow-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Graphics Cards"
 							value={data.totalGPUs}
 							icon={Cpu}
-							colorClass="text-orange-500"
+							colorClass="text-orange-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Processors"
 							value={data.totalCPUs}
 							icon={Cpu}
-							colorClass="text-red-400"
+							colorClass="text-red-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Motherboards"
 							value={data.totalMotherboards}
 							icon={Radio}
-							colorClass="text-amber-500"
+							colorClass="text-amber-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Power Supply Units"
 							value={data.totalPSUs}
 							icon={Shield}
-							colorClass="text-yellow-600"
+							colorClass="text-yellow-600 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
-							label="System Memory sticks"
+							label="System Memory Sticks"
 							value={data.totalRAM}
 							icon={Layers}
-							colorClass="text-lime-400"
+							colorClass="text-lime-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Liquid System Coolers"
 							value={data.totalAIOs}
 							icon={Disc}
-							colorClass="text-cyan-400"
+							colorClass="text-cyan-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Air System Coolers"
 							value={data.totalAirCoolers}
 							icon={Disc}
-							colorClass="text-blue-300"
+							colorClass="text-blue-300 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Case Cooling Fans"
 							value={data.totalCaseFans}
 							icon={Radio}
-							colorClass="text-teal-300"
+							colorClass="text-teal-300 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Solid State Drives"
 							value={data.totalSSDs}
 							icon={HardDrive}
-							colorClass="text-emerald-400"
+							colorClass="text-emerald-400 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Hard Disk Drives"
 							value={data.totalHDDs}
 							icon={HardDrive}
-							colorClass="text-green-500"
+							colorClass="text-green-500 text-sm sm:text-base md:text-lg"
 						/>
 						<DashBoardCard
 							label="Computer PC Cases"
 							value={data.totalPCCases}
 							icon={Box}
-							colorClass="text-amber-600"
+							colorClass="text-amber-600 text-sm sm:text-base md:text-lg"
 						/>
 					</div>
 				</section>
