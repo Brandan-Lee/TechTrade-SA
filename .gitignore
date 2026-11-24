@@ -11,6 +11,45 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+
+# Local credentials and private keys
+**/.npmrc
+!**/.npmrc.example
+**/credentials/
+**/secrets/
+credentials.json
+*-credentials.json
+service-account*.json
+client_secret*.json
+*.secret
+*.secrets
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.ppk
+id_rsa
+id_ed25519
+id_ecdsa
+*.tfstate
+*.tfstate.*
+
+# Runtime data and local database backups
+**/uploads/
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.bak
+*.backup
 
 # Editor directories and files
 .vscode/*

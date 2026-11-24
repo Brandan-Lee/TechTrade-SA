@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+	themes: techtrade --default;
+}
+
+@plugin "daisyui/theme" {
+	name: "techtrade";
+	default: true;
+	color-scheme: dark;
+	--color-base-100: #0b0712;
+	--color-base-200: #140d1e;
+	--color-base-300: #211431;
+	--color-base-content: #f3edfa;
+	--color-primary: #c084fc;
+	--color-primary-content: #1b0b2b;
+	--color-secondary: #7c3aed;
+	--color-secondary-content: #ffffff;
+	--color-accent: #d8b4fe;
+	--color-accent-content: #2e1065;
+	--color-neutral: #140d1e;
+	--color-neutral-content: #f3edfa;
+	--color-info: #a78bfa;
+	--color-success: #8ee6a1;
+	--color-warning: #ffd166;
+	--color-error: #ff8291;
+	--radius-selector: 0.625rem;
+	--radius-field: 0.875rem;
+	--radius-box: 1.25rem;
+	--border: 1px;
+	--depth: 1;
+	--noise: 0;
+}
+
+:root {
+	font-family:
+		Inter, "Avenir Next", Avenir, "Segoe UI", sans-serif;
+	color: var(--color-base-content);
+	background: var(--color-base-100);
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	scroll-behavior: smooth;
+	color-scheme: dark;
+}
+
+body {
+	min-width: 320px;
+	min-height: 100vh;
+	margin: 0;
+	background:
+		radial-gradient(ellipse at 50% -40%, rgb(124 58 237 / 8%), transparent 58%),
+		var(--color-base-100);
+}
+
+button:not(:disabled) {
+	cursor: pointer;
+}
+
+@layer components {
+	.page-container {
+		@apply mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8;
+	}
+
+	.page-title {
+		@apply text-3xl font-semibold tracking-tight text-white sm:text-4xl;
+	}
+
+	.page-description {
+		@apply mt-2 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base;
+	}
+
+	.page-eyebrow {
+		@apply text-xs font-semibold tracking-[0.12em] text-primary;
+	}
+
+	.surface-card {
+		@apply rounded-2xl border border-white/[0.08] bg-base-200/80 shadow-sm;
+	}
+
+	.brand-glow {
+		background-image:
+			radial-gradient(ellipse at 72% 32%, rgb(192 132 252 / 14%), transparent 35%),
+			radial-gradient(ellipse at 14% 80%, rgb(124 58 237 / 12%), transparent 38%);
+	}
+}
+
+::selection {
+	color: var(--color-primary-content);
+	background: var(--color-primary);
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 3px;
+}
+
+button,
+a {
+	-webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+@keyframes shake {
+	10%,
+	90% {
+		transform: translate3d(-1px, 0, 0);
+	}
+	20%,
+	80% {
+		transform: translate3d(2px, 0, 0);
+	}
+	30%,
+	50%,
+	70% {
+		transform: translate3d(-4px, 0, 0);
+	}
+	40%,
+	60% {
+		transform: translate3d(4px, 0, 0);
+	}
+}
+
+@utility animate-shake {
+	animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+	width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background-color: var(--color-primary);
+	border-radius: 10px;
+}
